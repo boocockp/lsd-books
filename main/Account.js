@@ -2,7 +2,7 @@ const {Record} = require('immutable'),
     // Books = require('./Books'),
     {CREDIT} = require('./Types').DebitCredit;
 
-class Account extends Record({name: null, code: null, type: null}) {
+class Account extends Record({id: null, name: null, code: null, type: null}) {
 
     constructor(data = {}) {
         super(data);
