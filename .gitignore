@@ -1,5 +1,5 @@
 .idea/
 *.iml
 node_modules
-main/appMain.bundle.js
+main/app/appMain.bundle.js
 
