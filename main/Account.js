@@ -1,4 +1,5 @@
 const {Record} = require('immutable'),
+    JsonUtil = require('../shared/modules/json/JsonUtil'),
     // Books = require('./Books'),
     {CREDIT} = require('./Types').DebitCredit;
 
@@ -28,6 +29,11 @@ class Account extends Record({id: null, name: null, code: null, type: null}) {
         return this.signedBalance > 0 ? this.signedBalance : null;
     }
 
+    toJSON() {
+        return Object.assign(super.toJSON(), {"@type": this.constructor.name});
+    }
+
 }
 
+JsonUtil.registerClass(Account);
 module.exports = Account;

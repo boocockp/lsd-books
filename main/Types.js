@@ -1,4 +1,5 @@
-const _ = require('lodash');
+const _ = require('lodash'),
+    JsonUtil = require('../shared/modules/json/JsonUtil');
 
 function enumValues(clazz, ...enumArgs) {
     for(const n of enumArgs) {
@@ -9,20 +10,22 @@ function enumValues(clazz, ...enumArgs) {
 
 class DebitCredit {
 
-    static toStoreJson(obj) {
-        return {name: obj.name};
-    }
-
     constructor(name) {
         this.name = name;
     }
     toString() {
         return this.name;
     }
+    toJSON() {
+        return {"@type": this.constructor.name, name: this.name};
+    }
+
 }
 enumValues(DebitCredit, 'DEBIT', 'CREDIT');
 
 const {DEBIT, CREDIT} = DebitCredit;
+JsonUtil.registerClass(DebitCredit);
+
 
 class AccountType {
     static toStoreJson(obj) {
@@ -40,6 +43,12 @@ class AccountType {
 
     get isAsset() { return this === AccountType.FIXED_ASSET || this === AccountType.CURRENT_ASSET}
     get isLiability() { return this === AccountType.LONG_TERM_LIABILITY || this === AccountType.CURRENT_LIABILITY}
+
+    toJSON() {
+        return {"@type": this.constructor.name, name: this.name};
+    }
+
+
 }
 
 enumValues(AccountType,
@@ -50,5 +59,8 @@ enumValues(AccountType,
     ['CAPITAL', CREDIT],
     ['EXPENSE', DEBIT],
     ['REVENUE', CREDIT]);
+
+JsonUtil.registerClass(AccountType);
+
 
 module.exports = {DebitCredit, AccountType};

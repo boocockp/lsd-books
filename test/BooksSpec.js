@@ -6,7 +6,7 @@ let chai = require('chai'),
     Posting = require('../main/Posting'),
     // Memoize = require('../../shared/modules/memoize/Memoize'),
     // Observe = require('../../shared/modules/observe/Observe'),
-    // JsonUtil = require('../../shared/modules/json/JsonUtil'),
+    JsonUtil = require('../shared/modules/json/JsonUtil'),
     {DEBIT, CREDIT} = require('../main/Types').DebitCredit,
     {FIXED_ASSET, CURRENT_ASSET, LONG_TERM_LIABILITY, CURRENT_LIABILITY, CAPITAL, EXPENSE, REVENUE} = require('../main/Types').AccountType;
 
@@ -147,19 +147,19 @@ describe("Books", function () {
         });
     });
 
-    describe.skip("Json", function () {
+    describe("Json", function () {
         it("can be serialized to JSON and deserialized", function () {
             dcTransaction(date1, 100, a, b);
             transaction(date2, debit(a, 200, c, 50), credit(b, 200, d, 50));
 
             const json = JsonUtil.toStore(books);
-            // console.log("json", json);
+            console.log("json", json);
             const newBooks = JsonUtil.fromStore(json);
-            // console.log("newBooks", newBooks);
+            console.log("newBooks", newBooks);
 
-            newBooks.accountsByName.map(it => it.signedBalance).should.eql([300, -50, 50, -300]);
-            newBooks.accountsByName.map(it => it.debitBalance).should.eql([null, 50, null, 300]);
-            newBooks.accountsByName.map(it => it.creditBalance).should.eql([300, null, 50, null]);
+            newBooks.accountViewsByName().map(it => it.signedBalance).should.jsEql([300, -50, 50, -300]);
+            newBooks.accountViewsByName().map(it => it.debitBalance).should.jsEql([null, 50, null, 300]);
+            newBooks.accountViewsByName().map(it => it.creditBalance).should.jsEql([300, null, 50, null]);
         });
 
     });

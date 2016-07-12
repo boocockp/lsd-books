@@ -1,4 +1,5 @@
-const {Record, List} = require('immutable');
+const {Record, List} = require('immutable'),
+    JsonUtil = require('../shared/modules/json/JsonUtil');
 
 class Transaction extends Record({date: null, description: null, postings: new List()}) {
 
@@ -6,6 +7,11 @@ class Transaction extends Record({date: null, description: null, postings: new L
         super({date, description, postings: new List(postings)});
     }
 
+    toJSON() {
+        return Object.assign(super.toJSON(), {"@type": this.constructor.name});
+    }
+
 }
 
+JsonUtil.registerClass(Transaction);
 module.exports = Transaction;

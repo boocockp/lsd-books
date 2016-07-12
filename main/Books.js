@@ -3,7 +3,7 @@ let _instance;
 const 
     // Memoize = require('../../shared/modules/memoize/Memoize'),
     // Observe = require('../../shared/modules/observe/Observe'),
-    // JsonUtil = require('../../shared/modules/json/JsonUtil'),
+    JsonUtil = require('../shared/modules/json/JsonUtil'),
     {Record, List, Map} = require('immutable'),
     Account = () => require('./Account'),
     AccountAsAt = require('./AccountAsAt')
@@ -17,14 +17,6 @@ class Books extends Record({accounts: new Map(), transactions: new List()}) {
         return _instance || (_instance = new Books());
     }
     
-    static toStoreJson(obj) {
-        return {accounts: obj._accounts, transactions: obj._transactions};
-    }
-
-    static fromStoreJson(data) {
-        return Object.assign(new Books(), {_accounts: data.accounts, _transactions: data.transactions} )
-    }
-
     constructor() {
         super();
     }
@@ -89,7 +81,12 @@ class Books extends Record({accounts: new Map(), transactions: new List()}) {
         // Observe.dataChanged();
     }
 
+    toJSON() {
+        return Object.assign(super.toJSON(), {"@type": this.constructor.name});
+    }
+
+
 }
 
-
+JsonUtil.registerClass(Books);
 module.exports = Books;
