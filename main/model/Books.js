@@ -3,7 +3,7 @@ let _instance;
 const 
     // Memoize = require('../../shared/modules/memoize/Memoize'),
     // Observe = require('../../shared/modules/observe/Observe'),
-    JsonUtil = require('../shared/modules/json/JsonUtil'),
+    JsonUtil = require('../../shared/modules/json/JsonUtil'),
     {Record, List, Map} = require('immutable'),
     Account = () => require('./Account'),
     AccountAsAt = require('./AccountAsAt'),

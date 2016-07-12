@@ -1,5 +1,5 @@
 const _ = require('lodash'),
-    JsonUtil = require('../shared/modules/json/JsonUtil');
+    JsonUtil = require('../../shared/modules/json/JsonUtil');
 
 function enumValues(clazz, ...enumArgs) {
     for(const n of enumArgs) {

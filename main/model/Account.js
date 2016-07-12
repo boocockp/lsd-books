@@ -1,5 +1,5 @@
 const {Record} = require('immutable'),
-    JsonUtil = require('../shared/modules/json/JsonUtil'),
+    JsonUtil = require('../../shared/modules/json/JsonUtil'),
     // Books = require('./Books'),
     {CREDIT} = require('./Types').DebitCredit;
 

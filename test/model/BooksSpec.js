@@ -1,15 +1,15 @@
 let chai = require('chai'),
     chaiSubset = require('chai-subset'),
     _ = require('lodash'),
-    Books = require('../main/Books'),
-    Account = require('../main/Account'),
-    Transaction = require('../main/Transaction'),
-    Posting = require('../main/Posting'),
+    Books = require('../../main/model/Books'),
+    Account = require('../../main/model/Account'),
+    Transaction = require('../../main/model/Transaction'),
+    Posting = require('../../main/model/Posting'),
     // Memoize = require('../../shared/modules/memoize/Memoize'),
     // Observe = require('../../shared/modules/observe/Observe'),
-    JsonUtil = require('../shared/modules/json/JsonUtil'),
-    {DEBIT, CREDIT} = require('../main/Types').DebitCredit,
-    {FIXED_ASSET, CURRENT_ASSET, LONG_TERM_LIABILITY, CURRENT_LIABILITY, CAPITAL, EXPENSE, REVENUE} = require('../main/Types').AccountType;
+    JsonUtil = require('../../shared/modules/json/JsonUtil'),
+    {DEBIT, CREDIT} = require('../../main/model/Types').DebitCredit,
+    {FIXED_ASSET, CURRENT_ASSET, LONG_TERM_LIABILITY, CURRENT_LIABILITY, CAPITAL, EXPENSE, REVENUE} = require('../../main/model/Types').AccountType;
 
 chai.should();
 chai.use(chaiSubset);
