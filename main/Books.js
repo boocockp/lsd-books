@@ -6,8 +6,8 @@ const
     JsonUtil = require('../shared/modules/json/JsonUtil'),
     {Record, List, Map} = require('immutable'),
     Account = () => require('./Account'),
-    AccountAsAt = require('./AccountAsAt')
-    // TrialBalance = require('./TrialBalance'),
+    AccountAsAt = require('./AccountAsAt'),
+    TrialBalance = require('./TrialBalance')
     // BalanceSheet = require('./BalanceSheet')
     ;
 

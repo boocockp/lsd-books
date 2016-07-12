@@ -164,20 +164,21 @@ describe("Books", function () {
 
     });
 
-    describe.skip("trial balance", function () {
+    describe("trial balance", function () {
 
         it("has accounts with non-zero balances and debit totals", function () {
-            const tb = books.trialBalance;
 
             transaction(date1, debit(a, 100), credit(b, 100));
 
-            tb.accounts.should.eql([b, a]);
+            let tb = books.trialBalance;
+            tb.accounts.map(it => it.name).should.jsEql([b.name, a.name]);
             tb.debitTotal.should.eql(100);
             tb.creditTotal.should.eql(100);
 
             transaction(date2, debit(a, 200, c, 50), credit(b, 200, d, 50));
 
-            tb.accounts.should.eql([c, b, a, d]);
+            tb = books.trialBalance;
+            tb.accounts.map(it => it.name).should.jsEql([c, b, a, d].map(it => it.name));
             tb.debitTotal.should.eql(350);
             tb.creditTotal.should.eql(350);
 
