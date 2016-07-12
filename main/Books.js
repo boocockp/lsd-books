@@ -7,8 +7,8 @@ const
     {Record, List, Map} = require('immutable'),
     Account = () => require('./Account'),
     AccountAsAt = require('./AccountAsAt'),
-    TrialBalance = require('./TrialBalance')
-    // BalanceSheet = require('./BalanceSheet')
+    TrialBalance = require('./TrialBalance'),
+    BalanceSheet = require('./BalanceSheet')
     ;
 
 class Books extends Record({accounts: new Map(), transactions: new List()}) {
@@ -38,9 +38,13 @@ class Books extends Record({accounts: new Map(), transactions: new List()}) {
         return this.accounts.toList().sortBy( it => it.name);
     }
 
-    accountViewsByName(fromDate = 0, toDate = Number.MAX_SAFE_INTEGER) {
+    accountViews(fromDate = 0, toDate = Number.MAX_SAFE_INTEGER) {
         const postings = (acct) => this.postingsForAccount(acct, fromDate, toDate);
-        return this.accountsByName.map( it => new AccountAsAt(it, postings(it)) );
+        return this.accounts.toList().map( it => new AccountAsAt(it, postings(it)) );
+    }
+
+    accountViewsByName(fromDate = 0, toDate = Number.MAX_SAFE_INTEGER) {
+        return this.accountViews(fromDate, toDate).sortBy( x => x.name);
     }
 
     account(id) {
@@ -76,15 +80,9 @@ class Books extends Record({accounts: new Map(), transactions: new List()}) {
         return Books.instance
     };
 
-    dataChanged() {
-        // Memoize.dataChanged();
-        // Observe.dataChanged();
-    }
-
     toJSON() {
         return Object.assign(super.toJSON(), {"@type": this.constructor.name});
     }
-
 
 }
 

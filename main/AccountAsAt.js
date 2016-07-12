@@ -8,6 +8,7 @@ module.exports = class AccountAsAt {
     constructor(account, postings) {
         this.account = account;
         this.postings = postings;
+        this.id = account.id;
         this.name = account.name;
         this.code = account.code;
         this.type = account.type;

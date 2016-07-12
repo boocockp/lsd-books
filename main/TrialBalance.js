@@ -1,19 +1,13 @@
-function sum(acc, val) {
-    return (acc === undefined ? 0 : acc) + val;
-}
-
-function prop(propertyName) {
-    return it => it[propertyName];
-}
+const {sum, prop} = require('./FunctionHelpers');
 
 module.exports = class TrialBalance {
     
     constructor(books) {
-        this._books = books;
+        this.books = books;
     }
     
     get accounts() {
-        return this._books.accountViewsByName().filter( it => it.signedBalance !== 0 ).sortBy(prop('code'));
+        return this.books.accountViewsByName().filter(it => it.signedBalance !== 0 ).sortBy(prop('code'));
     }
 
     get debitTotal() {

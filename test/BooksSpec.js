@@ -1,4 +1,5 @@
 let chai = require('chai'),
+    chaiSubset = require('chai-subset'),
     _ = require('lodash'),
     Books = require('../main/Books'),
     Account = require('../main/Account'),
@@ -11,26 +12,7 @@ let chai = require('chai'),
     {FIXED_ASSET, CURRENT_ASSET, LONG_TERM_LIABILITY, CURRENT_LIABILITY, CAPITAL, EXPENSE, REVENUE} = require('../main/Types').AccountType;
 
 chai.should();
-
-function trackChanges(valueFn) {
-    if (typeof valueFn != 'function') {
-        throw new Error('trackChanges must be given a function');
-    }
-    const theChanges = [];
-    Observe.onChange(() => theChanges.push(valueFn()));
-
-    return {
-        get latest() {
-            return theChanges.slice(-1)[0]
-        },
-        get count() {
-            return theChanges.length
-        },
-        get all() {
-            return theChanges
-        }
-    }
-}
+chai.use(chaiSubset);
 
 function jsEqual(chai, utils) {
     var Assertion = chai.Assertion;
@@ -40,7 +22,16 @@ function jsEqual(chai, utils) {
     });
 }
 
+function jsMatch(chai, utils) {
+    var Assertion = chai.Assertion;
+
+    Assertion.addMethod('jsMatch', function (expected) {
+        new Assertion(this._obj.toJS()).to.containSubset(expected);
+    });
+}
+
 chai.use(jsEqual);
+chai.use(jsMatch);
 
 function credit(...acctsAmounts) {
     const type = CREDIT;
@@ -153,9 +144,9 @@ describe("Books", function () {
             transaction(date2, debit(a, 200, c, 50), credit(b, 200, d, 50));
 
             const json = JsonUtil.toStore(books);
-            console.log("json", json);
+            // console.log("json", json);
             const newBooks = JsonUtil.fromStore(json);
-            console.log("newBooks", newBooks);
+            // console.log("newBooks", newBooks);
 
             newBooks.accountViewsByName().map(it => it.signedBalance).should.jsEql([300, -50, 50, -300]);
             newBooks.accountViewsByName().map(it => it.debitBalance).should.jsEql([null, 50, null, 300]);
@@ -171,36 +162,36 @@ describe("Books", function () {
             transaction(date1, debit(a, 100), credit(b, 100));
 
             let tb = books.trialBalance;
-            tb.accounts.map(it => it.name).should.jsEql([b.name, a.name]);
+            tb.accounts.should.jsMatch([b, a]);
             tb.debitTotal.should.eql(100);
             tb.creditTotal.should.eql(100);
 
             transaction(date2, debit(a, 200, c, 50), credit(b, 200, d, 50));
 
             tb = books.trialBalance;
-            tb.accounts.map(it => it.name).should.jsEql([c, b, a, d].map(it => it.name));
+            tb.accounts.should.jsMatch([c, b, a, d]);
             tb.debitTotal.should.eql(350);
             tb.creditTotal.should.eql(350);
 
         });
     });
 
-    describe.skip("balance sheet", function () {
+    describe("balance sheet", function () {
         it("has amounts in correct categories sorted by code", function () {
             const
                 faFurniture = account("Furniture", "5557", FIXED_ASSET),
                 faMachines = account("Machines", "5554", FIXED_ASSET),
                 capital = account("Capital", "4000", CAPITAL);
 
-            const bs = books.balanceSheet(date2);
             dcTransaction(date1, 100, faMachines, capital);
             dcTransaction(date1, 75, faFurniture, capital);
             dcTransaction(date2, 150, faFurniture, capital);
 
-            bs.fixedAssets.accounts.map( it => [it.name, it.balance]).should.eql( [["Machines", 100], ["Furniture", 225]]);
+            const bs = books.balanceSheet(date2);
+            bs.fixedAssets.accounts.map( it => [it.name, it.balance]).should.jsEql( [["Machines", 100], ["Furniture", 225]]);
             bs.fixedAssets.total.should.eql(325);
 
-            bs.capitalReserves.accounts.map( it => [it.name, it.balance]).should.eql( [["Capital", 325]]);
+            bs.capitalReserves.accounts.map( it => [it.name, it.balance]).should.jsEql( [["Capital", 325]]);
             bs.capitalReserves.total.should.eql(325);
 
         });
@@ -210,18 +201,12 @@ describe("Books", function () {
             const fa2 = account("Furniture", "5556", FIXED_ASSET);
             const cap = account("Capital", "4000", CAPITAL);
 
+            transaction(date1, debit(fa1, 100), credit(cap, 100));
+            transaction(date2, debit(fa2, 200), credit(cap, 200));
+
             const bs1 = books.balanceSheet(date1);
             const bs2 = books.balanceSheet(date2);
 
-            transaction(date1, debit(fa1, 100), credit(cap, 100));
-
-            bs1.fixedAssets.total.should.eql(100);
-            bs1.capitalReserves.total.should.eql(100);
-
-            bs2.fixedAssets.total.should.eql(100);
-            bs2.capitalReserves.total.should.eql(100);
-
-            transaction(date2, debit(fa2, 200), credit(cap, 200));
             bs1.fixedAssets.total.should.eql(100);
             bs1.capitalReserves.total.should.eql(100);
 
