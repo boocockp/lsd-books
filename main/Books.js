@@ -5,12 +5,13 @@ const
     // Observe = require('../../shared/modules/observe/Observe'),
     // JsonUtil = require('../../shared/modules/json/JsonUtil'),
     {Record, List, Map} = require('immutable'),
-    Account = () => require('./Account')
+    Account = () => require('./Account'),
+    AccountAsAt = require('./AccountAsAt')
     // TrialBalance = require('./TrialBalance'),
     // BalanceSheet = require('./BalanceSheet')
     ;
 
-class Books extends Record({accounts: new Map()}) {
+class Books extends Record({accounts: new Map(), transactions: new List()}) {
     
     static get instance() {
         return _instance || (_instance = new Books());
@@ -33,19 +34,21 @@ class Books extends Record({accounts: new Map()}) {
         return this.setIn(['accounts', account.id], account);
     }
 
-    updateAccount(code, details) {
-        let acc = this.accountByCode(code);
-        Object.assign(acc, details);
-        this.dataChanged();
+    updateAccount(id, data) {
+        return this.mergeIn(['accounts', id], data);
     }
     
     addTransaction(transaction) {
-        this._transactions.push(transaction);
-        this.dataChanged();
+        return this.update('transactions', l => l.push(transaction));
     }
     
     get accountsByName() {
         return this.accounts.toList().sortBy( it => it.name);
+    }
+
+    accountViewsByName(fromDate = 0, toDate = Number.MAX_SAFE_INTEGER) {
+        const postings = (acct) => this.postingsForAccount(acct, fromDate, toDate);
+        return this.accountsByName.map( it => new AccountAsAt(it, postings(it)) );
     }
 
     account(id) {
@@ -64,8 +67,8 @@ class Books extends Record({accounts: new Map()}) {
         function inDates(transaction) {
             return transaction.date >= fromDate && transaction.date <= toDate;
         }
-        let postingLists = this._transactions.filter(inDates).map( t => t.postings.filter( p => p.accountCode == acct.code ));
-        return [].concat(...postingLists);
+        let postingLists = this.transactions.filter(inDates).map( t => t.postings.filter( p => p.accountId == acct.id ));
+        return postingLists.flatten(1);
     }
 
     get trialBalance() {

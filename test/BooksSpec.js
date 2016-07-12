@@ -2,8 +2,8 @@ let chai = require('chai'),
     _ = require('lodash'),
     Books = require('../main/Books'),
     Account = require('../main/Account'),
-    // Transaction = require('../../main/model/Transaction'),
-    // Posting = require('../../main/model/Posting'),
+    Transaction = require('../main/Transaction'),
+    Posting = require('../main/Posting'),
     // Memoize = require('../../shared/modules/memoize/Memoize'),
     // Observe = require('../../shared/modules/observe/Observe'),
     // JsonUtil = require('../../shared/modules/json/JsonUtil'),
@@ -32,16 +32,26 @@ function trackChanges(valueFn) {
     }
 }
 
+function jsEqual(chai, utils) {
+    var Assertion = chai.Assertion;
+
+    Assertion.addMethod('jsEql', function (expected) {
+        new Assertion(this._obj.toJS()).to.eql(expected);
+    });
+}
+
+chai.use(jsEqual);
+
 function credit(...acctsAmounts) {
     const type = CREDIT;
     const acctAmountPairs = _.chunk(acctsAmounts, 2);
-    return acctAmountPairs.map( ([acct, amount]) => new Posting(acct.code, type, amount));
+    return acctAmountPairs.map( ([acct, amount]) => new Posting(acct.id, type, amount));
 }
 
 function debit(...acctsAmounts) {
     const type = DEBIT;
     const acctAmountPairs = _.chunk(acctsAmounts, 2);
-    return acctAmountPairs.map( ([acct, amount]) => new Posting(acct.code, type, amount));
+    return acctAmountPairs.map( ([acct, amount]) => new Posting(acct.id, type, amount));
 }
 
 
@@ -53,7 +63,7 @@ describe("Books", function () {
     let books, a, b, c, d;
 
     function transaction(date, debits, credits) {
-        books.addTransaction(new Transaction(date, "Transaction " + (transaction.seqNo++), debits.concat(credits)));
+        books = books.addTransaction(new Transaction(date, "Transaction " + (transaction.seqNo++), debits.concat(credits)));
     }
     transaction.seqNo = 0;
 
@@ -81,110 +91,59 @@ describe("Books", function () {
 
     describe("Books object", function () {
         it("gets account by id now", function () {
-            books.account(a.id).toJS().should.eql(a);
+            books.account(a.id).should.jsEql(a);
         });
 
         it("knows accounts by name now", function () {
-            books.accountsByName.toJS().should.eql([b, c, d, a]);
+            books.accountsByName.should.jsEql([b, c, d, a]);
         });
 
         it("gets accounts by type sorted by code now", function () {
-            books.accountsOfType(EXPENSE).toJS().should.eql([c, a, d]);
+            books.accountsOfType(EXPENSE).should.jsEql([c, a, d]);
         });
 
         it("gets account by code now", function () {
-            books.accountByCode("2222").toJS().should.eql(b);
+            books.accountByCode("2222").should.jsEql(b);
         });
     });
 
-    describe.skip("books object with changing data", function () {
+    describe("books object with changing data", function () {
+        it("updates account from partial data", function () {
+            books = books.updateAccount(b.id, {name: "Water"});
+            books.account(b.id).should.jsEql(_.merge({}, b, {name: "Water"}));
+        });
         it("re-sorts accounts when names change", function () {
-            const accountListChanges = trackChanges(() => books.accountsByName);
-            books.updateAccount(b.code, {name: "Water"});
-            accountListChanges.latest.should.eql([c, d, a, b]);
+            books = books.updateAccount(b.id, {name: "Water"});
+            books.accountsByName.should.jsEql([c, d, a, _.merge({}, b, {name: "Water"})]);
         });
     });
 
-    describe.skip("Books object with transactions", function () {
+    describe("Books object with transactions", function () {
         it("knows account balances and debit and credit balances", function () {
             dcTransaction(date1, 100, a, b);
             transaction(date2, debit(a, 200, c, 50), credit(b, 200, d, 50));
 
-            books.accountsByName.map(it => it.signedBalance).should.eql([300, -50, 50, -300]);
-            books.accountsByName.map(it => it.debitBalance).should.eql([null, 50, null, 300]);
-            books.accountsByName.map(it => it.creditBalance).should.eql([300, null, 50, null]);
+            books.accountViewsByName().map(it => it.signedBalance).should.jsEql([300, -50, 50, -300]);
+            books.accountViewsByName().map(it => it.debitBalance).should.jsEql([null, 50, null, 300]);
+            books.accountViewsByName().map(it => it.creditBalance).should.jsEql([300, null, 50, null]);
         });
 
-        it("notifies updates to individual account balance", function () {
+        it("knows updates to individual account names", function () {
+            books = books.updateAccount(a.id, {name: "Travel Expenses"})
+                         .updateAccount(b.id, {name: "Entertainment"});
 
-            const changesA = trackChanges(() => books.accountByCode(a.code).signedBalance);
-            const changesB = trackChanges(() => books.accountByCode(b.code).signedBalance);
+            books.account(a.id).name.should.eql("Travel Expenses");
+            books.account(b.id).name.should.eql("Entertainment");
 
-            books.addTransaction(new Transaction(date1, "Day out", [
-                new Posting(a.code, DEBIT, 100),
-                new Posting(b.code, CREDIT, 100)
-            ]));
-
-            changesA.latest.should.eql(-100);
-            changesB.latest.should.eql(100);
-
-            books.addTransaction(new Transaction(date2, "Conference trip", [
-                new Posting(a.code, DEBIT, 200),
-                new Posting(b.code, CREDIT, 200),
-                new Posting(c.code, DEBIT, 50),
-                new Posting(d.code, CREDIT, 50)
-            ]));
-
-            changesA.latest.should.eql(-300);
-            changesB.latest.should.eql(300);
-        });
-
-        it("notifies updates to individual account names", function () {
-
-            const changesA = trackChanges(() => books.accountByCode(a.code).name);
-            const changesB = trackChanges(() => books.accountByCode(b.code).name);
-
-            books.updateAccount(a.code, {name: "Travel Expenses"});
-            books.updateAccount(b.code, {name: "Entertainment"});
-
-            changesA.latest.should.eql("Travel Expenses");
-            changesB.latest.should.eql("Entertainment");
-
-            books.updateAccount(b.code, {name: "Customer Ents"});
-            changesA.latest.should.eql("Travel Expenses");
-            changesB.latest.should.eql("Customer Ents");
-        });
-
-        it("notifies updates to any of the account balances", function () {
-
-            const changes = trackChanges(() => books.accountsByName.map(it => it.signedBalance));
-
-            books.addTransaction(new Transaction(date1, "Day out", [
-                new Posting(a.code, DEBIT, 100),
-                new Posting(b.code, CREDIT, 100)
-            ]));
-
-            changes.all.should.eql([[0, 0, 0, 0], [100, 0, 0, -100]]);
-
-            books.addTransaction(new Transaction(date2, "Conference trip", [
-                new Posting(a.code, DEBIT, 200),
-                new Posting(b.code, CREDIT, 200),
-                new Posting(c.code, DEBIT, 50),
-                new Posting(d.code, CREDIT, 50)
-            ]));
-
-            changes.all.should.eql([[0, 0, 0, 0], [100, 0, 0, -100], [300, -50, 50, -300]]);
-
-            // changes.latest.should.eql([300, -50, 50, -300]);
-            // changes.count.should.eql(3); // inc initial zero bals
-
+            books = books.updateAccount(b.id, {name: "Customer Ents"});
+            books.account(a.id).name.should.eql("Travel Expenses");
+            books.account(b.id).name.should.eql("Customer Ents");
         });
 
         it("returns same functional objects for each call", function () {
-            const nameA = books.accountByCode(a.code).name;
-            const nameA2 = books.accountByCode(a.code).name;
-            nameA.should.equal(nameA2);
-
+            const accA = books.accountByCode(a.code);
+            const accA2 = books.accountByCode(a.code);
+            accA.should.equal(accA2);
         });
     });
 
