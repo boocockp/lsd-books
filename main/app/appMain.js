@@ -1,23 +1,34 @@
+const React = require('react');
+const ReactDOM = require('react-dom');
 const {createStore} = require('redux');
 const {addAccount, UpdateAccount, AddTransaction} = require('./actions');
 const Books = require('../model/Books');
 const {booksReducer} = require('./reducers');
+const AccountList = require('../viewbuild/AccountList')
 
 const store = createStore(booksReducer);
-
 window.store = store;
+console.log("Initial state", store.getState())
 
-console.log(store.getState());
+const mainElement = React.createElement(AccountList, {})
+const renderedElement = ReactDOM.render(mainElement, document.getElementById('main'))
 
-// Every time the state changes, log it
+
+// Every time the state changes, log it and update list
 // Note that subscribe() returns a function for unregistering the listener
-let unsubscribe = store.subscribe(() =>
-    console.log(store.getState())
+let unsubscribe = store.subscribe(() => {
+        console.log(store.getState())
+        renderedElement.setState( {accounts: store.getState().accountsByName} )
+    }
 )
 
 // Dispatch some actions
-store.dispatch(addAccount({id: 1001, name: "Travel"}))
+store.dispatch(addAccount({id: 1001, name: "Travel", code: "4110"}))
+store.dispatch(addAccount({id: 1002, name: "Accommodation", code: "4120"}))
 
-// Stop listening to state updates
-unsubscribe()
+window.setTimeout( () => store.dispatch(addAccount({id: 1003, name: "Food", code: "4130"})), 2000)
+
+
+
+
 

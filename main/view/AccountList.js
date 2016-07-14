@@ -1,16 +1,26 @@
 const React = require('react')
 const {PropTypes} = require('react')
+const AccountListItem = require('./AccountListItem')
 
-const AccountList = ({accounts}) => (
-    <ul>
-        {accounts.map(acct =>
-            <AccountListItem
-                key={acct.id}
-                {...acct}
-            />
-        )}
-    </ul>
-)
+const AccountList = React.createClass({
+    getInitialState: function () {
+        return {accounts: []}
+    },
+
+    render: function () {
+        return (
+            <ul>
+                {this.state.accounts.map(acct =>
+                    <AccountListItem
+                        key={acct.id}
+                        name={acct.name}
+                        code={acct.code}
+                    />
+                )}
+            </ul>
+        )
+    }
+})
 
 // AccountList.propTypes = {
 //     todos: PropTypes.arrayOf(PropTypes.shape({
@@ -21,4 +31,4 @@ const AccountList = ({accounts}) => (
 //     onTodoClick: PropTypes.func.isRequired
 // }
 
-module.exports = {AccountList}
+module.exports = AccountList

@@ -1,9 +1,11 @@
 {
   "name": "reactbooks",
+  "description": "reactbooks",
   "version": "0.0.1",
   "scripts": {
-    "build-babel": "babel --presets es2015,react main/view/ --out-dir main/view/build/",
-    "build": "webpack main/app/appMain.js main/app/appMain.bundle.js",
+    "build-babel": "babel --presets es2015,react main/view/ --out-dir main/viewbuild/",
+    "build-webpack": "webpack main/app/appMain.js main/app/appMain.bundle.js",
+    "build": "npm run build-babel && npm run build-webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -19,5 +21,7 @@
     "chai": "^3.5.0",
     "chai-subset": "^1.2.2",
     "webpack": "^1.13.1"
-  }
+  },
+  "repository": "http://none",
+  "license": "none"
 }
