@@ -2,7 +2,7 @@ const {addAccount, updateAccount, addTransaction} = require('./actions');
 const Books = require('../model/Books');
 
 
-function booksReducer(state = new Books(), action) {
+function booksReducer(state, action) {
 
     switch(action.type) {
         case addAccount:
@@ -14,7 +14,8 @@ function booksReducer(state = new Books(), action) {
         case addTransaction:
             return state.addTransaction(action.transaction);
 
-
+        default:
+            return state
     }
 
 }

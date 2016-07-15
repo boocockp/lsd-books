@@ -1,16 +1,13 @@
 const React = require('react')
 const {PropTypes} = require('react')
 const AccountListItem = require('./AccountListItem')
+const {List} = require('immutable')
 
 const AccountList = React.createClass({
-    getInitialState: function () {
-        return {accounts: []}
-    },
-
     render: function () {
         return (
             <ul>
-                {this.state.accounts.map(acct =>
+                {this.props.accounts.map(acct =>
                     <AccountListItem
                         key={acct.id}
                         name={acct.name}
@@ -19,16 +16,15 @@ const AccountList = React.createClass({
                 )}
             </ul>
         )
+    },
+
+    getDefaultProps: function() {
+        return {accounts: []}
     }
 })
 
-// AccountList.propTypes = {
-//     todos: PropTypes.arrayOf(PropTypes.shape({
-//         id: PropTypes.number.isRequired,
-//         completed: PropTypes.bool.isRequired,
-//         text: PropTypes.string.isRequired
-//     }).isRequired).isRequired,
-//     onTodoClick: PropTypes.func.isRequired
-// }
+AccountList.propTypes = {
+    accounts: PropTypes.instanceOf(List).isRequired,
+}
 
 module.exports = AccountList

@@ -1,21 +1,16 @@
 const React = require('react')
 const {PropTypes} = require('react')
 
-const AccountListItem = React.createClass({
-    render: function () {
-        return (
-            <li >
-                {this.props.name} - {this.props.code}
-            </li>
-        )
-    }
-});
+const AccountListItem = ({name, code}) => (
+    <li >
+        {name} - {code}
+    </li>
+)
 
 
-// Todo.propTypes = {
-//     onClick: PropTypes.func.isRequired,
-//     completed: PropTypes.bool.isRequired,
-//     text: PropTypes.string.isRequired
-// }
+AccountListItem.propTypes = {
+    name: PropTypes.string.isRequired,
+    code: PropTypes.string.isRequired
+}
 
 module.exports = AccountListItem
