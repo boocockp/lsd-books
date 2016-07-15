@@ -6,12 +6,12 @@ const {List} = require('immutable')
 const AccountList = React.createClass({
     render: function () {
         return (
-            <ul>
+            <ul className="list-unstyled">
                 {this.props.accounts.map(acct =>
                     <AccountListItem
                         key={acct.id}
-                        name={acct.name}
-                        code={acct.code}
+                        account={acct}
+                        onClick={this.onClick.bind(this, acct)}
                     />
                 )}
             </ul>
@@ -20,11 +20,21 @@ const AccountList = React.createClass({
 
     getDefaultProps: function() {
         return {accounts: []}
+    },
+
+    onClick: function(acct) {
+        console.log('onClick', acct)
+
+        const onSelect = this.props.onSelect;
+        if (onSelect) {
+            onSelect(acct)
+        }
     }
 })
 
 AccountList.propTypes = {
     accounts: PropTypes.instanceOf(List).isRequired,
+    onSelect: PropTypes.func
 }
 
 module.exports = AccountList

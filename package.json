@@ -9,8 +9,10 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
+    "bootstrap": "^3.3.6",
     "immutable": "^3.8.1",
     "react": "^15.2.1",
+    "react-dom": "^15.2.1",
     "react-redux": "^4.4.5",
     "redux": "^3.5.2"
   },
@@ -23,5 +25,5 @@
     "webpack": "^1.13.1"
   },
   "repository": "http://none",
-  "license": "none"
+  "license": "UNLICENSED"
 }

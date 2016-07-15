@@ -1,5 +1,5 @@
 const { connect } = require('react-redux')
-const AccountList = require('./AccountList')
+const AccountListWithView = require('./AccountListWithView')
 
 const mapStateToProps = (state) => {
     return {
@@ -12,6 +12,6 @@ const mapDispatchToProps = () => ({})
 const VisibleAccountList = connect(
     mapStateToProps,
     mapDispatchToProps
-)(AccountList)
+)(AccountListWithView)
 
 module.exports = VisibleAccountList
