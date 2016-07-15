@@ -1,9 +1,11 @@
 const React = require('react')
+const { connect } = require('react-redux')
 const {PropTypes} = require('react')
 const Account = require('../model/Account')
 const FormItem = require('./FormItem')
+const {addAccount, updateAccount, addTransaction} = require('../app/actions')
 
-const AccountView = React.createClass({
+const accountViewClass = React.createClass({
     render: function () {
         this.formChanges = {}
         const acct = this.props.account;
@@ -29,8 +31,11 @@ const AccountView = React.createClass({
     onSave: function(e) {
         console.log('save', this.formChanges)
         e.preventDefault()
+        this.props.dispatch(updateAccount(this.props.account.id, this.formChanges))
     }
 })
+
+const AccountView = connect()(accountViewClass)
 
 AccountView.propTypes = {
     account: PropTypes.instanceOf(Account).isRequired,
