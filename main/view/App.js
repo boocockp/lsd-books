@@ -2,7 +2,8 @@ const React = require('react')
 const PersistentRouter = require('./PersistentRouter')
 const VisibleAccountList = require('./VisibleAccountList')
 const MainPage = require('./MainPage')
-const {Locations, Location} = require('react-router-component')
+const NotFoundPage = require('./NotFoundPage')
+const {Locations, Location, NotFound} = require('react-router-component')
 
 const App = () => (
     <div>
@@ -10,6 +11,8 @@ const App = () => (
         <PersistentRouter hash>
             <Location path="/" handler={MainPage}/>
             <Location path="/account" handler={VisibleAccountList}/>
+            <Location path="/account/:routedId" handler={VisibleAccountList}/>
+            <NotFound handler={NotFoundPage} />
         </PersistentRouter>
     </div>)
 

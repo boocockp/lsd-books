@@ -10,6 +10,7 @@ const AccountList = React.createClass({
             <ListGroup>
                 {this.props.accounts.map(acct =>
                     <ListGroupItem key={acct.id}
+                                   active={acct.id === this.props.selectedAccountId}
                                    onClick={this.onClick.bind(this, acct)}>
                         <AccountListItem account={acct} />
                     </ListGroupItem>
