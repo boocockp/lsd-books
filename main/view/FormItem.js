@@ -1,5 +1,6 @@
 const React = require('react')
 const {PropTypes} = require('react')
+const {FormGroup, ControlLabel, FormControl, HelpBlock} = require('react-bootstrap')
 
 const FormItem = React.createClass({
     getInitialState: function () {
@@ -15,12 +16,12 @@ const FormItem = React.createClass({
     render: function () {
         const fieldId = `id_${Math.floor(Math.random() * 1000000) + 1 }`
         return (
-            <div className="form-group">
-                <label htmlFor={fieldId}>Type</label>
-                <input type="text" className="form-control" id={fieldId} name={this.props.name} placeholder={this.props.placeholder}
-                       value={this.state.value}
-                       onChange={this.handleChange}/>
-            </div>
+            <FormGroup controlId={fieldId} >
+                <ControlLabel>{this.props.label}</ControlLabel>
+                <FormControl type="text" value={this.state.value} placeholder={this.props.placeholder} onChange={this.handleChange} />
+                <FormControl.Feedback />
+                {this.props.help ? <HelpBlock>{this.props.help}</HelpBlock> : ''}
+            </FormGroup>
         )
     },
 
@@ -37,7 +38,9 @@ const FormItem = React.createClass({
 
 FormItem.propTypes = {
     value: PropTypes.string,
+    label: PropTypes.string,
     placeholder: PropTypes.string,
+    help: PropTypes.string,
     onChange: PropTypes.func,
 }
 

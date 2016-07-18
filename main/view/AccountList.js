@@ -2,19 +2,19 @@ const React = require('react')
 const {PropTypes} = require('react')
 const AccountListItem = require('./AccountListItem')
 const {List} = require('immutable')
+const {ListGroup, ListGroupItem} = require('react-bootstrap')
 
 const AccountList = React.createClass({
     render: function () {
         return (
-            <ul className="list-unstyled">
+            <ListGroup>
                 {this.props.accounts.map(acct =>
-                    <AccountListItem
-                        key={acct.id}
-                        account={acct}
-                        onClick={this.onClick.bind(this, acct)}
-                    />
+                    <ListGroupItem key={acct.id}
+                                   onClick={this.onClick.bind(this, acct)}>
+                        <AccountListItem account={acct} />
+                    </ListGroupItem>
                 )}
-            </ul>
+            </ListGroup>
         )
     },
 

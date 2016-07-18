@@ -12,11 +12,11 @@ const accountViewClass = React.createClass({
         const change = (name) => (value) => this.onChange(name, value)
         return (
             <div >
-                <h2>Account {acct.code} - {acct.name}</h2>
+                <h2>Account {this.props.account.code} - {this.props.account.name}</h2>
                 <form>
-                    <FormItem onChange={change("name")} value={acct.name} label="Code" placeholder="The descriptive name"/>
-                    <FormItem onChange={change("code")} value={acct.code} label="Code" placeholder="The account short code"/>
-                    <FormItem onChange={change("type")} value={acct.type.name} label="Type" placeholder="The type of account"/>
+                    <FormItem onChange={change("name")} value={this.props.account.name} label="Name" placeholder="The descriptive name"/>
+                    <FormItem onChange={change("code")} value={this.props.account.code} label="Code" placeholder="The account short code" help="Must be 4 digits"/>
+                    <FormItem onChange={change("type")} value={this.props.account.type.name} label="Type" placeholder="The type of account"/>
                 </form>
                 <button type="submit" className="btn btn-default" onClick={this.onSave}>Save</button>
             </div>

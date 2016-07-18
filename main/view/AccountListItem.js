@@ -3,9 +3,7 @@ const {PropTypes} = require('react')
 const Account = require('../model/Account')
 
 const AccountListItem = ({account, onClick}) => (
-    <li onClick={onClick}>
-        {account.code} &nbsp; {account.name}
-    </li>
+        <span>{account.code} &nbsp; {account.name}</span>
 )
 
 
