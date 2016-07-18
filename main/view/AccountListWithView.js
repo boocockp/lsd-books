@@ -8,12 +8,13 @@ const {Grid, Row, Col} = require('react-bootstrap')
 
 const AccountListWithView = React.createClass({
     render: function () {
-        const p = this.props, s = this.state;
-        const account = s.selectedAccountId ? p.accounts.find( a => a.id === s.selectedAccountId) : null
+        const p = this.props
+        const selectedAccountId = parseInt(p.selectedAccountId)
+        const account = selectedAccountId ? p.accounts.find( a => a.id === selectedAccountId) : null
         return (
             <Grid>
                 <Row>
-                    <Col xs={12} md={3}><AccountList accounts={p.accounts} selectedAccountId={s.selectedAccountId} onSelect={this.select}/></Col>
+                    <Col xs={12} md={3}><AccountList accounts={p.accounts} selectedAccountId={selectedAccountId} onSelect={this.select}/></Col>
                     <Col xs={12} md={9}>{account ? <AccountView account={account}/> : '' }</Col>
                 </Row>
             </Grid>
@@ -21,17 +22,14 @@ const AccountListWithView = React.createClass({
     },
 
     select: function(account) {
-        this.setState({selectedAccountId: account.id})
-    },
-
-    getInitialState: function () { return {
-        selectedAccountId: parseInt(this.props.routedId)
-    } }
+        this.props.onSelect && this.props.onSelect(account.id)
+    }
 })
 
 AccountListWithView.propTypes = {
     accounts: PropTypes.instanceOf(List).isRequired,
-    selectedAccountId: PropTypes.string
+    selectedAccountId: PropTypes.string,
+    onSelect: PropTypes.func,
 }
 
 module.exports = AccountListWithView

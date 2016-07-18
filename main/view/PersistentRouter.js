@@ -49,7 +49,7 @@ const PersistentRouter =  React.createClass({
             for (const [p, handler] of cache.entries()) {
                 const show = handler === currentHandler
                 handlers.push((
-                    <div style={ show ? {} : {display: 'none'} }>
+                    <div key={p} style={ show ? {} : {display: 'none'} }>
                         {handler}
                     </div>
                 ))
