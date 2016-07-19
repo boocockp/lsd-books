@@ -19,7 +19,7 @@ class SynchronizingStore {
     dispatch(action) {
         const id = action.id = newId()
         this.localStore.storeAction(action)
-        this.applyAction(action);
+        this._applyAction(action);
     }
 
     subscribe(listener) {
@@ -28,15 +28,15 @@ class SynchronizingStore {
 
     init() {
         const localActions = this.localStore.getLocalActions()
-        this.applyActions(localActions)
+        this._applyActions(localActions)
     }
 
-    applyActions(actions) {
+    _applyActions(actions) {
         actions.filter( a => !this.actionsApplied.has(a.id))
-                .forEach( a => this.applyAction(a) )
+                .forEach( a => this._applyAction(a) )
     }
 
-    applyAction(action) {
+    _applyAction(action) {
         this.actionsApplied.set(action.id, action)
         return this.reduxStore.dispatch(action)
     }
