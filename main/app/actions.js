@@ -1,5 +1,5 @@
 function action(type, args) {
-    return Object.assign( {type}, args);
+    return Object.assign( {type: type.name}, args);
     
 }
 
@@ -7,8 +7,8 @@ function addAccount(data) {
     return action(addAccount, {data});
 }
 
-function updateAccount(id, data) {
-    return action(updateAccount, {id, data});
+function updateAccount(data) {
+    return action(updateAccount, {data});
 }
 
 function addTransaction(transaction) {

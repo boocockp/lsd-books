@@ -26,8 +26,8 @@ class Books extends Record({accounts: new Map(), transactions: new List()}) {
         return this.setIn(['accounts', account.id], account);
     }
 
-    updateAccount(id, data) {
-        return this.mergeIn(['accounts', id], data);
+    updateAccount(data) {
+        return this.mergeIn(['accounts', data.id], data);
     }
     
     addTransaction(transaction) {

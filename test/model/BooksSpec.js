@@ -100,11 +100,11 @@ describe("Books", function () {
 
     describe("books object with changing data", function () {
         it("updates account from partial data", function () {
-            books = books.updateAccount(b.id, {name: "Water"});
+            books = books.updateAccount({id: b.id, name: "Water"});
             books.account(b.id).should.jsEql(_.merge({}, b, {name: "Water"}));
         });
         it("re-sorts accounts when names change", function () {
-            books = books.updateAccount(b.id, {name: "Water"});
+            books = books.updateAccount({id: b.id, name: "Water"});
             books.accountsByName.should.jsEql([c, d, a, _.merge({}, b, {name: "Water"})]);
         });
     });
@@ -120,13 +120,13 @@ describe("Books", function () {
         });
 
         it("knows updates to individual account names", function () {
-            books = books.updateAccount(a.id, {name: "Travel Expenses"})
-                         .updateAccount(b.id, {name: "Entertainment"});
+            books = books.updateAccount({id: a.id, name: "Travel Expenses"})
+                         .updateAccount({id: b.id, name: "Entertainment"});
 
             books.account(a.id).name.should.eql("Travel Expenses");
             books.account(b.id).name.should.eql("Entertainment");
 
-            books = books.updateAccount(b.id, {name: "Customer Ents"});
+            books = books.updateAccount({id: b.id, name: "Customer Ents"});
             books.account(a.id).name.should.eql("Travel Expenses");
             books.account(b.id).name.should.eql("Customer Ents");
         });

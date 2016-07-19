@@ -5,10 +5,9 @@ const Account = require('../model/Account')
 const FormItem = require('./FormItem')
 const {addAccount, updateAccount, addTransaction} = require('../app/actions')
 
-const accountViewClass = React.createClass({
+let AccountView = React.createClass({
     render: function () {
         this.formChanges = {}
-        const acct = this.props.account;
         const change = (name) => (value) => this.onChange(name, value)
         return (
             <div >
@@ -24,18 +23,18 @@ const accountViewClass = React.createClass({
     },
 
     onChange: function(name, value) {
-        console.log('change', name, value)
+        // console.log('change', name, value)
         this.formChanges[name] = value
     },
 
     onSave: function(e) {
         console.log('save', this.formChanges)
         e.preventDefault()
-        this.props.dispatch(updateAccount(this.props.account.id, this.formChanges))
+        this.props.dispatch(updateAccount(Object.assign({id: this.props.account.id}, this.formChanges)))
     }
 })
 
-const AccountView = connect()(accountViewClass)
+AccountView = connect()(AccountView)
 
 AccountView.propTypes = {
     account: PropTypes.instanceOf(Account).isRequired,

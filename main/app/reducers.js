@@ -5,13 +5,13 @@ const Books = require('../model/Books');
 function booksReducer(state, action) {
 
     switch(action.type) {
-        case addAccount:
+        case addAccount.name:
             return state.addAccount(action.data);
 
-        case updateAccount:
-            return state.updateAccount(action.id, action.data);
+        case updateAccount.name:
+            return state.updateAccount(action.data);
 
-        case addTransaction:
+        case addTransaction.name:
             return state.addTransaction(action.transaction);
 
         default:
