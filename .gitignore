@@ -4,3 +4,4 @@ node_modules
 main/app/appMain.bundle.js
 
 /main/viewbuild/
+stuff/

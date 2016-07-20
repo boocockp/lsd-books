@@ -6,8 +6,8 @@ function newId() {
 
 class SynchronizingStore {
 
-    constructor(reduxStore, localStore) {
-        Object.assign(this, {reduxStore, localStore})
+    constructor(reduxStore, localStore, remoteStore) {
+        Object.assign(this, {reduxStore, localStore, remoteStore})
         this.actionsApplied = new Map()
         this.dispatch = this.dispatch.bind(this)
     }
@@ -19,7 +19,14 @@ class SynchronizingStore {
     dispatch(action) {
         const id = action.id = newId()
         this.localStore.storeAction(action)
+
         this._applyAction(action);
+
+        try {
+            this.remoteStore.storeActions([action])
+        } catch(e) {
+            console.error(e)
+        }
     }
 
     subscribe(listener) {
@@ -27,8 +34,12 @@ class SynchronizingStore {
     }
 
     init() {
-        const localActions = this.localStore.getLocalActions()
-        this._applyActions(localActions)
+        this.remoteStore.getUpdates().then( updates => {
+            const remoteActions = updates.map( x => x.actions ).reduce( (acc, val) => acc.concat(val), [] )
+            this._applyActions(remoteActions)
+            const localActions = this.localStore.getLocalActions()
+            this._applyActions(localActions)
+        })
     }
 
     _applyActions(actions) {
