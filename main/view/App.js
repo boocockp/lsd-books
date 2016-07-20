@@ -16,7 +16,7 @@ const App = React.createClass({
     render: function () {
         return (
             <div>
-                <h1>Books</h1>
+                <h1>ReactBooks</h1>
                 <div id="googleLogin">
                     <GoogleSignin clientId={config.clientId}/>
                 </div>

@@ -6,7 +6,7 @@ module.exports = class S3UpdateStore {
 
     constructor(bucketName, keyPrefix, appId, authTracker, identityPoolId) {
         Object.assign(this, {bucketName, keyPrefix, appId, identityPoolId})
-        authTracker.onSignIn( a => this.googleLogin(a) )
+        authTracker.signIn.sendTo( this.googleLogin.bind(this) )
     }
 
     storeActions(actions) {
