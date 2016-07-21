@@ -8,6 +8,7 @@ const LocalStorageUpdateStore = require('../store/LocalStorageUpdateStore')
 const S3UpdateStore = require('../store/S3UpdateStore')
 const SynchronizingStore = require('../store/SynchronizingStore')
 const StoreController = require('../store/StoreController')
+const PersistentStore = require('../store/PersistentStore')
 const AccountList = require('../viewbuild/AccountList')
 const App = require('../viewbuild/App')
 const AppProvider = require('../viewbuild/AppProvider')
@@ -21,19 +22,19 @@ const config = {
 }
 
 const reduxStore = createStore(booksReducer, new Books());
-const localStore = new LocalStorageUpdateStore('reactbooks', localStorage)
-const signinTracker = new GoogleSigninTracker()
-const remoteStore = new S3UpdateStore('ashridgetech.reactbooks-test', 'updates', 'reactbooks', signinTracker, config.identityPoolId)
 const appStore = new SynchronizingStore(reduxStore)
-const storeController = new StoreController(appStore, localStore, remoteStore)
-appStore.dispatches.sendTo( storeController.newAction )
+const persistentStore = new PersistentStore(config)
+persistentStore.externalAction.sendTo(appStore.applyAction)
+appStore.dispatches.sendTo( persistentStore.dispatchAction )
+
+persistentStore.init()
+
 
 window.appStore = appStore;
+window.perStore = persistentStore;
 
 const mainElement = React.createElement(AppProvider, {store: appStore})
 const renderedElement = ReactDOM.render(mainElement, document.getElementById('main'))
-
-storeController.init()
 
 
 // store.dispatch(addAccount({id: 1001, name: "Travel", code: "4110", type: AccountType.EXPENSE}))

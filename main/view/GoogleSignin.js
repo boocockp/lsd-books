@@ -21,7 +21,7 @@ const GoogleSignin = React.createClass({
 })
 
 GoogleSignin.propTypes = {
-    clientId: PropTypes.func.isRequired
+    clientId: PropTypes.string.isRequired
 }
 
 module.exports = GoogleSignin

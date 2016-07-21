@@ -6,6 +6,7 @@ class SynchronizingStore {
         Object.assign(this, {reduxStore})
         this.dispatches = new ObservableData()
         this.dispatch = this.dispatch.bind(this)
+        this.applyAction = this.applyAction.bind(this)
     }
 
     getState() {

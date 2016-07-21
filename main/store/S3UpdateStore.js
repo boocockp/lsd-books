@@ -7,6 +7,9 @@ module.exports = class S3UpdateStore {
     constructor(bucketName, keyPrefix, appId, authTracker, identityPoolId) {
         Object.assign(this, {bucketName, keyPrefix, appId, identityPoolId})
         authTracker.signIn.sendTo( this.googleLogin.bind(this) )
+
+        this.storeActions = this.storeActions.bind(this)
+        this.storeUpdate = this.storeUpdate.bind(this)
     }
 
     storeActions(actions) {
@@ -16,6 +19,12 @@ module.exports = class S3UpdateStore {
         const ensureUnique = Math.floor(Math.random() * 100000)
         const key = prefix + this.appId + '/' + timestamp + '-' + ensureUnique
         this._storeInS3(key, updateContent)
+    }
+
+    storeUpdate(update) {
+        const prefix = this.keyPrefix ? this.keyPrefix + '/' : ''
+        const key = prefix + this.appId + '/' + update.id
+        this._storeInS3(key, JSON.stringify( update)).then( )
     }
 
     getUpdates() {
@@ -43,13 +52,16 @@ module.exports = class S3UpdateStore {
     }
 
     _storeInS3(key, objectContent) {
+        if (!this.s3) {
+            return Promise.reject()
+        }
         const params = {
             Bucket: this.bucketName,
             Key: key,
             Body: objectContent
         }
 
-        this.s3.putObject(params).promise().catch( e => console.error(e) )
+        return this.s3.putObject(params).promise().catch( e => console.error(e) )
     }
 
     googleLogin(authResponse) {

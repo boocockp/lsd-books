@@ -16,7 +16,7 @@ class StoreController {
         this.remoteStore.getUpdates().then( updates => {
             const remoteActions = updates.map( x => x.actions ).reduce( (acc, val) => acc.concat(val), [] )
             this._applyActions(remoteActions)
-            const localActions = this.localStore.getLocalActions()
+            const localActions = this.localStore._getLocalActions()
             this._applyActions(localActions)
         })
     }
