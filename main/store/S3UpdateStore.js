@@ -1,5 +1,6 @@
 require('aws-sdk/dist/aws-sdk')
 const AWS = window.AWS
+const ObservableData = require('../util/ObservableData')
 
 
 module.exports = class S3UpdateStore {
@@ -8,23 +9,18 @@ module.exports = class S3UpdateStore {
         Object.assign(this, {bucketName, keyPrefix, appId, identityPoolId})
         authTracker.signIn.sendTo( this.googleLogin.bind(this) )
 
-        this.storeActions = this.storeActions.bind(this)
-        this.storeUpdate = this.storeUpdate.bind(this)
+        this.updateStored = new ObservableData()
+        this.storeUpdates = this.storeUpdates.bind(this)
     }
 
-    storeActions(actions) {
-        const timestamp = Date.now()
-        const updateContent = JSON.stringify( {timestamp, actions})
-        const prefix = this.keyPrefix ? this.keyPrefix + '/' : ''
-        const ensureUnique = Math.floor(Math.random() * 100000)
-        const key = prefix + this.appId + '/' + timestamp + '-' + ensureUnique
-        this._storeInS3(key, updateContent)
+    storeUpdates(updates) {
+        updates.forEach( u => this._storeUpdate(u) );
     }
 
-    storeUpdate(update) {
+    _storeUpdate(update) {
         const prefix = this.keyPrefix ? this.keyPrefix + '/' : ''
         const key = prefix + this.appId + '/' + update.id
-        this._storeInS3(key, JSON.stringify( update)).then( )
+        this._storeInS3(key, JSON.stringify(update)).then( () => this.updateStored.set(update) )
     }
 
     getUpdates() {
@@ -61,7 +57,7 @@ module.exports = class S3UpdateStore {
             Body: objectContent
         }
 
-        return this.s3.putObject(params).promise().catch( e => console.error(e) )
+        return this.s3.putObject(params).promise().catch( e => console.warn('Failed to send update', e) )
     }
 
     googleLogin(authResponse) {

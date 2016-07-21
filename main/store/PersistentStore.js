@@ -47,9 +47,13 @@ module.exports = class PersistentStore {
 
         this.localStore.storedActions.sendTo(this.newActionRouter.newActions)
 
-        // this.newActionRouter.newUpdates.sendTo(this.remoteStore.storeUpdate)
-        this.newActionRouter.newUpdates.sendTo(this.startupRouter.updatesFromStore)
+        this.newActionRouter.updatesToRemote.sendTo(this.startupRouter.updatesFromStore)
         this.localStore.allStoredUpdates.sendTo(this.startupRouter.updatesFromStore)
         this.startupRouter.updates.sendTo(this.updateRouter.updates)
+
+        this.newActionRouter.updateToLocal.sendTo(this.localStore.storeUpdate)
+        this.newActionRouter.updatesToRemote.sendTo(this.remoteStore.storeUpdates)
+        this.remoteStore.updateStored.sendTo(this.newActionRouter.updateStored)
+        this.newActionRouter.actionsToDelete.sendTo(this.localStore.deleteActions)
     }
 }

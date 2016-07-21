@@ -7,7 +7,6 @@ const {booksReducer} = require('./reducers');
 const LocalStorageUpdateStore = require('../store/LocalStorageUpdateStore')
 const S3UpdateStore = require('../store/S3UpdateStore')
 const SynchronizingStore = require('../store/SynchronizingStore')
-const StoreController = require('../store/StoreController')
 const PersistentStore = require('../store/PersistentStore')
 const AccountList = require('../viewbuild/AccountList')
 const App = require('../viewbuild/App')
@@ -30,7 +29,7 @@ appStore.dispatches.sendTo( persistentStore.dispatchAction )
 persistentStore.init()
 
 
-window.appStore = appStore;
+window.appStore_ = appStore;
 window.perStore = persistentStore;
 
 const mainElement = React.createElement(AppProvider, {store: appStore})
