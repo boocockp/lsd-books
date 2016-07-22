@@ -9,7 +9,7 @@ class UpdateRouter {
         this.updateIdsWanted = new ObservableData()
 
         this.updatesAvailable = this.updatesAvailable.bind(this)
-        this.updates = this.updates.bind(this)
+        this.update = this.update.bind(this)
 
     }
 
@@ -17,12 +17,9 @@ class UpdateRouter {
         this.updateIdsWanted.value = newUpdateIds.filter( x => !this.updateIdsApplied.has(x))
     }
 
-    updates(updates) {
-        updates = [].concat(updates)
-        updates.forEach( x => {
-            this._applyActions(x.actions)
-            this.updateIdsApplied.add(x.id)
-        } )
+    update(update) {
+        this._applyActions(update.actions)
+        this.updateIdsApplied.add(update.id)
     }
 
     _applyActions(actions) {

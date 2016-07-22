@@ -10,14 +10,12 @@ module.exports = class S3UpdateStore {
         authTracker.signIn.sendTo( this.googleLogin.bind(this) )
 
         this.updateStored = new ObservableData()
-        this.storeUpdates = this.storeUpdates.bind(this)
+        this.storeAvailable = new ObservableData(false)
+
+        this.storeUpdate = this.storeUpdate.bind(this)
     }
 
-    storeUpdates(updates) {
-        updates.forEach( u => this._storeUpdate(u) );
-    }
-
-    _storeUpdate(update) {
+    storeUpdate(update) {
         const prefix = this.keyPrefix ? this.keyPrefix + '/' : ''
         const key = prefix + this.appId + '/' + update.id
         this._storeInS3(key, JSON.stringify(update)).then( () => this.updateStored.set(update) )
@@ -71,7 +69,7 @@ module.exports = class S3UpdateStore {
 
 
         this.s3 = new AWS.S3()
-
+        this.storeAvailable.set(true)
         console.log('Logged in.');
     }
 

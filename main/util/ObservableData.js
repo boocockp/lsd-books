@@ -15,13 +15,17 @@ module.exports = class ObservableData {
         this._listeners.map(l => l(data) )
     }
 
-    sendTo(listener) {
-        if (typeof listener !== 'function') {
-            throw new Error(`Observable listener must be a function, not ${listener}`)
+    sendTo(...listeners) {
+        for( const l of listeners) {
+            if (typeof l !== 'function') {
+                throw new Error(`Observable listener must be a function, not ${l}`)
+            }
         }
-        this._listeners.push(listener)
-        if (this._value !== undefined) {
-            listener(this._value)
+        for( const l of listeners) {
+            this._listeners.push(l)
+            if (this._value !== undefined) {
+                l(this._value)
+            }
         }
     }
 }

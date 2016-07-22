@@ -6,6 +6,7 @@ const LocalStorageUpdateStore = require('../store/LocalStorageUpdateStore')
 const S3UpdateStore = require('../store/S3UpdateStore')
 const UpdateRouter = require('../store/UpdateRouter')
 const NewActionRouter = require('../store/NewActionRouter')
+const NewActionScheduler = require('../store/NewActionScheduler')
 const StartupRouter = require('../store/StartupRouter')
 
 function newId() {
@@ -39,21 +40,21 @@ module.exports = class PersistentStore {
         this.remoteStore = new S3UpdateStore('ashridgetech.reactbooks-test', 'updates', 'reactbooks', this.signinTracker, config.identityPoolId)
         this.updateRouter = new UpdateRouter()
         this.newActionRouter = new NewActionRouter()
+        this.newActionScheduler = new NewActionScheduler()
         this.startupRouter = new StartupRouter()
 
         this.updateRouter.action.sendTo(this.externalAction.set)
 
-        this.dispatchedAction.sendTo(this.localStore.storeAction)
+        this.dispatchedAction.sendTo(this.localStore.storeAction, this.newActionScheduler.newAction)
 
-        // this.localStore.storedActions.sendTo(this.newActionRouter.newActions)
+        this.localStore.allActions.sendTo(this.newActionRouter.newActions)
 
-        this.newActionRouter.updatesToRemote.sendTo(this.startupRouter.updatesFromStore)
-        this.localStore.allUpdates.sendTo(this.startupRouter.updatesFromStore)
-        this.startupRouter.updates.sendTo(this.updateRouter.updates)
+        this.localStore.allActions.sendTo(this.startupRouter.actions)
+        this.localStore.allUpdates.sendTo(this.startupRouter.updates)
+        this.startupRouter.update.sendTo(this.updateRouter.update)
 
-        this.newActionRouter.updateToLocal.sendTo(this.localStore.storeUpdate)
-        this.newActionRouter.updatesToRemote.sendTo(this.remoteStore.storeUpdates)
-        this.remoteStore.updateStored.sendTo(this.newActionRouter.updateStored)
+        // this.newActionRouter.updateToStore.sendTo(this.remoteStore.storeUpdate)
+        this.remoteStore.updateStored.sendTo(this.newActionRouter.updateStored, this.newActionScheduler.updateStored)
         this.newActionRouter.actionsToDelete.sendTo(this.localStore.deleteActions)
     }
 }
