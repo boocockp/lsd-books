@@ -15,6 +15,7 @@ module.exports = class StartupRouter {
         }
     }
 
+    // TODO why do we need this? - should kick in when wiring complete
     init() {
         this.updates.value = this._updates
     }

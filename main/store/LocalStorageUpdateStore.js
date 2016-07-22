@@ -6,8 +6,9 @@ module.exports = class LocalStorageUpdateStore {
         this.actionStoreKey = `${appId}.actions`
         this.updateStoreKey = `${appId}.updates`
         this.storage = storage
-        this.storedActions = new ObservableData(this._getActions())
-        this.allStoredUpdates = new ObservableData(this._getUpdates())
+
+        this.allActions = new ObservableData(this._getActions())
+        this.allUpdates = new ObservableData(this._getUpdates())
 
         this.storeAction = this.storeAction.bind(this)
         this.storeUpdate = this.storeUpdate.bind(this)
@@ -17,20 +18,20 @@ module.exports = class LocalStorageUpdateStore {
     storeAction(action) {
         const updatedActions = this._getActions().concat(action)
         this.storage.setItem(this.actionStoreKey, JSON.stringify(updatedActions))
-        this.storedActions.value = updatedActions
+        this.allActions.value = updatedActions
     }
 
     deleteActions(actions) {
         const deletedIds = new Set(actions.map( a => a.id))
         const updatedActions = this._getActions().filter( a => !deletedIds.has(a.id) )
         this.storage.setItem(this.actionStoreKey, JSON.stringify(updatedActions))
-        this.storedActions.value = updatedActions
+        this.allActions.value = updatedActions
     }
 
     storeUpdate(update) {
         const updatedUpdates = this._getUpdates().concat(update)
         this.storage.setItem(this.updateStoreKey, JSON.stringify(updatedUpdates))
-        this.allStoredUpdates.value = updatedUpdates
+        this.allUpdates.value = updatedUpdates
     }
 
 
