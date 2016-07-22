@@ -18,7 +18,7 @@ module.exports = class S3UpdateStore {
     storeUpdate(update) {
         const prefix = this.keyPrefix ? this.keyPrefix + '/' : ''
         const key = prefix + this.appId + '/' + update.id
-        this._storeInS3(key, JSON.stringify(update)).then( () => this.updateStored.set(update) )
+        this._storeInS3(key, JSON.stringify(update)).then( () => this.updateStored.set(update) ).then( () => console.log('Update stored', update.id))
     }
 
     getUpdates() {

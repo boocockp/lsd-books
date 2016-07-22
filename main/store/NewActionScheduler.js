@@ -7,16 +7,26 @@ module.exports = class NewActionScheduler {
 
         this.newAction = this.newAction.bind(this)
         this.updateStored = this.updateStored.bind(this)
+        this.storeAvailable = this.storeAvailable.bind(this)
     }
 
     newAction(action) {
         //TODO do not trigger when store in progress, when store not available
         // TODO trigger only after quiet for an interval
-        this.storeRequired.set(true)
+        if (this._storeAvailable) {
+            this.storeRequired.set()
+        }
     }
 
     updateStored(update) {
 
+    }
+
+    storeAvailable(isAvailable) {
+        this._storeAvailable = isAvailable
+        if (this._storeAvailable) {
+            this.storeRequired.set()
+        }
     }
 
 }

@@ -28,7 +28,7 @@ module.exports = class PersistentStore {
     }
 
     dispatchAction(action) {
-        const storedAction = Object.assign({id: newId(), action})
+        const storedAction = Object.assign({id: newId()}, action)
         this.dispatchedAction.value = storedAction;
     }
 
@@ -53,8 +53,13 @@ module.exports = class PersistentStore {
         this.localStore.allUpdates.sendTo(this.startupRouter.updates)
         this.startupRouter.update.sendTo(this.updateRouter.update)
 
-        // this.newActionRouter.updateToStore.sendTo(this.remoteStore.storeUpdate)
-        this.remoteStore.updateStored.sendTo(this.newActionRouter.updateStored, this.newActionScheduler.updateStored)
+        this.newActionRouter.updateToStore.sendTo(this.remoteStore.storeUpdate)
+        this.remoteStore.updateStored.sendTo(this.newActionRouter.updateStored,
+                                                this.newActionScheduler.updateStored,
+                                                this.localStore.storeUpdate)
+        this.remoteStore.storeAvailable.sendTo(this.newActionScheduler.storeAvailable)
+        this.newActionScheduler.storeRequired.sendTo(this.newActionRouter.tryToStore)
         this.newActionRouter.actionsToDelete.sendTo(this.localStore.deleteActions)
+
     }
 }
