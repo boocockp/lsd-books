@@ -1,5 +1,5 @@
 const {Record} = require('immutable'),
-    JsonUtil = require('../../shared/modules/json/JsonUtil');
+    JsonUtil = require('../../../shared/modules/json/JsonUtil');
 
 class Posting extends Record({accountId: null, type: null, amount: null}) {
     

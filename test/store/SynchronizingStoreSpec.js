@@ -4,8 +4,8 @@ let chai = require('chai'),
     sinonChai = require("sinon-chai"),
     _ = require('lodash'),
     uuid = require('node-uuid'),
-    LocalStorageUpdateStore = require('../../main/store/LocalStorageUpdateStore'),
-    SynchronizingStore = require('../../main/store/SynchronizingStore')
+    LocalStorageUpdateStore = require('../../main/js/store/LocalStorageUpdateStore'),
+    SynchronizingStore = require('../../main/js/store/SynchronizingStore')
 
 chai.should();
 chai.use(chaiSubset);

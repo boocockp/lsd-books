@@ -1,5 +1,5 @@
 const {Record, List} = require('immutable'),
-    JsonUtil = require('../../shared/modules/json/JsonUtil');
+    JsonUtil = require('../../../shared/modules/json/JsonUtil');
 
 class Transaction extends Record({date: null, description: null, postings: new List()}) {
 

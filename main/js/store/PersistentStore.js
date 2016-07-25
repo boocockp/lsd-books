@@ -2,12 +2,12 @@ const uuid = require('node-uuid')
 
 const ObservableData = require('../util/ObservableData')
 const GoogleSigninTracker = require('../auth/GoogleSigninTracker')
-const LocalStorageUpdateStore = require('../store/LocalStorageUpdateStore')
-const S3UpdateStore = require('../store/S3UpdateStore')
-const UpdateRouter = require('../store/UpdateRouter')
-const NewActionRouter = require('../store/NewActionRouter')
-const NewActionScheduler = require('../store/NewActionScheduler')
-const StartupRouter = require('../store/StartupRouter')
+const LocalStorageUpdateStore = require('./LocalStorageUpdateStore')
+const S3UpdateStore = require('./S3UpdateStore')
+const UpdateRouter = require('./UpdateRouter')
+const NewActionRouter = require('./NewActionRouter')
+const NewActionScheduler = require('./NewActionScheduler')
+const StartupRouter = require('./StartupRouter')
 
 function newId() {
     return uuid.v4()

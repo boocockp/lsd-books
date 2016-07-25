@@ -1,6 +1,6 @@
 let chai = require('chai'),
-    Account = require('../../main/model/Account'),
-    {EXPENSE} = require('../../main/model/Types').AccountType;
+    Account = require('../../main/js/model/Account'),
+    {EXPENSE} = require('../../main/js/model/Types').AccountType;
 
 chai.should();
 

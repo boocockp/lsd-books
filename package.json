@@ -3,10 +3,11 @@
   "description": "reactbooks",
   "version": "0.0.1",
   "scripts": {
-    "build-babel": "babel --presets es2015,react main/view/ --out-dir main/viewbuild/",
-    "build-webpack": "webpack main/app/appMain.js main/app/appMain.bundle.js",
-    "build": "npm run build-babel && npm run build-webpack",
+    "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "babel": {
+    "presets": ["es2015", "react"]
   },
   "dependencies": {
     "aws-sdk": "^2.4.7",
@@ -23,13 +24,15 @@
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
+    "babel-loader": "^6.2.4",
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-react": "^6.11.1",
     "chai": "^3.5.0",
     "chai-subset": "^1.2.2",
-    "webpack": "^1.13.1",
+    "copy-webpack-plugin": "^3.0.1",
     "sinon": "^1.17.4",
-    "sinon-chai": "^2.8.0"
+    "sinon-chai": "^2.8.0",
+    "webpack": "^1.13.1"
   },
   "repository": "http://none",
   "license": "UNLICENSED"
