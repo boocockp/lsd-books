@@ -1,5 +1,4 @@
-const ObservableData = require('../util/ObservableData')
-const EventObserver = require('../util/EventObserver')
+const {makeInputEvent, makeOutputEvent, bindEventFunctions} = require('../util/Events')
 
 class NewActionRouter {
 
@@ -16,7 +15,7 @@ class NewActionRouter {
     }
 
     constructor() {
-        this._bindEventFunctions()
+        bindEventFunctions(this)
     }
 
     // get newActions() {
@@ -50,48 +49,13 @@ class NewActionRouter {
         if (this.updateStored.triggered) return this.updateStored.value.actions
     }
 
-    _inputEvents() {
-        return ['newActions', 'tryToStore', 'updateStored']
-    }
-
-    _outputEvents() {
-        return ['updateToStore', 'actionsToDelete']
-    }
-
-    _bindEventFunctions() {
-        this._inputEvents().concat(this._outputEvents()).forEach( p => this[p] = this[p].bind(this) )
-        this._outputEvents().forEach( p => new EventObserver(this[p]) )
-    }
-
-    _resetInputEvents() {
-        this._inputEvents().forEach( f => {
-            this[f].triggered = false
-            this[f].value = undefined
-        })
-    }
-
-    _fireOutputEvents() {
-        this._outputEvents().forEach( f => {
-            this[f]._observer.checkEvent()
-        })
-    }
-
 }
 
+makeInputEvent(NewActionRouter.prototype, "newActions")
+makeInputEvent(NewActionRouter.prototype, "tryToStore")
+makeInputEvent(NewActionRouter.prototype, "updateStored")
 
-function makeInputEventFunction(obj, propertyName) {
-    const originalFunction = obj[propertyName]
-    obj[propertyName] = function (data) {
-        this._resetInputEvents()
-        this[propertyName].triggered = true
-        this[propertyName].value = data
-        originalFunction.call(this, data)
-        this._fireOutputEvents()
-    }
-}
-
-makeInputEventFunction(NewActionRouter.prototype, "newActions")
-makeInputEventFunction(NewActionRouter.prototype, "tryToStore")
-makeInputEventFunction(NewActionRouter.prototype, "updateStored")
+makeOutputEvent(NewActionRouter.prototype, "updateToStore")
+makeOutputEvent(NewActionRouter.prototype, "actionsToDelete")
 
 module.exports = NewActionRouter
