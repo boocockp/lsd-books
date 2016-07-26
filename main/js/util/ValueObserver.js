@@ -1,4 +1,4 @@
-module.exports = class EventObserver {
+module.exports = class ValueObserver {
     constructor(eventFn) {
         this._listeners = []
         this.valueFn = eventFn
@@ -6,9 +6,9 @@ module.exports = class EventObserver {
         this.valueFn.sendTo = this.sendTo.bind(this)
     }
 
-    checkEvent() {
+    checkChange() {
         let currentValue = this.valueFn()
-        if (currentValue && currentValue !== this.previousValue) {
+        if (currentValue !== this.previousValue) {
             this.notify(currentValue)
         }
         this.previousValue = currentValue
@@ -24,8 +24,14 @@ module.exports = class EventObserver {
                 throw new Error(`Observable listener must be a function, not ${l}`)
             }
         }
+
+        let currentValue = this.valueFn()
+
         for( const l of listeners) {
             this._listeners.push(l)
+            if (currentValue !== undefined) {
+                l(currentValue)
+            }
         }
     }
 }

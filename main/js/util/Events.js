@@ -1,20 +1,26 @@
 const EventObserver = require('./EventObserver')
+const ValueObserver = require('./ValueObserver')
 
 function bindEventFunctions(obj) {
-    inputEvents(obj).concat(outputEvents(obj), inputValues(obj)).forEach( p => obj[p] = obj[p].bind(obj) )
+    inputEvents(obj).concat(outputEvents(obj), inputValues(obj), outputValues(obj)).forEach( p => obj[p] = obj[p].bind(obj) )
+    outputValues(obj).forEach( p => new ValueObserver(obj[p]) )
     outputEvents(obj).forEach( p => new EventObserver(obj[p]) )
 }
 
 function inputValues(obj) {
-    return Object.getPrototypeOf(obj)._inputValues
+    return Object.getPrototypeOf(obj)._inputValues || []
 }
 
 function inputEvents(obj) {
-    return Object.getPrototypeOf(obj)._inputEvents
+    return Object.getPrototypeOf(obj)._inputEvents || []
+}
+
+function outputValues(obj) {
+    return Object.getPrototypeOf(obj)._outputValues || []
 }
 
 function outputEvents(obj) {
-    return Object.getPrototypeOf(obj)._outputEvents
+    return Object.getPrototypeOf(obj)._outputEvents || []
 }
 
 function resetInputEvents(obj) {
@@ -24,7 +30,10 @@ function resetInputEvents(obj) {
     })
 }
 
-function fireOutputEvents(obj) {
+function notifyOutputChanges(obj) {
+    outputValues(obj).forEach( f => {
+        obj[f]._observer.checkChange()
+    })
     outputEvents(obj).forEach( f => {
         obj[f]._observer.checkEvent()
     })
@@ -38,7 +47,7 @@ function makeInputValue(obj, propertyName) {
             resetInputEvents(this)
             this[propertyName].value = data
             originalFunction.call(this, data)
-            fireOutputEvents(this)
+            notifyOutputChanges(this)
         }
         Object.defineProperty(obj, propertyName, propDesc)
     } else {
@@ -57,7 +66,7 @@ function makeInputEvent(obj, propertyName) {
             this[propertyName].triggered = true
             this[propertyName].value = data
             originalFunction.call(this, data)
-            fireOutputEvents(this)
+            notifyOutputChanges(this)
         }
         Object.defineProperty(obj, propertyName, propDesc)
     } else {
@@ -71,4 +80,8 @@ function makeOutputEvent(obj, propertyName) {
     obj._outputEvents = (obj._outputEvents || []).concat(propertyName)
 }
 
-module.exports = {makeInputEvent, makeInputValue, makeOutputEvent, bindEventFunctions}
+function makeOutputValue(obj, propertyName) {
+    obj._outputValues = (obj._outputValues || []).concat(propertyName)
+}
+
+module.exports = {makeInputEvent, makeInputValue, makeOutputEvent, makeOutputValue, bindEventFunctions}

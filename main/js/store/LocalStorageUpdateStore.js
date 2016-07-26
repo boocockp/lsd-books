@@ -1,48 +1,54 @@
-const ObservableData = require('../util/ObservableData')
+const {makeInputEvent, makeOutputValue, bindEventFunctions} = require('../util/Events')
 
-module.exports = class LocalStorageUpdateStore {
+class LocalStorageUpdateStore {
 
     constructor(appId, storage) {
         this.actionStoreKey = `${appId}.actions`
         this.updateStoreKey = `${appId}.updates`
         this.storage = storage
-
-        this.allActions = new ObservableData(this._getActions())
-        this.allUpdates = new ObservableData(this._getUpdates())
-
-        this.storeAction = this.storeAction.bind(this)
-        this.storeUpdate = this.storeUpdate.bind(this)
-        this.deleteActions = this.deleteActions.bind(this)
+        bindEventFunctions(this)
     }
 
     storeAction(action) {
-        const updatedActions = this._getActions().concat(action)
-        this.storage.setItem(this.actionStoreKey, JSON.stringify(updatedActions))
-        this.allActions.value = updatedActions
+        const updatedActions = this.allActions().concat(action)
+        this._storedActions = this._writeToStorage(this.actionStoreKey, updatedActions)
     }
 
     deleteActions(actions) {
         const deletedIds = new Set(actions.map( a => a.id))
-        const updatedActions = this._getActions().filter( a => !deletedIds.has(a.id) )
-        this.storage.setItem(this.actionStoreKey, JSON.stringify(updatedActions))
-        this.allActions.value = updatedActions
+        const updatedActions = this.allActions().filter( a => !deletedIds.has(a.id) )
+        this._storedActions = this._writeToStorage(this.actionStoreKey, updatedActions)
     }
 
     storeUpdate(update) {
-        const updatedUpdates = this._getUpdates().concat(update)
-        this.storage.setItem(this.updateStoreKey, JSON.stringify(updatedUpdates))
-        this.allUpdates.value = updatedUpdates
+        const updatedUpdates = this.allUpdates().concat(update)
+        this._storedUpdates = this._writeToStorage(this.updateStoreKey, updatedUpdates)
     }
 
-
-
-    _getActions() {
-        const actionsJson = this.storage.getItem(this.actionStoreKey) || '[]'
-        return JSON.parse(actionsJson)
+    allActions() {
+        return this._storedActions || this._getFromStorage(this.actionStoreKey)
     }
 
-    _getUpdates() {
-        const updatesJson = this.storage.getItem(this.updateStoreKey) || '[]'
-        return JSON.parse(updatesJson)
+    allUpdates() {
+        return this._storedUpdates || this._getFromStorage(this.updateStoreKey)
+    }
+
+    _getFromStorage(key) {
+        const json = this.storage.getItem(key) || '[]'
+        return JSON.parse(json)
+    }
+
+    _writeToStorage(key, data) {
+        this.storage.setItem(key, JSON.stringify(data))
+        return data
     }
 }
+
+makeInputEvent(LocalStorageUpdateStore.prototype, "storeAction")
+makeInputEvent(LocalStorageUpdateStore.prototype, "deleteActions")
+makeInputEvent(LocalStorageUpdateStore.prototype, "storeUpdate")
+
+makeOutputValue(LocalStorageUpdateStore.prototype, "allActions")
+makeOutputValue(LocalStorageUpdateStore.prototype, "allUpdates")
+
+module.exports = LocalStorageUpdateStore
