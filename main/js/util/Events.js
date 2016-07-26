@@ -27,13 +27,19 @@ function fireOutputEvents(obj) {
 }
 
 function makeInputEvent(obj, propertyName) {
-    const originalFunction = obj[propertyName]
-    obj[propertyName] = function (data) {
-        resetInputEvents(this)
-        this[propertyName].triggered = true
-        this[propertyName].value = data
-        originalFunction.call(this, data)
-        fireOutputEvents(this)
+    const propDesc = Object.getOwnPropertyDescriptor(obj, propertyName)
+    if (propDesc.value && typeof propDesc.value === "function") {
+        const originalFunction = propDesc.value
+        propDesc.value = function (data) {
+            resetInputEvents(this)
+            this[propertyName].triggered = true
+            this[propertyName].value = data
+            originalFunction.call(this, data)
+            fireOutputEvents(this)
+        }
+        Object.defineProperty(obj, propertyName, propDesc)
+    } else {
+        throw new Error(`Cannot make input event with ${propertyName} of ${obj}: property is not a function`)
     }
 
     obj._inputEvents = (obj._inputEvents || []).concat(propertyName)
