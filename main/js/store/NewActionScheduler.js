@@ -1,32 +1,32 @@
-const ObservableData = require('../util/ObservableData')
+const {makeInputEvent, makeInputValue, makeOutputEvent, bindEventFunctions} = require('../util/Events')
 
-module.exports = class NewActionScheduler {
+class NewActionScheduler {
 
     constructor() {
-        this.storeRequired = new ObservableData() //TODO this is an event, not a value
-
-        this.newAction = this.newAction.bind(this)
-        this.updateStored = this.updateStored.bind(this)
-        this.storeAvailable = this.storeAvailable.bind(this)
+        bindEventFunctions(this)
     }
 
     newAction(action) {
-        //TODO do not trigger when store in progress, when store not available
-        // TODO trigger only after quiet for an interval
-        if (this._storeAvailable) {
-            this.storeRequired.set()
-        }
     }
 
     updateStored(update) {
-
     }
 
     storeAvailable(isAvailable) {
-        this._storeAvailable = isAvailable
-        if (this._storeAvailable) {
-            this.storeRequired.set()
-        }
+    }
+
+    storeRequired() {
+        // TODO do not trigger when store in progress
+        // TODO trigger only after quiet for an interval
+        return this.newAction.triggered || (this.storeAvailable.triggered && this.storeAvailable.value)
     }
 
 }
+
+makeInputEvent(NewActionScheduler.prototype, "newAction")
+makeInputEvent(NewActionScheduler.prototype, "updateStored")
+makeInputEvent(NewActionScheduler.prototype, "storeAvailable")
+
+makeOutputEvent(NewActionScheduler.prototype, "storeRequired")
+
+module.exports = NewActionScheduler

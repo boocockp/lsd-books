@@ -1,3 +1,5 @@
+const EventList = require('./EventList')
+
 module.exports = class EventObserver {
     constructor(eventFn) {
         this._listeners = []
@@ -15,7 +17,11 @@ module.exports = class EventObserver {
     }
 
     notify(data) {
-        this._listeners.map(l => l(data) )
+        if (data instanceof EventList) {
+            data.events.forEach( e => this.notify(e))
+        } else {
+            this._listeners.map(l => l(data) )
+        }
     }
 
     sendTo(...listeners) {

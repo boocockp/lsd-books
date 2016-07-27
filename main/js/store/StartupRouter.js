@@ -1,16 +1,13 @@
-const ObservableData = require('../util/ObservableData')
+const {makeInputEvent, makeOutputEvent, bindEventFunctions} = require('../util/Events')
+const EventList = require('../util/EventList')
 const NewActionRouter = require('./NewActionRouter')
 
-module.exports = class StartupRouter {
+class StartupRouter {
 
     constructor() {
         this._updates = []
         this._actions = []
-        this.update = new ObservableData()
-
-        this.updates = this.updates.bind(this)
-        this.actions = this.actions.bind(this)
-        this.init = this.init.bind(this)
+        bindEventFunctions(this)
     }
 
     updates(updates) {
@@ -25,11 +22,22 @@ module.exports = class StartupRouter {
         }
     }
 
-    // TODO why do we need this? - should kick in when wiring complete
     init() {
-        this._updates.forEach( u => this.update.set(u))
-        if (this._actions && this._actions.length) {
-            this.update.set(NewActionRouter.newUpdate(this._actions))
+    }
+
+    update() {
+        if (this.init.triggered) {
+            const actionsUpdate = (this._actions && this._actions.length) ? NewActionRouter.newUpdate(this._actions) : []
+            return new EventList( this._updates.concat(actionsUpdate))
         }
     }
+
 }
+
+makeInputEvent(StartupRouter.prototype, "updates")
+makeInputEvent(StartupRouter.prototype, "actions")
+makeInputEvent(StartupRouter.prototype, "init")
+
+makeOutputEvent(StartupRouter.prototype, "update")
+
+module.exports = StartupRouter

@@ -1,34 +1,41 @@
-const ObservableData = require('../util/ObservableData')
+const {makeInputEvent, makeOutputEvent, bindEventFunctions} = require('../util/Events')
 
 class UpdateRouter {
 
     constructor() {
-        this.actionsApplied = new Map()
+        this.actionsApplied = new Set()
         this.updateIdsApplied = new Set()
-        this.action = new ObservableData()
-        this.updateIdsWanted = new ObservableData()
-
-        this.updatesAvailable = this.updatesAvailable.bind(this)
+        bindEventFunctions(this)
         this.update = this.update.bind(this)
-
     }
 
     updatesAvailable(newUpdateIds) {
-        this.updateIdsWanted.value = newUpdateIds.filter( x => !this.updateIdsApplied.has(x))
     }
 
     update(update) {
-        this._applyActions(update.actions)
+        update.actions.filter( a => !this.actionsApplied.has(a.id))
+            .forEach( this._actionToApply )
+
         this.updateIdsApplied.add(update.id)
     }
 
-    _applyActions(actions) {
-        actions.filter( a => !this.actionsApplied.has(a.id))
-                .forEach( a => {
-                    this.actionsApplied.set(a.id, a)
-                    this.action.set(a)
-                } )
+    _actionToApply(action) {
+        this.actionsApplied.add(action.id)
+    }
+
+    action() {
+        return this._actionToApply.triggered && this._actionToApply.value
+    }
+
+    updateIdsWanted() {
+        return this.updatesAvailable.triggered && this.updatesAvailable.value.filter( x => !this.updateIdsApplied.has(x))
     }
 }
 
 module.exports = UpdateRouter
+
+makeInputEvent(UpdateRouter.prototype, "updatesAvailable")
+makeInputEvent(UpdateRouter.prototype, "_actionToApply")
+
+makeOutputEvent(UpdateRouter.prototype, "action")
+makeOutputEvent(UpdateRouter.prototype, "updateIdsWanted")
