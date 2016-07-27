@@ -1,7 +1,6 @@
 .idea/
 *.iml
 node_modules
-main/js/app/appMain.bundle.js
 
 stuff/
 build/

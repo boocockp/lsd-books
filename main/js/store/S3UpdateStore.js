@@ -1,24 +1,29 @@
 require('aws-sdk/dist/aws-sdk')
-const AWS = window.AWS
+const root = (typeof self === 'object' && self.self === self && self) ||
+    (typeof global === 'object' && global.global === global && global) ||
+    this
+
+const AWS = root.AWS
 const ObservableData = require('../util/ObservableData')
 
 
 module.exports = class S3UpdateStore {
 
-    constructor(bucketName, keyPrefix, appId, authTracker, identityPoolId) {
-        Object.assign(this, {bucketName, keyPrefix, appId, identityPoolId})
-        authTracker.signIn.sendTo( this.googleLogin.bind(this) )
+    constructor(bucketName, keyPrefix, appId, credentialsSource) {
+        Object.assign(this, {bucketName, keyPrefix, appId})
+        credentialsSource.credentialsAvailable.sendTo( this.credentialsAvailable.bind(this) )
 
         this.updateStored = new ObservableData()
         this.storeAvailable = new ObservableData(false)
 
         this.storeUpdate = this.storeUpdate.bind(this)
+        AWS.config.region = 'eu-west-1'
     }
 
     storeUpdate(update) {
         const prefix = this.keyPrefix ? this.keyPrefix + '/' : ''
         const key = prefix + this.appId + '/' + update.id
-        this._storeInS3(key, JSON.stringify(update)).then( () => this.updateStored.set(update) ).then( () => console.log('Update stored', update.id))
+        this._storeInS3(key, JSON.stringify(update)).then( () => this.updateStored.set(update) ).then( () => console.log('Update stored', update.id)).catch( e => console.error('Failed after sending update', e) )
     }
 
     getUpdates() {
@@ -47,7 +52,7 @@ module.exports = class S3UpdateStore {
 
     _storeInS3(key, objectContent) {
         if (!this.s3) {
-            return Promise.reject()
+            return Promise.reject(new Error("Store not available"))
         }
         const params = {
             Bucket: this.bucketName,
@@ -58,15 +63,8 @@ module.exports = class S3UpdateStore {
         return this.s3.putObject(params).promise().catch( e => console.warn('Failed to send update', e) )
     }
 
-    googleLogin(authResponse) {
-        AWS.config.region = 'eu-west-1'
-        AWS.config.credentials = new AWS.CognitoIdentityCredentials({
-            IdentityPoolId: this.identityPoolId,
-            Logins: {
-                'accounts.google.com': authResponse.id_token
-            }
-        });
-
+    credentialsAvailable(credentials) {
+        AWS.config.credentials = credentials;
 
         this.s3 = new AWS.S3()
         this.storeAvailable.set(true)

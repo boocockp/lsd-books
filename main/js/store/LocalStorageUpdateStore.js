@@ -2,10 +2,10 @@ const {makeInputEvent, makeOutputValue, bindEventFunctions} = require('../util/E
 
 class LocalStorageUpdateStore {
 
-    constructor(appId, storage) {
+    constructor(appId) {
         this.actionStoreKey = `${appId}.actions`
         this.updateStoreKey = `${appId}.updates`
-        this.storage = storage
+        this.storage = window.localStorage
         bindEventFunctions(this)
     }
 

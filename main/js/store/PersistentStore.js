@@ -1,9 +1,6 @@
 const uuid = require('node-uuid')
 
 const ObservableData = require('../util/ObservableData')
-const GoogleSigninTracker = require('../auth/GoogleSigninTracker')
-const LocalStorageUpdateStore = require('./LocalStorageUpdateStore')
-const S3UpdateStore = require('./S3UpdateStore')
 const UpdateRouter = require('./UpdateRouter')
 const NewActionRouter = require('./NewActionRouter')
 const NewActionScheduler = require('./NewActionScheduler')
@@ -15,12 +12,14 @@ function newId() {
 
 module.exports = class PersistentStore {
 
-    constructor(config) {
+    constructor(localStore, remoteStore) {
+        this.localStore = localStore
+        this.remoteStore = remoteStore
         this.externalAction = new ObservableData()
         this.dispatchedAction = new ObservableData()
         this.dispatchAction = this.dispatchAction.bind(this)
 
-        this._assembleComponents(config)
+        this._assembleComponents()
     }
 
     init() {
@@ -32,12 +31,7 @@ module.exports = class PersistentStore {
         this.dispatchedAction.value = storedAction;
     }
 
-
-
-    _assembleComponents(config) {
-        this.localStore = new LocalStorageUpdateStore('reactbooks', localStorage)
-        this.signinTracker = new GoogleSigninTracker()
-        this.remoteStore = new S3UpdateStore('ashridgetech.reactbooks-test', 'updates', 'reactbooks', this.signinTracker, config.identityPoolId)
+    _assembleComponents() {
         this.updateRouter = new UpdateRouter()
         this.newActionRouter = new NewActionRouter()
         this.newActionScheduler = new NewActionScheduler()

@@ -18,7 +18,7 @@ class NewActionScheduler {
     storeRequired() {
         // TODO do not trigger when store in progress
         // TODO trigger only after quiet for an interval
-        return this.newAction.triggered || (this.storeAvailable.triggered && this.storeAvailable.value)
+        return this.storeAvailable.value && (this.newAction.triggered || this.storeAvailable.triggered)
     }
 
 }
