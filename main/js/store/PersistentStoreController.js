@@ -18,8 +18,6 @@ class PersistentStoreController {
     constructor() {
         bindEventFunctions(this)
         this._assembleComponents()
-
-        this.actionsFromApp = new List()
     }
 
     init() {
@@ -56,7 +54,7 @@ class PersistentStoreController {
     }
 
     actionsToDelete() {
-        return this.newActionRouter.actionsToDelete.value
+        return this.newActionRouter.actionsToDelete()
     }
 
     actionToApply() {

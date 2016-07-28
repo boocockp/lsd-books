@@ -18,39 +18,33 @@ class NewActionRouter {
         bindEventFunctions(this)
     }
 
-    // input value
     newActions(actions) {
     }
 
-    // input event
     tryToStore(arg) {
-        console.log('tryToStore', arg)
     }
 
-    // input event
     updateStored(update) {
     }
 
-    // output event
     updateToStore() {
         const actions = this.newActions.value
-        if (actions && actions.length && this.tryToStore) {
+        if (actions && actions.length && this.tryToStore.value) {
             return NewActionRouter.newUpdate(actions)
         }
     }
 
-    // output event
     actionsToDelete() {
-        if (this.updateStored.triggered) return this.updateStored.value.actions
+        if (this.updateStored.value) return this.updateStored.value.actions
     }
 
 }
 
 makeInputValue(NewActionRouter.prototype, "newActions")
 makeInputValue(NewActionRouter.prototype, "tryToStore")
-makeInputEvent(NewActionRouter.prototype, "updateStored")
+makeInputValue(NewActionRouter.prototype, "updateStored")
 
 makeOutputValue(NewActionRouter.prototype, "updateToStore")
-makeOutputEvent(NewActionRouter.prototype, "actionsToDelete")
+makeOutputValue(NewActionRouter.prototype, "actionsToDelete")
 
 module.exports = NewActionRouter
