@@ -1,6 +1,7 @@
-const {makeInputEvent, makeInputValue, makeOutputEvent, bindEventFunctions} = require('../util/Events')
+const {makeInputEvent, makeInputValueList, makeInputValue, makeOutputEvent, bindEventFunctions} = require('../util/Events')
 
 const uuid = require('node-uuid')
+const {List} = require('immutable')
 
 const ObservableData = require('../util/ObservableData')
 const UpdateRouter = require('./UpdateRouter')
@@ -17,6 +18,8 @@ class PersistentStoreController {
     constructor() {
         bindEventFunctions(this)
         this._assembleComponents()
+
+        this.actionsFromApp = new List()
     }
 
     init() {
@@ -40,11 +43,12 @@ class PersistentStoreController {
     }
 
     actionToStore() {
-        return this.actionFromApp.value
+        const existingActions = new List(this.localStoredActions.value || [])
+        return this.actionFromApp.values.filterNot( x => existingActions.find( y => y.id === x.id)).first()
     }
 
     updateToStoreRemote() {
-        return this.newActionRouter.updateToStore.value
+        return this.newActionRouter.updateToStore()
     }
 
     updateToStoreLocal() {
@@ -82,8 +86,8 @@ class PersistentStoreController {
     }
 }
 
-makeInputEvent(PersistentStoreController.prototype, "actionFromApp")
-makeInputEvent(PersistentStoreController.prototype, "localStoredActions")
+makeInputValueList(PersistentStoreController.prototype, "actionFromApp")
+makeInputValue(PersistentStoreController.prototype, "localStoredActions")
 makeInputEvent(PersistentStoreController.prototype, "localStoredUpdates")
 makeInputEvent(PersistentStoreController.prototype, "updateStoredRemote")
 

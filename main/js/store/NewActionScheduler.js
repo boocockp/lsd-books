@@ -1,4 +1,4 @@
-const {makeInputEvent, makeInputValue, makeOutputEvent, bindEventFunctions} = require('../util/Events')
+const {makeInputEvent, makeInputValue, makeOutputValue, bindEventFunctions} = require('../util/Events')
 
 class NewActionScheduler {
 
@@ -18,18 +18,18 @@ class NewActionScheduler {
     storeRequired() {
         // TODO do not trigger when store in progress
         // TODO trigger only after quiet for an interval
-        const result = this.storeAvailable.value && (this.newAction.triggered || this.storeAvailable.changed);
+        const result = !!(this.storeAvailable.value && this.newAction.value);
         console.log('storeRequired', result)
         return result
     }
 
 }
 
-makeInputEvent(NewActionScheduler.prototype, "newAction")
+makeInputValue(NewActionScheduler.prototype, "newAction")
 makeInputEvent(NewActionScheduler.prototype, "updateStored")
 
 makeInputValue(NewActionScheduler.prototype, "storeAvailable")
 
-makeOutputEvent(NewActionScheduler.prototype, "storeRequired")
+makeOutputValue(NewActionScheduler.prototype, "storeRequired")
 
 module.exports = NewActionScheduler

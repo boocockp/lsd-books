@@ -1,11 +1,15 @@
+const {List} = require('immutable')
+
 const EventObserver = require('./EventObserver')
 const InputEventObserver = require('./InputEventObserver')
 const ValueObserver = require('./ValueObserver')
 const InputValueObserver = require('./InputValueObserver')
+const InputValueListObserver = require('./InputValueListObserver')
 
 function bindEventFunctions(obj) {
     inputEvents(obj).concat(outputEvents(obj), inputValues(obj), outputValues(obj)).forEach( p => obj[p] = obj[p].bind(obj) )
     inputValues(obj).forEach( p => new InputValueObserver(obj[p]) )
+    inputValueLists(obj).forEach( p => new InputValueListObserver(obj[p]) )
     inputEvents(obj).forEach( p => new InputEventObserver(obj[p]) )
     outputValues(obj).forEach( p => new ValueObserver(obj[p]) )
     outputEvents(obj).forEach( p => new EventObserver(obj[p]) )
@@ -13,6 +17,10 @@ function bindEventFunctions(obj) {
 
 function inputValues(obj) {
     return Object.getPrototypeOf(obj)._inputValues || []
+}
+
+function inputValueLists(obj) {
+    return Object.getPrototypeOf(obj)._inputValueLists || []
 }
 
 function inputEvents(obj) {
@@ -72,6 +80,31 @@ function makeInputValue(obj, propertyName) {
     obj._inputValues = (obj._inputValues || []).concat(propertyName)
 }
 
+function makeInputValueList(obj, propertyName) {
+    const propDesc = Object.getOwnPropertyDescriptor(obj, propertyName)
+    if (propDesc.value && typeof propDesc.value === "function") {
+        const originalFunction = propDesc.value
+        const newFunction = function (data) {
+            // resetInputEvents(this)
+            const originalFunctionResult = originalFunction.call(this, data)
+            const newData = (originalFunctionResult !== undefined) ? originalFunctionResult : data
+            const newValues = [].concat(newData)
+            const oldValues = this[propertyName].values || new List()
+            this[propertyName].values = oldValues.concat(newValues)
+            this[propertyName].changed = this[propertyName].values !== oldValues
+            notifyOutputChanges(this)
+        };
+        propDesc.value = newFunction
+        Object.defineProperty(obj, propertyName, propDesc)
+        obj[propertyName].values = new List()
+
+    } else {
+        throw new Error(`Cannot make input value with ${propertyName} of ${obj}: property is not a function`)
+    }
+
+    obj._inputValueLists = (obj._inputValueLists || []).concat(propertyName)
+}
+
 function makeInputEvent(obj, propertyName) {
     const propDesc = Object.getOwnPropertyDescriptor(obj, propertyName)
     if (propDesc.value && typeof propDesc.value === "function") {
@@ -99,4 +132,4 @@ function makeOutputValue(obj, propertyName) {
     obj._outputValues = (obj._outputValues || []).concat(propertyName)
 }
 
-module.exports = {makeInputEvent, makeInputValue, makeOutputEvent, makeOutputValue, bindEventFunctions}
+module.exports = {makeInputEvent, makeInputValue, makeInputValueList, makeOutputEvent, makeOutputValue, bindEventFunctions}

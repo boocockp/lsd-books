@@ -1,10 +1,12 @@
+const {List} = require('immutable')
 const EventList = require('./EventList')
 
-module.exports = class InputValueObserver {
+module.exports = class InputValueListObserver {
     constructor(valueFn) {
         this._listeners = []
         this.valueFn = valueFn
         this.valueFn._observer = this
+        this.valueFn.values = new List()
         this.valueFn.forwardTo = this.forwardTo.bind(this)
     }
 

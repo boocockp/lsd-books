@@ -1,4 +1,4 @@
-const {makeInputEvent, makeInputValue, makeOutputEvent, bindEventFunctions} = require('../util/Events')
+const {makeInputEvent, makeInputValue, makeOutputValue, makeOutputEvent, bindEventFunctions} = require('../util/Events')
 
 class NewActionRouter {
 
@@ -23,8 +23,8 @@ class NewActionRouter {
     }
 
     // input event
-    tryToStore() {
-        console.log('tryToStore')
+    tryToStore(arg) {
+        console.log('tryToStore', arg)
     }
 
     // input event
@@ -34,7 +34,7 @@ class NewActionRouter {
     // output event
     updateToStore() {
         const actions = this.newActions.value
-        if (actions && actions.length && this.tryToStore.triggered) {
+        if (actions && actions.length && this.tryToStore) {
             return NewActionRouter.newUpdate(actions)
         }
     }
@@ -47,10 +47,10 @@ class NewActionRouter {
 }
 
 makeInputValue(NewActionRouter.prototype, "newActions")
-makeInputEvent(NewActionRouter.prototype, "tryToStore")
+makeInputValue(NewActionRouter.prototype, "tryToStore")
 makeInputEvent(NewActionRouter.prototype, "updateStored")
 
-makeOutputEvent(NewActionRouter.prototype, "updateToStore")
+makeOutputValue(NewActionRouter.prototype, "updateToStore")
 makeOutputEvent(NewActionRouter.prototype, "actionsToDelete")
 
 module.exports = NewActionRouter
