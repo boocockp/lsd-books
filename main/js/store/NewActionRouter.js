@@ -24,6 +24,7 @@ class NewActionRouter {
 
     // input event
     tryToStore() {
+        console.log('tryToStore')
     }
 
     // input event

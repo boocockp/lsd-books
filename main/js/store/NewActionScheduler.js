@@ -6,7 +6,7 @@ class NewActionScheduler {
         bindEventFunctions(this)
     }
 
-    newAction(action) {
+    newAction() {
     }
 
     updateStored(update) {
@@ -18,14 +18,17 @@ class NewActionScheduler {
     storeRequired() {
         // TODO do not trigger when store in progress
         // TODO trigger only after quiet for an interval
-        return this.storeAvailable.value && (this.newAction.triggered || this.storeAvailable.triggered)
+        const result = this.storeAvailable.value && (this.newAction.triggered || this.storeAvailable.changed);
+        console.log('storeRequired', result)
+        return result
     }
 
 }
 
 makeInputEvent(NewActionScheduler.prototype, "newAction")
 makeInputEvent(NewActionScheduler.prototype, "updateStored")
-makeInputEvent(NewActionScheduler.prototype, "storeAvailable")
+
+makeInputValue(NewActionScheduler.prototype, "storeAvailable")
 
 makeOutputEvent(NewActionScheduler.prototype, "storeRequired")
 

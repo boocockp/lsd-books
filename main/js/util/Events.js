@@ -1,8 +1,12 @@
 const EventObserver = require('./EventObserver')
+const InputEventObserver = require('./InputEventObserver')
 const ValueObserver = require('./ValueObserver')
+const InputValueObserver = require('./InputValueObserver')
 
 function bindEventFunctions(obj) {
     inputEvents(obj).concat(outputEvents(obj), inputValues(obj), outputValues(obj)).forEach( p => obj[p] = obj[p].bind(obj) )
+    inputValues(obj).forEach( p => new InputValueObserver(obj[p]) )
+    inputEvents(obj).forEach( p => new InputEventObserver(obj[p]) )
     outputValues(obj).forEach( p => new ValueObserver(obj[p]) )
     outputEvents(obj).forEach( p => new EventObserver(obj[p]) )
 }
@@ -24,6 +28,10 @@ function outputEvents(obj) {
 }
 
 function resetInputEvents(obj) {
+    inputValues(obj).forEach( f => {
+        obj[f].changed = false
+    })
+
     inputEvents(obj).forEach( f => {
         obj[f].triggered = false
         obj[f].value = undefined
@@ -31,6 +39,12 @@ function resetInputEvents(obj) {
 }
 
 function notifyOutputChanges(obj) {
+    inputValues(obj).forEach( f => {
+        obj[f]._observer.check()
+    })
+    inputEvents(obj).forEach( f => {
+        obj[f]._observer.check()
+    })
     outputValues(obj).forEach( f => {
         obj[f]._observer.checkChange()
     })
@@ -45,8 +59,9 @@ function makeInputValue(obj, propertyName) {
         const originalFunction = propDesc.value
         propDesc.value = function (data) {
             resetInputEvents(this)
-            this[propertyName].value = data
-            originalFunction.call(this, data)
+            this[propertyName].changed = this[propertyName].value !== data
+            const originalFunctionResult = originalFunction.call(this, data)
+            this[propertyName].value = (originalFunctionResult !== undefined) ? originalFunctionResult : data
             notifyOutputChanges(this)
         }
         Object.defineProperty(obj, propertyName, propDesc)
@@ -64,8 +79,8 @@ function makeInputEvent(obj, propertyName) {
         propDesc.value = function (data) {
             resetInputEvents(this)
             this[propertyName].triggered = true
-            this[propertyName].value = data
-            originalFunction.call(this, data)
+            const originalFunctionResult = originalFunction.call(this, data)
+            this[propertyName].value = (originalFunctionResult !== undefined) ? originalFunctionResult : data
             notifyOutputChanges(this)
         }
         Object.defineProperty(obj, propertyName, propDesc)

@@ -1,19 +1,17 @@
 const EventList = require('./EventList')
 
-module.exports = class EventObserver {
+module.exports = class InputEventObserver {
     constructor(eventFn) {
         this._listeners = []
         this.valueFn = eventFn
         this.valueFn._observer = this
-        this.valueFn.sendTo = this.sendTo.bind(this)
+        this.valueFn.forwardTo = this.forwardTo.bind(this)
     }
 
-    checkEvent() {
-        let currentValue = this.valueFn()
-        if (currentValue) {
-            this.notify(currentValue)
+    check() {
+        if (this.valueFn.triggered) {
+            this.notify(this.valueFn.value)
         }
-        this.previousValue = currentValue
     }
 
     notify(data) {
@@ -24,7 +22,7 @@ module.exports = class EventObserver {
         }
     }
 
-    sendTo(...listeners) {
+    forwardTo(...listeners) {
         for( const l of listeners) {
             if (typeof l !== 'function') {
                 throw new Error(`Observable listener must be a function, not ${l}`)
