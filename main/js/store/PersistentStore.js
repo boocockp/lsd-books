@@ -1,6 +1,7 @@
 const uuid = require('node-uuid')
 
 const ObservableData = require('../util/ObservableData')
+const PersistentStoreController = require('./PersistentStoreController')
 const UpdateRouter = require('./UpdateRouter')
 const NewActionRouter = require('./NewActionRouter')
 const NewActionScheduler = require('./NewActionScheduler')
@@ -32,12 +33,9 @@ module.exports = class PersistentStore {
     }
 
     _assembleComponents() {
-        this.updateRouter = new UpdateRouter()
-        this.newActionRouter = new NewActionRouter()
-        this.newActionScheduler = new NewActionScheduler()
-        this.startupRouter = new StartupRouter()
+        this.controller = new PersistentStoreController()
 
-        this.updateRouter.action.sendTo(this.externalAction.set)
+        this.controller.actionToApply.sendTo(this.externalAction.set)
 
         this.dispatchedAction.sendTo(this.localStore.storeAction, this.newActionScheduler.newAction)
 

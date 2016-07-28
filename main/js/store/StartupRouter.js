@@ -1,4 +1,4 @@
-const {makeInputEvent, makeOutputEvent, bindEventFunctions} = require('../util/Events')
+const {makeInputEvent, makeInputValue, makeOutputValue, bindEventFunctions} = require('../util/Events')
 const EventList = require('../util/EventList')
 const NewActionRouter = require('./NewActionRouter')
 
@@ -23,12 +23,13 @@ class StartupRouter {
     }
 
     init() {
+        return true
     }
 
-    update() {
-        if (this.init.triggered) {
+    outgoingUpdates() {
+        if (this.init.value) {
             const actionsUpdate = (this._actions && this._actions.length) ? NewActionRouter.newUpdate(this._actions) : []
-            return new EventList( this._updates.concat(actionsUpdate))
+            return this._updates.concat(actionsUpdate)
         }
     }
 
@@ -36,8 +37,8 @@ class StartupRouter {
 
 makeInputEvent(StartupRouter.prototype, "updates")
 makeInputEvent(StartupRouter.prototype, "actions")
-makeInputEvent(StartupRouter.prototype, "init")
+makeInputValue(StartupRouter.prototype, "init")
 
-makeOutputEvent(StartupRouter.prototype, "update")
+makeOutputValue(StartupRouter.prototype, "outgoingUpdates")
 
 module.exports = StartupRouter

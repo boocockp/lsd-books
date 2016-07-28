@@ -1,30 +1,37 @@
-const {makeInputEvent, makeOutputEvent, bindEventFunctions} = require('../util/Events')
+const EventList = require('../util/EventList')
+const {makeInputEvent, makeInputValue, makeOutputValue, makeOutputEvent, bindEventFunctions} = require('../util/Events')
 
 class UpdateRouter {
 
     constructor() {
-        this.actionsApplied = new Set()
+        this.actionIdsApplied = new Set()
         this.updateIdsApplied = new Set()
+        this.latestUpdates = []
         bindEventFunctions(this)
-        this.update = this.update.bind(this)
     }
 
     updatesAvailable(newUpdateIds) {
     }
 
-    update(update) {
-        update.actions.filter( a => !this.actionsApplied.has(a.id))
-            .forEach( this._actionToApply )
+    updates(updates) {
+        const updatesArray = [].concat(updates)
+        this.updateIdsApplied.add(this.latestUpdates.map( x => x.id ))
+        let actionIds = (update) => update.actions.map( x => x.id )
+        const latestActionIds = [].concat(...this.latestUpdates.map(actionIds))
 
-        this.updateIdsApplied.add(update.id)
+        this.actionIdsApplied.add(latestActionIds)
+
+        this.latestUpdates = updatesArray
     }
 
-    _actionToApply(action) {
-        this.actionsApplied.add(action.id)
-    }
+    actions() {
+        let actions = (update) => update.actions
+        const latestActions = [].concat(...this.latestUpdates.map(actions))
+        const newActions = latestActions.filter( a => !this.actionIdsApplied.has(a.id))
 
-    action() {
-        return this._actionToApply.triggered && this._actionToApply.value
+        if (newActions.length) {
+            return new EventList(newActions)
+        }
     }
 
     updateIdsWanted() {
@@ -34,8 +41,8 @@ class UpdateRouter {
 
 module.exports = UpdateRouter
 
-makeInputEvent(UpdateRouter.prototype, "updatesAvailable")
-makeInputEvent(UpdateRouter.prototype, "_actionToApply")
+makeInputValue(UpdateRouter.prototype, "updatesAvailable")
+makeInputValue(UpdateRouter.prototype, "updates")
 
-makeOutputEvent(UpdateRouter.prototype, "action")
-makeOutputEvent(UpdateRouter.prototype, "updateIdsWanted")
+makeOutputValue(UpdateRouter.prototype, "actions")
+makeOutputValue(UpdateRouter.prototype, "updateIdsWanted")

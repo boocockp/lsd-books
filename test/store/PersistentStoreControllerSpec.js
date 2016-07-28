@@ -88,4 +88,17 @@ describe("Persistent store controller", function () {
         controller.actionsToDelete().should.eql([savedAction1, savedAction2])
         controller.updateToStoreLocal().actions.should.containSubset([savedAction1, savedAction2])
     });
+
+    it("on startup sends actions from local stored updates to action to apply one at a time", function () {
+        const actionsOutput = []
+        controller.actionToApply.sendTo( x => actionsOutput.push(x) )
+
+        controller.localStoredUpdates([update([savedAction1, savedAction2]), update([savedAction3])])
+        should.not.exist(controller.actionToApply())
+        actionsOutput.should.be.empty
+
+        controller.init()
+        actionsOutput.should.eql([savedAction1, savedAction2, savedAction3])
+    });
+
 })

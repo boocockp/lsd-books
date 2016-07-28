@@ -1,4 +1,4 @@
-const {makeInputEvent, makeInputValueList, makeInputValue, makeOutputEvent, bindEventFunctions} = require('../util/Events')
+const {makeInputEvent, makeInputValueList, makeInputValue, makeOutputValue, makeOutputEvent, bindEventFunctions} = require('../util/Events')
 
 const uuid = require('node-uuid')
 const {List} = require('immutable')
@@ -16,6 +16,7 @@ function newId() {
 class PersistentStoreController {
 
     constructor() {
+        this.actionToApply
         bindEventFunctions(this)
         this._assembleComponents()
     }
@@ -31,7 +32,7 @@ class PersistentStoreController {
     localStoredActions(actions) {
     }
 
-    localStoredUpdates(actions) {
+    localStoredUpdates(updates) {
     }
 
     updateStoredRemote(update) {
@@ -58,7 +59,7 @@ class PersistentStoreController {
     }
 
     actionToApply() {
-        return this.updateRouter.action.value
+        return this.updateRouter.actions()
     }
 
     _assembleComponents() {
@@ -74,7 +75,7 @@ class PersistentStoreController {
         this.localStoredActions.forwardTo(this.startupRouter.actions)
         this.localStoredUpdates.forwardTo(this.startupRouter.updates)
 
-        this.startupRouter.update.sendTo(this.updateRouter.update)
+        this.startupRouter.outgoingUpdates.sendTo(this.updateRouter.updates)
 
         this.updateStoredRemote.forwardTo(this.newActionRouter.updateStored,
                                                 this.newActionScheduler.updateStored)
@@ -84,10 +85,11 @@ class PersistentStoreController {
     }
 }
 
+makeInputValue(PersistentStoreController.prototype, "init")
 makeInputValueList(PersistentStoreController.prototype, "actionFromApp")
 makeInputValue(PersistentStoreController.prototype, "localStoredActions")
-makeInputEvent(PersistentStoreController.prototype, "localStoredUpdates")
-makeInputEvent(PersistentStoreController.prototype, "updateStoredRemote")
+makeInputValue(PersistentStoreController.prototype, "localStoredUpdates")
+makeInputValue(PersistentStoreController.prototype, "updateStoredRemote")
 
 makeInputValue(PersistentStoreController.prototype, "remoteStoreAvailable")
 
@@ -95,7 +97,7 @@ makeOutputEvent(PersistentStoreController.prototype, "actionToStore")
 makeOutputEvent(PersistentStoreController.prototype, "updateToStoreRemote")
 makeOutputEvent(PersistentStoreController.prototype, "updateToStoreLocal")
 makeOutputEvent(PersistentStoreController.prototype, "actionsToDelete")
-makeOutputEvent(PersistentStoreController.prototype, "actionToApply")
+makeOutputValue(PersistentStoreController.prototype, "actionToApply")
 
 module.exports = PersistentStoreController
 
