@@ -1,7 +1,5 @@
-const {makeInputEvent, makeInputValueList, makeInputValue, makeOutputValue, makeOutputEvent, bindEventFunctions} = require('../util/Events')
-
 const uuid = require('node-uuid')
-const {List} = require('immutable')
+const {Record, List, Map} = require('immutable')
 
 const ObservableData = require('../util/ObservableData')
 const UpdateRouter = require('./UpdateRouter')
@@ -13,91 +11,67 @@ function newId() {
     return uuid.v4()
 }
 
-class PersistentStoreController {
+class PersistentStoreController extends Record({_actionsFromApp: new List(),
+                                                _localStoredActions: new List(),
+                                                _localStoredUpdates: new List(),
+                                                _updateStoredRemote: null,
+                                                _remoteStoreAvailable: false}) {
 
     constructor() {
-        this.actionToApply
         bindEventFunctions(this)
-        this._assembleComponents()
     }
 
-    init() {
-        this.startupRouter.init()
+    prev(previousState) {
+        this._previousState = {
+            actionsToApply: previousState.actionsToApply()
+        }
     }
 
     actionFromApp(action) {
-        return Object.assign({id: newId()}, action)
+        const actionWithId = Object.assign({id: newId()}, action)
+        return this.update('_actionsFromApp', l => l.push(actionWithId)).prev(this);
     }
 
     localStoredActions(actions) {
+        return this.set('_localStoredActions', actions).prev(this)
     }
 
     localStoredUpdates(updates) {
+        return this.set('_localStoredUpdates', updates).prev(this)
     }
 
     updateStoredRemote(update) {
+       return this.set('_updateStoredRemote', update).prev(this)
     }
 
     remoteStoreAvailable(isAvailable) {
+        return this.set('_remoteStoreAvailable', isAvailable).prev(this)
     }
 
     actionToStore() {
-        const existingActions = new List(this.localStoredActions.value || [])
-        return this.actionFromApp.values.filterNot( x => existingActions.find( y => y.id === x.id)).first()
+        return this._actionsFromApp.filterNot( x => this._localStoredActions.find( y => y.id === x.id)).first()
     }
 
     updateToStoreRemote() {
-        return this.newActionRouter.updateToStore()
+        const actions = this._localStoredActions
+        if (actions.size && this._remoteStoreAvailable) {
+            return NewActionRouter.newUpdate(actions)
+        }
     }
 
     updateToStoreLocal() {
-        return this.updateStoredRemote.value
+        return this._updateStoredRemote
     }
 
     actionsToDelete() {
-        return this.newActionRouter.actionsToDelete()
+        if (this._updateStoredRemote) return this._updateStoredRemote.actions
     }
 
-    actionToApply() {
-        return this.updateRouter.actions()
+    actionsToApply() {
+        return this._localStoredActions.toSet().subtract(this._actionsFromApp).subtract(this._previousState.actionsToApply)
     }
 
-    _assembleComponents() {
-        this.updateRouter = new UpdateRouter()
-        this.newActionRouter = new NewActionRouter()
-        this.newActionScheduler = new NewActionScheduler()
-        this.startupRouter = new StartupRouter()
-
-        this.actionFromApp.forwardTo(this.newActionScheduler.newAction)
-
-        this.localStoredActions.forwardTo(this.newActionScheduler.newAction)
-        this.localStoredActions.forwardTo(this.newActionRouter.newActions)
-        this.localStoredActions.forwardTo(this.startupRouter.actions)
-        this.localStoredUpdates.forwardTo(this.startupRouter.updates)
-
-        this.startupRouter.outgoingUpdates.sendTo(this.updateRouter.updates)
-
-        this.updateStoredRemote.forwardTo(this.newActionRouter.updateStored,
-                                                this.newActionScheduler.updateStored)
-        this.remoteStoreAvailable.forwardTo(this.newActionScheduler.storeAvailable)
-        this.newActionScheduler.storeRequired.sendTo(this.newActionRouter.tryToStore)
-
-    }
-}
-
-makeInputValue(PersistentStoreController.prototype, "init")
-makeInputValueList(PersistentStoreController.prototype, "actionFromApp")
-makeInputValue(PersistentStoreController.prototype, "localStoredActions")
-makeInputValue(PersistentStoreController.prototype, "localStoredUpdates")
-makeInputValue(PersistentStoreController.prototype, "updateStoredRemote")
-
-makeInputValue(PersistentStoreController.prototype, "remoteStoreAvailable")
-
-makeOutputEvent(PersistentStoreController.prototype, "actionToStore")
-makeOutputEvent(PersistentStoreController.prototype, "updateToStoreRemote")
-makeOutputEvent(PersistentStoreController.prototype, "updateToStoreLocal")
-makeOutputEvent(PersistentStoreController.prototype, "actionsToDelete")
-makeOutputValue(PersistentStoreController.prototype, "actionToApply")
+ }
 
 module.exports = PersistentStoreController
 
