@@ -18,13 +18,14 @@ module.exports = class PersistentStore {
         this.remoteStore = remoteStore
         this.externalAction = new ObservableData()
         this.dispatchedAction = new ObservableData()
+        this.controller = new PersistentStoreController()
         this.dispatchAction = this.dispatchAction.bind(this)
 
         this._assembleComponents()
     }
 
     init() {
-        this.startupRouter.init()
+        this.controller.init()
     }
 
     dispatchAction(action) {
@@ -33,25 +34,20 @@ module.exports = class PersistentStore {
     }
 
     _assembleComponents() {
-        this.controller = new PersistentStoreController()
+        const {localStore, remoteStore, controller} = this;
 
-        this.controller.actionToApply.sendTo(this.externalAction.set)
+        controller.actionToApply.sendTo(this.externalAction.set)
+        this.dispatchedAction.sendTo(controller.actionFromApp)
 
-        this.dispatchedAction.sendTo(this.localStore.storeAction, this.newActionScheduler.newAction)
+        controller.actionToStore.sendTo(localStore.storeAction)
+        localStore.allActions.sendTo(controller.localStoredActions)
+        controller.updateToStoreLocal.sendTo(localStore.storeUpdate)
+        controller.actionsToDelete.sendTo(localStore.deleteActions)
+        localStore.allUpdates.sendTo(controller.localStoredUpdates)
 
-        this.localStore.allActions.sendTo(this.newActionRouter.newActions)
-
-        this.localStore.allActions.sendTo(this.startupRouter.actions)
-        this.localStore.allUpdates.sendTo(this.startupRouter.updates)
-        this.startupRouter.update.sendTo(this.updateRouter.update)
-
-        this.newActionRouter.updateToStore.sendTo(this.remoteStore.storeUpdate)
-        this.remoteStore.updateStored.sendTo(this.newActionRouter.updateStored,
-                                                this.newActionScheduler.updateStored,
-                                                this.localStore.storeUpdate)
-        this.remoteStore.storeAvailable.sendTo(this.newActionScheduler.storeAvailable)
-        this.newActionScheduler.storeRequired.sendTo(this.newActionRouter.tryToStore)
-        this.newActionRouter.actionsToDelete.sendTo(this.localStore.deleteActions)
+        remoteStore.storeAvailable.sendTo(controller.remoteStoreAvailable)
+        controller.updateToStoreRemote.sendTo(remoteStore.storeUpdate)
+        remoteStore.updateStored.sendTo(controller.updateStoredRemote)
 
     }
 }

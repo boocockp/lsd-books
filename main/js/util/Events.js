@@ -7,7 +7,7 @@ const InputValueObserver = require('./InputValueObserver')
 const InputValueListObserver = require('./InputValueListObserver')
 
 function bindEventFunctions(obj) {
-    inputEvents(obj).concat(outputEvents(obj), inputValues(obj), outputValues(obj)).forEach( p => obj[p] = obj[p].bind(obj) )
+    inputEvents(obj).concat(outputEvents(obj), inputValues(obj), inputValueLists(obj), outputValues(obj)).forEach( p => obj[p] = obj[p].bind(obj) )
     inputValues(obj).forEach( p => new InputValueObserver(obj[p]) )
     inputValueLists(obj).forEach( p => new InputValueListObserver(obj[p]) )
     inputEvents(obj).forEach( p => new InputEventObserver(obj[p]) )
