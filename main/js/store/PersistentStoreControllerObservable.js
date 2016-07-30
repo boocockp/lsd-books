@@ -1,7 +1,14 @@
+const {makeInputEvent, makeInputValue, makeOutputValue, makeOutputEvent, bindEventFunctions} = require('../util/Events')
+
 class PersistentStoreControllerObservable {
 
     constructor(state) {
         this.state = state
+        bindEventFunctions(this)
+    }
+
+    init() {
+        this.state = this.state.init()
     }
 
     actionFromApp(action) {
@@ -25,43 +32,39 @@ class PersistentStoreControllerObservable {
     }
 
     actionToStore() {
-        return this._actionsFromApp.filterNot( x => this._localStoredActions.find( y => y.id === x.id)).first()
+        return this.state.actionToStore()
     }
 
     updateToStoreRemote() {
-        const actions = this._localStoredActions
-        if (actions.size && this._remoteStoreAvailable) {
-            return NewActionRouter.newUpdate(actions)
-        }
+        return this.state.updateToStoreRemote()
     }
 
     updateToStoreLocal() {
-        return this._updateStoredRemote
+        return this.state.updateToStoreLocal()
     }
 
     actionsToDelete() {
-        if (this._updateStoredRemote) return this._updateStoredRemote.actions
+        return this.state.actionsToDelete()
     }
 
     actionsToApply() {
-        return this._localStoredActions.toSet().subtract(this._actionsFromApp).subtract(this._previousState.actionsToApply)
+        return this.state.actionsToApply()
     }
 
 }
 
-// makeInputValue(PersistentStoreController.prototype, "init")
-// makeInputValueList(PersistentStoreController.prototype, "actionFromApp")
-// makeInputValue(PersistentStoreController.prototype, "localStoredActions")
-// makeInputValue(PersistentStoreController.prototype, "localStoredUpdates")
-// makeInputValue(PersistentStoreController.prototype, "updateStoredRemote")
-//
-// makeInputValue(PersistentStoreController.prototype, "remoteStoreAvailable")
-//
-// makeOutputEvent(PersistentStoreController.prototype, "actionToStore")
-// makeOutputEvent(PersistentStoreController.prototype, "updateToStoreRemote")
-// makeOutputEvent(PersistentStoreController.prototype, "updateToStoreLocal")
-// makeOutputEvent(PersistentStoreController.prototype, "actionsToDelete")
-// makeOutputValue(PersistentStoreController.prototype, "actionToApply")
+makeInputValue(PersistentStoreControllerObservable.prototype, "init")
+makeInputValue(PersistentStoreControllerObservable.prototype, "actionFromApp")
+makeInputValue(PersistentStoreControllerObservable.prototype, "localStoredActions")
+makeInputValue(PersistentStoreControllerObservable.prototype, "localStoredUpdates")
+makeInputValue(PersistentStoreControllerObservable.prototype, "updateStoredRemote")
+makeInputValue(PersistentStoreControllerObservable.prototype, "remoteStoreAvailable")
 
-module.exports = PersistentStoreController
+makeOutputValue(PersistentStoreControllerObservable.prototype, "actionToStore")
+makeOutputValue(PersistentStoreControllerObservable.prototype, "updateToStoreRemote")
+makeOutputValue(PersistentStoreControllerObservable.prototype, "updateToStoreLocal")
+makeOutputValue(PersistentStoreControllerObservable.prototype, "actionsToDelete")
+makeOutputValue(PersistentStoreControllerObservable.prototype, "actionsToApply")
+
+module.exports = PersistentStoreControllerObservable
 

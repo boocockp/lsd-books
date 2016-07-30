@@ -3,9 +3,11 @@ const EventList = require('./EventList')
 module.exports = class ValueObserver {
     constructor(eventFn) {
         this._listeners = []
+        this._listeners = []
         this.valueFn = eventFn
         this.valueFn._observer = this
         this.valueFn.sendTo = this.sendTo.bind(this)
+        this.valueFn.sendFlatTo = this.sendFlatTo.bind(this)
     }
 
     checkChange() {
@@ -38,6 +40,20 @@ module.exports = class ValueObserver {
             if (currentValue !== undefined) {
                 l(currentValue)
             }
+        }
+    }
+
+    sendFlatTo(...listeners) {
+        this.sendTo(...listeners.map(this.flatListener))
+
+    }
+
+    flatListener(listener) {
+        return function(collection) {
+            collection.forEach( x => {
+                listener(x)
+                return true
+            } )
         }
     }
 }

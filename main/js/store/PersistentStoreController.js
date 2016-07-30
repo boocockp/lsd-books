@@ -1,12 +1,6 @@
 const uuid = require('node-uuid')
 const {Record, List, Map} = require('immutable')
 
-const ObservableData = require('../util/ObservableData')
-const UpdateRouter = require('./UpdateRouter')
-const NewActionRouter = require('./NewActionRouter')
-const NewActionScheduler = require('./NewActionScheduler')
-const StartupRouter = require('./StartupRouter')
-
 function newId() {
     return uuid.v4()
 }
@@ -15,16 +9,38 @@ class PersistentStoreController extends Record({_actionsFromApp: new List(),
                                                 _localStoredActions: new List(),
                                                 _localStoredUpdates: new List(),
                                                 _updateStoredRemote: null,
-                                                _remoteStoreAvailable: false}) {
+                                                _remoteStoreAvailable: false,
+                                                _started: false}) {
+
+    static newId() {
+        const ensureUnique = Math.floor(Math.random() * 1000000)
+        return Date.now() + '-' + ensureUnique
+    }
+
+    static newUpdate(actions) {
+        return {
+            id: PersistentStoreController.newId(),
+            actions: actions
+        }
+    }
+
 
     constructor() {
-        bindEventFunctions(this)
+        super()
+        this.prev(null)
     }
 
     prev(previousState) {
         this._previousState = {
-            actionsToApply: previousState.actionsToApply()
+            actionsToApply: previousState ? previousState.actionsToApply() : null,
+            updateToStoreLocal: previousState ? previousState.updateToStoreLocal() : null
         }
+
+        return this
+    }
+
+    init() {
+        return this.set('_started', true).prev(this)
     }
 
     actionFromApp(action) {
@@ -33,11 +49,11 @@ class PersistentStoreController extends Record({_actionsFromApp: new List(),
     }
 
     localStoredActions(actions) {
-        return this.set('_localStoredActions', actions).prev(this)
+        return this.set('_localStoredActions', List(actions)).prev(this)
     }
 
     localStoredUpdates(updates) {
-        return this.set('_localStoredUpdates', updates).prev(this)
+        return this.set('_localStoredUpdates', List(updates)).prev(this)
     }
 
     updateStoredRemote(update) {
@@ -55,20 +71,26 @@ class PersistentStoreController extends Record({_actionsFromApp: new List(),
     updateToStoreRemote() {
         const actions = this._localStoredActions
         if (actions.size && this._remoteStoreAvailable) {
-            return NewActionRouter.newUpdate(actions)
+            return PersistentStoreController.newUpdate(actions)
         }
     }
 
     updateToStoreLocal() {
-        return this._updateStoredRemote
+        if (this._updateStoredRemote != this._previousState.updateToStoreLocal) {
+            return this._updateStoredRemote
+        }
     }
 
     actionsToDelete() {
-        if (this._updateStoredRemote) return this._updateStoredRemote.actions
+        if (this.updateToStoreLocal()) return this._updateStoredRemote.actions
     }
 
     actionsToApply() {
-        return this._localStoredActions.toSet().subtract(this._actionsFromApp).subtract(this._previousState.actionsToApply)
+        if (this._started) {
+            const actionsFromUpdates = this._localStoredUpdates.reduce( (acc, val) => acc.concat(val.actions), [])
+            const allActions = List(actionsFromUpdates).concat(this._localStoredActions)
+            return allActions.toSet().subtract(this._actionsFromApp).subtract(this._previousState.actionsToApply)
+        }
     }
 
  }

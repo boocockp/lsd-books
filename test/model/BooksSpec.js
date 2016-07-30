@@ -1,5 +1,4 @@
 let chai = require('chai'),
-    chaiSubset = require('chai-subset'),
     _ = require('lodash'),
     Books = require('../../main/js/model/Books'),
     Account = require('../../main/js/model/Account'),
@@ -9,26 +8,10 @@ let chai = require('chai'),
     // Observe = require('../../shared/modules/observe/Observe'),
     JsonUtil = require('../../shared/modules/json/JsonUtil'),
     {DEBIT, CREDIT} = require('../../main/js/model/Types').DebitCredit,
-    {FIXED_ASSET, CURRENT_ASSET, LONG_TERM_LIABILITY, CURRENT_LIABILITY, CAPITAL, EXPENSE, REVENUE} = require('../../main/js/model/Types').AccountType;
+    {FIXED_ASSET, CURRENT_ASSET, LONG_TERM_LIABILITY, CURRENT_LIABILITY, CAPITAL, EXPENSE, REVENUE} = require('../../main/js/model/Types').AccountType,
+    {jsEqual, jsMatch} = require('../testutil/ChaiHelpers')
 
 chai.should();
-chai.use(chaiSubset);
-
-function jsEqual(chai, utils) {
-    var Assertion = chai.Assertion;
-
-    Assertion.addMethod('jsEql', function (expected) {
-        new Assertion(this._obj.toJS()).to.eql(expected);
-    });
-}
-
-function jsMatch(chai, utils) {
-    var Assertion = chai.Assertion;
-
-    Assertion.addMethod('jsMatch', function (expected) {
-        new Assertion(this._obj.toJS()).to.containSubset(expected);
-    });
-}
 
 chai.use(jsEqual);
 chai.use(jsMatch);
