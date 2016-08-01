@@ -8,7 +8,7 @@ const FormSelectItem = React.createClass({
     },
     handleChange: function (event) {
         const optionValue = event.target.value
-        const value = this.props.options.find( x => x.name === optionValue)
+        const value = this.props.options.find( x => x.name === optionValue) || null
         this.setState({value})
         if (this.props.onChange) {
             this.props.onChange(value)
@@ -20,7 +20,8 @@ const FormSelectItem = React.createClass({
         return (
             <FormGroup controlId={fieldId} >
                 <ControlLabel>{this.props.label}</ControlLabel>
-                <FormControl componentClass="select" value={this.state.value} placeholder={this.props.placeholder} onChange={this.handleChange}>
+                <FormControl componentClass="select" value={this.state.value || ""} onChange={this.handleChange}>
+                    { this.props.placeholder ? <option value="">{this.props.placeholder}</option> : ""}
                     {optionList.map( op => <option key={op.value} value={op.value}>{op.name}</option> )}
                 </FormControl>
                 <FormControl.Feedback />

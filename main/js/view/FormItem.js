@@ -4,11 +4,12 @@ const {FormGroup, ControlLabel, FormControl, HelpBlock} = require('react-bootstr
 
 const FormItem = React.createClass({
     getInitialState: function () {
-        return {value: this.props.value};
+        return {value: this.props.value}
     },
     handleChange: function (event) {
-        const value = event.target.value;
-        this.setState({value});
+        const valueStr = event.target.value
+        const value = valueStr === '' ? null : valueStr
+        this.setState({value})
         if (this.props.onChange) {
             this.props.onChange(value)
         }
@@ -18,7 +19,7 @@ const FormItem = React.createClass({
         return (
             <FormGroup controlId={fieldId} >
                 <ControlLabel>{this.props.label}</ControlLabel>
-                <FormControl type="text" value={this.state.value} placeholder={this.props.placeholder} onChange={this.handleChange} />
+                <FormControl type="text" value={this.state.value || ''} placeholder={this.props.placeholder} onChange={this.handleChange} />
                 <FormControl.Feedback />
                 {this.props.help ? <HelpBlock>{this.props.help}</HelpBlock> : ''}
             </FormGroup>

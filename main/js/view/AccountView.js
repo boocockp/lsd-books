@@ -11,13 +11,14 @@ let AccountView = React.createClass({
     render: function () {
         this.formChanges = {}
         const change = (name) => (value) => this.onChange(name, value)
+        const account = this.props.account
         return (
             <div >
-                <h2>Account {this.props.account.code} - {this.props.account.name}</h2>
+                <h2>{account.id ? `Account ${account.code} - ${account.name}` : "New Account"}</h2>
                 <form>
-                    <FormItem onChange={change("name")} value={this.props.account.name} label="Name" placeholder="The descriptive name"/>
-                    <FormItem onChange={change("code")} value={this.props.account.code} label="Code" placeholder="The account short code" help="Must be 4 digits"/>
-                    <FormSelectItem onChange={change("type")} value={this.props.account.type} label="Type" placeholder="The type of account" options={AccountType.values()}/>
+                    <FormItem onChange={change("name")} value={account.name} label="Name" placeholder="The descriptive name"/>
+                    <FormItem onChange={change("code")} value={account.code} label="Code" placeholder="The account short code" help="Must be 4 digits"/>
+                    <FormSelectItem onChange={change("type")} value={account.type} label="Type" placeholder="The type of account" options={AccountType.values()}/>
                 </form>
                 <button type="submit" className="btn btn-default" onClick={this.onSave}>Save</button>
             </div>
@@ -32,7 +33,15 @@ let AccountView = React.createClass({
     onSave: function(e) {
         console.log('save', this.formChanges)
         e.preventDefault()
-        this.props.dispatch(updateAccount(Object.assign({id: this.props.account.id}, this.formChanges)))
+        if (this.props.account.id) {
+            this.props.dispatch(updateAccount(Object.assign({id: this.props.account.id}, this.formChanges)))
+        } else {
+            const action = addAccount(Object.assign(this.formChanges));
+            this.props.dispatch(action)
+            if (this.props.onNewObjectSaved) {
+                this.props.onNewObjectSaved(action.data)
+            }
+        }
     }
 })
 
@@ -40,6 +49,7 @@ AccountView = connect()(AccountView)
 
 AccountView.propTypes = {
     account: PropTypes.instanceOf(Account).isRequired,
+    onNewObjectSaved: PropTypes.func
 }
 
 module.exports = AccountView

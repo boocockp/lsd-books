@@ -10,7 +10,7 @@ const Account = require('../model/Account')
 const AccountListWithView = React.createClass({
     render: function () {
         const p = this.props
-        const selectedAccountId = parseInt(p.selectedAccountId)
+        const selectedAccountId = p.selectedAccountId
         const account = p.selectedAccountId === "new" ? new Account() : p.accounts.find(a => a.id === selectedAccountId)
         return (
             <Grid>
@@ -19,7 +19,7 @@ const AccountListWithView = React.createClass({
                         {this.props.onNew ? <Button onClick={this.newObject}>New</Button> : ''}
                         <AccountList accounts={p.accounts} selectedAccountId={selectedAccountId} onSelect={this.select}/>
                     </Col>
-                    <Col xs={12} md={9}>{account ? <AccountView account={account}/> : '' }</Col>
+                    <Col xs={12} md={9}>{account ? <AccountView account={account} onNewObjectSaved={this.newObjectSaved}/> : '' }</Col>
                 </Row>
             </Grid>
         )
@@ -31,6 +31,10 @@ const AccountListWithView = React.createClass({
 
     newObject: function() {
         this.props.onNew && this.props.onNew()
+    },
+
+    newObjectSaved: function(data) {
+        this.select(data)
     }
 })
 
