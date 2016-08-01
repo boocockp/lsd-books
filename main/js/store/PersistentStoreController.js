@@ -1,8 +1,8 @@
 const uuid = require('node-uuid')
 const {Record, List, Map} = require('immutable')
 
-function newId() {
-    return uuid.v4()
+function subtractById(original, itemsToRemove) {
+    return original.filterNot( x => itemsToRemove.find( y => y.id === x.id) )
 }
 
 class PersistentStoreController extends Record({_actionsFromApp: new List(),
@@ -24,7 +24,6 @@ class PersistentStoreController extends Record({_actionsFromApp: new List(),
         }
     }
 
-
     constructor() {
         super()
         this.prev(null)
@@ -32,7 +31,7 @@ class PersistentStoreController extends Record({_actionsFromApp: new List(),
 
     prev(previousState) {
         this._previousState = {
-            actionsToApply: previousState ? previousState.actionsToApply() : null,
+            actionsToApply: previousState ? previousState.actionsToApply() : List(),
             updateToStoreLocal: previousState ? previousState.updateToStoreLocal() : null
         }
 
@@ -44,7 +43,7 @@ class PersistentStoreController extends Record({_actionsFromApp: new List(),
     }
 
     actionFromApp(action) {
-        const actionWithId = Object.assign({id: newId()}, action)
+        const actionWithId = Object.assign({id: PersistentStoreController.newId()}, action)
         return this.update('_actionsFromApp', l => l.push(actionWithId)).prev(this);
     }
 
@@ -88,9 +87,13 @@ class PersistentStoreController extends Record({_actionsFromApp: new List(),
     actionsToApply() {
         if (this._started) {
             const actionsFromUpdates = this._localStoredUpdates.reduce( (acc, val) => acc.concat(val.actions), [])
-            const allActions = List(actionsFromUpdates).concat(this._localStoredActions)
-            return allActions.toSet().subtract(this._actionsFromApp).subtract(this._previousState.actionsToApply)
+            let allActions = List(actionsFromUpdates).concat(this._localStoredActions)
+            allActions = subtractById(allActions, this._actionsFromApp)
+            allActions = subtractById(allActions, this._previousState.actionsToApply)
+            return allActions
         }
+
+        return List()
     }
 
  }

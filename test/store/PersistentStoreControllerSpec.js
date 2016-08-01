@@ -101,7 +101,7 @@ describe("Persistent store controller", function () {
         controller.actionsToApply.sendFlatTo( x => actionsOutput.push(x) )
 
         controller.localStoredUpdates([update([savedAction1, savedAction2]), update([savedAction3])])
-        should.not.exist(controller.actionsToApply())
+        controller.actionsToApply().size.should.eql(0)
         actionsOutput.should.be.empty
 
         controller.init()

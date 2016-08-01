@@ -1,6 +1,7 @@
 const uuid = require('node-uuid')
 
 const ObservableData = require('../util/ObservableData')
+const PersistentStoreControllerObservable = require('./PersistentStoreControllerObservable')
 const PersistentStoreController = require('./PersistentStoreController')
 const UpdateRouter = require('./UpdateRouter')
 const NewActionRouter = require('./NewActionRouter')
@@ -18,7 +19,7 @@ module.exports = class PersistentStore {
         this.remoteStore = remoteStore
         this.externalAction = new ObservableData()
         this.dispatchedAction = new ObservableData()
-        this.controller = new PersistentStoreController()
+        this.controller = new PersistentStoreControllerObservable(new PersistentStoreController())
         this.dispatchAction = this.dispatchAction.bind(this)
 
         this._assembleComponents()
@@ -36,7 +37,7 @@ module.exports = class PersistentStore {
     _assembleComponents() {
         const {localStore, remoteStore, controller} = this;
 
-        controller.actionToApply.sendTo(this.externalAction.set)
+        controller.actionsToApply.sendFlatTo(this.externalAction.set)
         this.dispatchedAction.sendTo(controller.actionFromApp)
 
         controller.actionToStore.sendTo(localStore.storeAction)

@@ -21,7 +21,7 @@ module.exports = class ValueObserver {
     notify(data) {
         if (data instanceof EventList) {
             data.events.forEach( e => this.notify(e))
-        } else {
+        } else if (data !== undefined) {
             this._listeners.map(l => l(data) )
         }
     }
