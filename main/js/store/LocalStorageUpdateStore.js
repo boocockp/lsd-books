@@ -1,4 +1,5 @@
 const ObservableData = require('../util/ObservableData')
+const JsonUtil = require('../../../shared/modules/json/JsonUtil')
 
 module.exports = class LocalStorageUpdateStore {
 
@@ -17,20 +18,20 @@ module.exports = class LocalStorageUpdateStore {
 
     storeAction(action) {
         const updatedActions = this._getActions().concat(action)
-        this.storage.setItem(this.actionStoreKey, JSON.stringify(updatedActions))
+        this.storage.setItem(this.actionStoreKey, JsonUtil.toStore(updatedActions))
         this.allActions.value = updatedActions
     }
 
     deleteActions(actions) {
         const deletedIds = new Set(actions.map( a => a.id))
         const updatedActions = this._getActions().filter( a => !deletedIds.has(a.id) )
-        this.storage.setItem(this.actionStoreKey, JSON.stringify(updatedActions))
+        this.storage.setItem(this.actionStoreKey, JsonUtil.toStore(updatedActions))
         this.allActions.value = updatedActions
     }
 
     storeUpdate(update) {
         const updatedUpdates = this._getUpdates().concat(update)
-        this.storage.setItem(this.updateStoreKey, JSON.stringify(updatedUpdates))
+        this.storage.setItem(this.updateStoreKey, JsonUtil.toStore(updatedUpdates))
         this.allUpdates.value = updatedUpdates
     }
 
@@ -38,11 +39,11 @@ module.exports = class LocalStorageUpdateStore {
 
     _getActions() {
         const actionsJson = this.storage.getItem(this.actionStoreKey) || '[]'
-        return JSON.parse(actionsJson)
+        return JsonUtil.fromStore(actionsJson)
     }
 
     _getUpdates() {
         const updatesJson = this.storage.getItem(this.updateStoreKey) || '[]'
-        return JSON.parse(updatesJson)
+        return JsonUtil.fromStore(updatesJson)
     }
 }

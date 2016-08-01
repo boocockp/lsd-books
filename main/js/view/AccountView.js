@@ -2,7 +2,9 @@ const React = require('react')
 const { connect } = require('react-redux')
 const {PropTypes} = require('react')
 const Account = require('../model/Account')
+const {AccountType} = require('../model/Types')
 const FormItem = require('./FormItem')
+const FormSelectItem = require('./FormSelectItem')
 const {addAccount, updateAccount, addTransaction} = require('../app/actions')
 
 let AccountView = React.createClass({
@@ -15,7 +17,7 @@ let AccountView = React.createClass({
                 <form>
                     <FormItem onChange={change("name")} value={this.props.account.name} label="Name" placeholder="The descriptive name"/>
                     <FormItem onChange={change("code")} value={this.props.account.code} label="Code" placeholder="The account short code" help="Must be 4 digits"/>
-                    <FormItem onChange={change("type")} value={this.props.account.type.name} label="Type" placeholder="The type of account"/>
+                    <FormSelectItem onChange={change("type")} value={this.props.account.type} label="Type" placeholder="The type of account" options={AccountType.values()}/>
                 </form>
                 <button type="submit" className="btn btn-default" onClick={this.onSave}>Save</button>
             </div>

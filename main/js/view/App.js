@@ -34,9 +34,13 @@ const App = React.createClass({
         this._router.navigate(`/account/${id}`)
     },
 
+    navigateToNewAccount: function() {
+        this._router.navigate(`/account/new`)
+    },
+
     accountList: function () {
         return (
-            <VisibleAccountList onSelect={this.navigateToAccount}/>
+            <VisibleAccountList onSelect={this.navigateToAccount} onNew={this.navigateToNewAccount}/>
         )
     }
 })

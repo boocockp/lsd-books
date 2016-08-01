@@ -2,9 +2,20 @@ const _ = require('lodash'),
     JsonUtil = require('../../../shared/modules/json/JsonUtil');
 
 function enumValues(clazz, ...enumArgs) {
+    const vals = []
     for(const n of enumArgs) {
-        const instanceArgs = _.isArray(n) ? n : [n];
-        clazz[instanceArgs[0]] = new clazz(...instanceArgs);
+        const instanceArgs = [].concat(n)
+        const instance = new clazz(...instanceArgs);
+        clazz[instanceArgs[0]] = instance
+        vals.push(instance)
+    }
+
+    clazz.values = function() {
+        return vals.slice()
+    }
+
+    clazz.valueMap = function() {
+        return _.fromPairs(vals.map( v => [v.name, v]))
     }
 }
 
@@ -28,10 +39,6 @@ JsonUtil.registerClass(DebitCredit);
 
 
 class AccountType {
-    static toStoreJson(obj) {
-        return {name: obj.name};
-    }
-
     constructor(name, normalBalanceType) {
         this.name = name;
         this.normalBalanceType = normalBalanceType;
