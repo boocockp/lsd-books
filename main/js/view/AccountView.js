@@ -10,7 +10,7 @@ let AccountView = React.createClass({
     render: function () {
         const updateEntity = data => this.props.dispatch(updateAccount(data))
         const addEntity = data => {
-            const action = addAccount(this.formChanges);
+            const action = addAccount(data);
             this.props.dispatch(action)
             if (this.props.onNewObjectSaved) {
                 this.props.onNewObjectSaved(action.data)

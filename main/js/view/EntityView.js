@@ -1,3 +1,4 @@
+const _ = require('lodash')
 const React = require('react')
 const { connect } = require('react-redux')
 const {PropTypes} = require('react')
@@ -6,16 +7,16 @@ const FormItem = require('./FormItem')
 let EntityView = React.createClass({
     render: function () {
         this.formChanges = {}
-        const change = (name) => (value) => this.onChange(name, value)
         const entity = this.props.entity
         const entityDescriptor = entity.constructor.entityDescriptor || this.props.entityDescriptor
         if (!entityDescriptor) throw new Error('EntityDescriptor required')
         const entityName = entityDescriptor.name
+        const propertyNames = _.without(entityDescriptor.propertyNames, "id")
         return (
             <div >
                 <h2>{entity.id ? `${entityName} ${entity.description}` : `New ${entityName}`}</h2>
                 <form>
-                    {entityDescriptor.propertyNames.map( name => this.formItem(entityDescriptor.propertyDescriptor(name), entity[name]) )}
+                    {propertyNames.map( name => this.formItem(entityDescriptor.propertyDescriptor(name), entity[name]) )}
                 </form>
                 <button type="submit" className="btn btn-default" onClick={this.onSave}>Save</button>
             </div>
@@ -38,7 +39,7 @@ let EntityView = React.createClass({
 
     formItem: function(propDesc, value) {
         const changeFn = this.onChange.bind(this, propDesc.name)
-        return <FormItem type={propDesc.type} onChange={changeFn} value={value} label={propDesc.label} placeholder={propDesc.placeholder} help={propDesc.help}/>
+        return <FormItem key={propDesc.name} type={propDesc.type} onChange={changeFn} value={value} label={propDesc.label} placeholder={propDesc.placeholder} help={propDesc.help}/>
     }
 })
 

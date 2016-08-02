@@ -8,50 +8,52 @@ const _ = require('lodash'),
     {AccountType} = require('./Types')
     , Posting2 = require('./Posting2')
 
-type AccountData = {
-        name?: string,
-    code?: number,
-    type?: AccountType
+// type AccountData = {
+//         name?: string,
+//     code?: number,
+//     type?: AccountType
+//     }
+
+const propertyDescriptors = [
+    {
+        name: "id",
+        type: String,
+        placeholder: "The unique identifier for this object"
+    },
+    {
+        name: "name",
+        type: String,
+        placeholder: "The descriptive name"
+    },
+    {
+        name: "code",
+        type: Number,
+        maxLength: 4,
+        placeholder: "The account short code",
+        help: "Must be 4 digits"
+    },
+    {
+        name: "type",
+        type: AccountType,
+        placeholder: "The type of account"
     }
+]
+const descriptor =  {
+        name: "Account",
+        propertyNames: propertyDescriptors.map( x => x.name ),
+        propertyDescriptor: function(name) {
+            return Object.assign({name, label: _.startCase(name)}, propertyDescriptors.find( x => x.name === name ))
+        },
+        get defaultValues() { return _.fromPairs( propertyDescriptors.map( desc => [desc.name, null]))  }
+}
 
-// class AccountData  {
-//     id: string = null
-//     name: string = null
-//
-//     @length(4)
-//     code: number = null
-//     type: AccountType = null
-// }
-
-class Account extends Record({id: null, name: null, code: null, type: null}) {
+class Account extends Record(descriptor.defaultValues) {
 
     static get entityDescriptor() : Object {
-        const descriptors = {
-            name: {
-                type: String,
-                placeholder: "The descriptive name"
-            },
-            code: {
-                type: Number,
-                maxLength: 4,
-                placeholder: "The account short code",
-                help: "Must be 4 digits"
-            },
-            type: {
-                type: AccountType,
-                placeholder: "The type of account"
-            }
-        }
-        return {
-            name: "Account",
-            propertyNames: ["name", "code", "type"],
-            propertyDescriptor: function(name) {
-                return Object.assign({name, label: _.startCase(name)}, descriptors[name])
-            }
-        }
+        return descriptor
     }
 
-    constructor(data : AccountData) {
+    constructor(data : Object) {
         super(data)
     }
 
