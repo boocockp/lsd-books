@@ -1,12 +1,15 @@
+// @flow
+
 const {Record} = require('immutable'),
-    JsonUtil = require('../../../shared/modules/json/JsonUtil');
+    JsonUtil = require('../../../shared/modules/json/JsonUtil')
+    , {DebitCredit} = require('./Types')
 
 class Posting extends Record({accountId: null, type: null, amount: null}) {
     
-    constructor(accountId, type, amount) {
+    constructor(accountId: string, type: DebitCredit, amount: number ) {
         super({accountId, type, amount})
     }
-    toJSON() {
+    toJSON() : Object {
         return Object.assign(super.toJSON(), {"@type": this.constructor.name});
     }
 

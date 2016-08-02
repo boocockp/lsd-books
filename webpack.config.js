@@ -20,6 +20,12 @@ module.exports = {
             {
                 loader: 'babel-loader',
                 test: dir_js,
+                include: [
+                    dir_js,
+                ],
+                exclude: [
+                    path.resolve(__dirname, "node_modules"),
+                ]
             }
         ]
     },
