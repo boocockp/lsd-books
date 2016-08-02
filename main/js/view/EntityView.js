@@ -11,7 +11,7 @@ let EntityView = React.createClass({
         const entityDescriptor = entity.constructor.entityDescriptor || this.props.entityDescriptor
         if (!entityDescriptor) throw new Error('EntityDescriptor required')
         const entityName = entityDescriptor.name
-        const propertyNames = _.without(entityDescriptor.propertyNames, "id")
+        const propertyNames = this.props.propertiesToShow
         return (
             <div >
                 <h2>{entity.id ? `${entityName} ${entity.description}` : `New ${entityName}`}</h2>
@@ -39,13 +39,15 @@ let EntityView = React.createClass({
 
     formItem: function(propDesc, value) {
         const changeFn = this.onChange.bind(this, propDesc.name)
-        return <FormItem key={propDesc.name} type={propDesc.type} onChange={changeFn} value={value} label={propDesc.label} placeholder={propDesc.placeholder} help={propDesc.help}/>
+        return <FormItem key={propDesc.name} type={propDesc.type} readOnly={propDesc.readOnly} onChange={changeFn} value={value} label={propDesc.label}
+                         placeholder={propDesc.description} help={propDesc.help}/>
     }
 })
 
 EntityView.propTypes = {
     entityDescriptor: PropTypes.object,
     entity: PropTypes.object.isRequired,
+    propertiesToShow: PropTypes.arrayOf(PropTypes.string),
     onUpdateEntity: PropTypes.func.isRequired,
     onAddEntity: PropTypes.func.isRequired
 }

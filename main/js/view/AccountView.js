@@ -17,7 +17,8 @@ let AccountView = React.createClass({
             }
         }
         return (
-            <EntityView entity={this.props.account} onUpdateEntity={updateEntity} onAddEntity={addEntity}/>
+            <EntityView entity={this.props.account} onUpdateEntity={updateEntity} onAddEntity={addEntity}
+                        propertiesToShow={["name", "code", "type", "balance"]}/>
         )
     },
 

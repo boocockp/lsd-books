@@ -48,17 +48,20 @@ const FormItem = React.createClass({
 
     formControl: function() {
         const type = this.props.type
+        const readOnly = this.props.readOnly
+        const placeholder = readOnly ? "" : this.props.placeholder
+        const value = (this.state.value === undefined || this.state.value === null) ? "" : this.state.value
         if (type === String) {
-            return <FormControl type="text" value={this.state.value || ''} placeholder={this.props.placeholder} onChange={this.handleChange} />
+            return <FormControl type="text" value={value} placeholder={placeholder} onChange={this.handleChange} readOnly={readOnly}/>
         }
         if (type === Number) {
-            return <FormControl type="text" value={this.state.value || ''} placeholder={this.props.placeholder} onChange={this.handleChange} />
+            return <FormControl type="text" value={value} placeholder={placeholder} onChange={this.handleChange}  readOnly={readOnly}/>
         }
         if (type.values) {
-            const optionList = type.values().map( o => ({value: o.name, name: _.startCase(o.name.toLowerCase())}) )
+            const optionList = type.values().map( o => ({value: o.name, name: o.label}) )
             return (
-                <FormControl componentClass="select" value={this.state.value || ""} onChange={this.handleSelectChange}>
-                    { this.props.placeholder ? <option value="">{this.props.placeholder}</option> : ""}
+                <FormControl componentClass="select" value={value} onChange={this.handleSelectChange} readOnly={readOnly}>
+                    <option value="">{placeholder || "Not selected"}</option>
                     {optionList.map( op => <option key={op.value} value={op.value}>{op.name}</option> )}
                 </FormControl>
                 )
@@ -72,6 +75,7 @@ FormItem.propTypes = {
     label: PropTypes.string,
     placeholder: PropTypes.string,
     help: PropTypes.string,
+    readOnly: PropTypes.boolean,
     onChange: PropTypes.func,
 }
 

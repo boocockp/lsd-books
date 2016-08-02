@@ -11,3 +11,11 @@ button.list-group-item {
 select.no-selection {
     color: lightgray;
 }
+
+.form-control[readonly] {
+    color: inherit;
+    background-color: inherit;
+    border: none;
+    box-shadow: none;
+    -webkit-box-shadow: none;
+}

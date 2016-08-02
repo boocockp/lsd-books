@@ -24,6 +24,11 @@ class DebitCredit {
     constructor(name) {
         this.name = name;
     }
+
+    get label() {
+        return _.startCase(this.name.toLowerCase())
+    }
+
     toString() {
         return this.name;
     }
@@ -42,6 +47,10 @@ class AccountType {
     constructor(name, normalBalanceType) {
         this.name = name;
         this.normalBalanceType = normalBalanceType;
+    }
+
+    get label() {
+        return _.startCase(this.name.toLowerCase())
     }
 
     toString() {
