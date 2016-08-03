@@ -5,6 +5,11 @@ function action(type, args) {
     
 }
 
+function setAccount(account) {
+    const accountWithId = account.id ? account : account.merge({id: uuid.v4()})
+    return action(setAccount, {data: accountWithId});
+}
+
 function addAccount(data) {
     const dataWithId = data.id ? data : Object.assign({id: uuid.v4()}, data)
     return action(addAccount, {data: dataWithId});
@@ -18,4 +23,4 @@ function addTransaction(transaction) {
     return action(addTransaction, {transaction})
 }
 
-module.exports = {addAccount, updateAccount, addTransaction};
+module.exports = {setAccount, addAccount, updateAccount, addTransaction};

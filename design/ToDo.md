@@ -28,4 +28,10 @@ Entity view
 - Reduce callbacks to on save - up to container to know whether new object or not
 - Properties displayed - can have default on metadata
 - Horizontal layout variant
+
+Storing changes
+---------------
+- Need to store only updated writable fields
+- Need to store only fields that have changed
+- May need to use json patch - but could be overkill, may not work for lists anyway
  

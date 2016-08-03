@@ -1,10 +1,13 @@
-const {addAccount, updateAccount, addTransaction} = require('./actions');
+const {setAccount, addAccount, updateAccount, addTransaction} = require('./actions');
 const Books = require('../model/Books');
 
 
 function booksReducer(state, action) {
 
     switch(action.type) {
+        case setAccount.name:
+            return state.setAccount(action.data);
+
         case addAccount.name:
             return state.addAccount(action.data);
 

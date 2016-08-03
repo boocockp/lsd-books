@@ -5,9 +5,13 @@ const {PropTypes} = require('react')
 const FormItem = require('./FormItem')
 
 let EntityView = React.createClass({
+
+    componentWillMount: function () {
+        this.setState({entity: this.props.entity})
+    },
+
     render: function () {
-        this.formChanges = {}
-        const entity = this.props.entity
+        const entity = this.state.entity
         const entityDescriptor = entity.constructor.entityDescriptor || this.props.entityDescriptor
         if (!entityDescriptor) throw new Error('EntityDescriptor required')
         const entityName = entityDescriptor.name
@@ -24,16 +28,19 @@ let EntityView = React.createClass({
     },
 
     onChange: function(name, value) {
-        this.formChanges[name] = value
+        const oldEntity = this.state.entity
+        const entity = oldEntity.set(name, value)
+        this.setState({entity})
     },
 
     onSave: function(e) {
-        console.log('save', this.formChanges)
+        const entity = this.state.entity;
+        console.log('save', entity.toJS())
         e.preventDefault()
         if (this.props.entity.id) {
-            this.props.onUpdateEntity(Object.assign({id: this.props.entity.id}, this.formChanges))
+            this.props.onUpdateEntity(entity)
         } else {
-            this.props.onAddEntity(this.formChanges)
+            this.props.onAddEntity(entity)
         }
     },
 

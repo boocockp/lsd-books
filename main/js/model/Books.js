@@ -5,13 +5,14 @@ const
     // Observe = require('../../shared/modules/observe/Observe'),
     JsonUtil = require('../../../shared/modules/json/JsonUtil'),
     {Record, List, Map} = require('immutable'),
+    actions = require('../app/actions'),
     Account = () => require('./Account'),
     AccountAsAt = require('./AccountAsAt'),
     TrialBalance = require('./TrialBalance'),
     BalanceSheet = require('./BalanceSheet')
     ;
 
-class Books extends Record({accounts: new Map(), transactions: new List()}) {
+class Books extends Record({accounts: new Map(), transactions: new List(), $actionForLatestUpdate: null}) {
     
     static get instance() {
         return _instance || (_instance = new Books());
@@ -19,6 +20,17 @@ class Books extends Record({accounts: new Map(), transactions: new List()}) {
     
     constructor() {
         super();
+    }
+
+    setAccount(account) {
+        const updateAction = () => {
+            if (this.getIn(['accounts', account.id])) {
+                return actions.updateAccount(account.toJS())
+            } else {
+                return actions.addAccount(account.toJS())
+            }
+        }
+        return this.setIn(['accounts', account.id], account).set('$actionForLatestUpdate', updateAction());
     }
 
     addAccount(data) {

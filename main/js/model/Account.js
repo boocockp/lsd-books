@@ -87,7 +87,7 @@ class Account extends Record(descriptor.defaultValues) {
     }
 
     get balance() : number {
-        const sign = this.type.normalBalanceType == CREDIT ? 1 : -1
+        const sign = this.type ? (this.type.normalBalanceType == CREDIT ? 1 : -1) : 0
         return this.signedBalance * sign
     }
 

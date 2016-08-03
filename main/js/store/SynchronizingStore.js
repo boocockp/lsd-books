@@ -15,7 +15,10 @@ class SynchronizingStore {
 
     dispatch(action) {
         this.applyAction(action)
-        this.dispatches.value = action
+        const latestUpdateAction = this.reduxStore.getState().$actionForLatestUpdate
+        if (latestUpdateAction) {
+            this.dispatches.value = latestUpdateAction
+        }
     }
 
     subscribe(listener) {
