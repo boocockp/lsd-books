@@ -15,7 +15,4 @@ select.no-selection {
 .form-control[readonly] {
     color: inherit;
     background-color: inherit;
-    border: none;
-    box-shadow: none;
-    -webkit-box-shadow: none;
 }

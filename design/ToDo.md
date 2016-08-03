@@ -14,4 +14,18 @@ Auto metadata
 - Workflow for accessing generated metadata at runtime
 - Entity view driven from runtime metadata
 - Overrides and additions possible to entity view - override metadata, provide own rendering
+
+List view
+---------
+- General list view
+- Parameterized with item display view and item edit view - as functions? as classes?
+- Try function from item => element for display, or (item, onSave) => element for edit
+- Click to edit handled by list or its sub-item
+- Is given an imm List of entity items
+
+Entity view
+-----------
+- Reduce callbacks to on save - up to container to know whether new object or not
+- Properties displayed - can have default on metadata
+- Horizontal layout variant
  

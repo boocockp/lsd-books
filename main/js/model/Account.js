@@ -6,12 +6,6 @@ const _ = require('lodash'),
     {AccountType} = require('./Types')
     , Posting2 = require('./Posting2')
 
-// type AccountData = {
-//         name?: string,
-//     code?: number,
-//     type?: AccountType
-//     }
-
 const propertyDescriptors = [
     {
         name: "id",
@@ -110,8 +104,6 @@ class Account extends Record(descriptor.defaultValues) {
     }
 
 }
-
-const account1 = new Account({name: "23"} )
 
 JsonUtil.registerClass(Account)
 module.exports = Account

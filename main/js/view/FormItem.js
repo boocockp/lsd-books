@@ -51,16 +51,19 @@ const FormItem = React.createClass({
         const readOnly = this.props.readOnly
         const placeholder = readOnly ? "" : this.props.placeholder
         const value = (this.state.value === undefined || this.state.value === null) ? "" : this.state.value
+        if (readOnly) {
+            return <FormControl.Static>{value}</FormControl.Static>
+        }
         if (type === String) {
-            return <FormControl type="text" value={value} placeholder={placeholder} onChange={this.handleChange} readOnly={readOnly}/>
+            return <FormControl type="text" value={value} placeholder={placeholder} onChange={this.handleChange}/>
         }
         if (type === Number) {
-            return <FormControl type="text" value={value} placeholder={placeholder} onChange={this.handleChange}  readOnly={readOnly}/>
+            return <FormControl type="text" value={value} placeholder={placeholder} onChange={this.handleChange}/>
         }
         if (type.values) {
             const optionList = type.values().map( o => ({value: o.name, name: o.label}) )
             return (
-                <FormControl componentClass="select" value={value} onChange={this.handleSelectChange} readOnly={readOnly}>
+                <FormControl componentClass="select" value={value} onChange={this.handleSelectChange}>
                     <option value="">{placeholder || "Not selected"}</option>
                     {optionList.map( op => <option key={op.value} value={op.value}>{op.name}</option> )}
                 </FormControl>
@@ -75,7 +78,7 @@ FormItem.propTypes = {
     label: PropTypes.string,
     placeholder: PropTypes.string,
     help: PropTypes.string,
-    readOnly: PropTypes.boolean,
+    readOnly: PropTypes.bool,
     onChange: PropTypes.func,
 }
 
