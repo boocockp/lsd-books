@@ -1,4 +1,5 @@
 const React = require('react')
+const { connect } = require('react-redux')
 const {PropTypes} = require('react')
 const {List} = require('immutable')
 const EntityList = require('./EntityList')
@@ -8,7 +9,7 @@ const {Grid, Row, Col, Button} = require('react-bootstrap')
 const Account = require('../model/Account')
 
 
-const AccountListWithView = React.createClass({
+let AccountListWithView = React.createClass({
     render: function () {
         const p = this.props
         const selectedAccountId = p.selectedAccountId
@@ -46,5 +47,12 @@ AccountListWithView.propTypes = {
     onSelect: PropTypes.func,
     onNew: PropTypes.func,
 }
+
+const mapStateToProps = (state) => {
+    return {
+        accounts: state.accountsByName
+    }
+}
+AccountListWithView = connect(mapStateToProps)(AccountListWithView)
 
 module.exports = AccountListWithView

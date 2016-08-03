@@ -1,6 +1,7 @@
 const React = require('react')
+const { connect } = require('react-redux')
 const PersistentRouter = require('./PersistentRouter')
-const VisibleAccountList = require('./VisibleAccountList')
+const AccountListWithView = require('./AccountListWithView')
 const MainPage = require('./MainPage')
 const NotFoundPage = require('./NotFoundPage')
 const {Locations, Location, NotFound} = require('react-router-component')
@@ -12,7 +13,13 @@ const config = {
     "bucketName": "ashridgetech.reactbooks-test"
 }
 
-const App = React.createClass({
+const mapStateToProps = (state) => {
+    return {
+        appState: state
+    }
+}
+
+let App = React.createClass({
     render: function () {
         return (
             <div>
@@ -40,9 +47,11 @@ const App = React.createClass({
 
     accountList: function () {
         return (
-            <VisibleAccountList onSelect={this.navigateToAccount} onNew={this.navigateToNewAccount}/>
+            <AccountListWithView accounts={this.props.appState.accountsByName} onSelect={this.navigateToAccount} onNew={this.navigateToNewAccount}/>
         )
     }
 })
+
+App = connect(mapStateToProps)(App)
 
 module.exports = App

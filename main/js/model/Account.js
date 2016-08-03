@@ -1,5 +1,5 @@
 const _ = require('lodash'),
-    {Record} = require('immutable'),
+    {Record, List} = require('immutable'),
     JsonUtil = require('../../../shared/modules/json/JsonUtil'),
     // Books = require('./Books'),
     {CREDIT} = require('./Types').DebitCredit,
@@ -10,7 +10,6 @@ const propertyDescriptors = [
     {
         name: "id",
         type: String,
-        readOnly: true,
         description: "The unique identifier for this object"
     },
     {
@@ -19,7 +18,7 @@ const propertyDescriptors = [
         description: "The descriptive name"
     },
     {
-        name: "description",
+        name: "shortSummary",
         type: String,
         readOnly: true,
         description: "Code and name of this account"
@@ -55,13 +54,24 @@ const propertyDescriptors = [
         description: "The current balance of the account if it is a credit balance, otherwise empty"
     }
 ]
+
+function defaultValueForType(type) {
+    switch (type) {
+        case List:
+            return new List()
+
+        default:
+            return null
+    }
+}
+
 const descriptor =  {
-        name: "Account",
-        propertyNames: propertyDescriptors.map( x => x.name ),
-        propertyDescriptor: function(name) {
-            return Object.assign({name, label: _.startCase(name)}, propertyDescriptors.find( x => x.name === name ))
-        },
-        get defaultValues() { return _.fromPairs( propertyDescriptors.map( desc => [desc.name, null]))  }
+    name: "Account",
+    propertyNames: propertyDescriptors.map( x => x.name ),
+    propertyDescriptor: function(name) {
+        return Object.assign({name, label: _.startCase(name)}, propertyDescriptors.find( x => x.name === name ))
+    },
+    get defaultValues() { return _.fromPairs( propertyDescriptors.filter( pd => !pd.readOnly ).map( desc => [desc.name, defaultValueForType(desc.type)]))  }
 }
 
 class Account extends Record(descriptor.defaultValues) {
@@ -74,7 +84,7 @@ class Account extends Record(descriptor.defaultValues) {
         super(data)
     }
 
-    get description() : string {
+    get shortSummary() : string {
         return `${this.code} - ${this.name}`
     }
 

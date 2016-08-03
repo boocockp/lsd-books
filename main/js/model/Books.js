@@ -7,12 +7,13 @@ const
     {Record, List, Map} = require('immutable'),
     actions = require('../app/actions'),
     Account = () => require('./Account'),
+    Transaction = () => require('./Transaction'),
     AccountAsAt = require('./AccountAsAt'),
     TrialBalance = require('./TrialBalance'),
     BalanceSheet = require('./BalanceSheet')
     ;
 
-class Books extends Record({accounts: new Map(), transactions: new List(), $actionForLatestUpdate: null}) {
+class Books extends Record({accounts: new Map(), transactions: new Map(), $actionForLatestUpdate: null}) {
     
     static get instance() {
         return _instance || (_instance = new Books());
@@ -42,8 +43,24 @@ class Books extends Record({accounts: new Map(), transactions: new List(), $acti
         return this.mergeIn(['accounts', data.id], data);
     }
     
-    addTransaction(transaction) {
-        return this.update('transactions', l => l.push(transaction));
+    setTransaction(transaction) {
+        const updateAction = () => {
+            if (this.getIn(['transactions', transaction.id])) {
+                return actions.updateTransaction(transaction.toJS())
+            } else {
+                return actions.addTransaction(transaction.toJS())
+            }
+        }
+        return this.setIn(['transactions', transaction.id], transaction).set('$actionForLatestUpdate', updateAction());
+    }
+
+    addTransaction(data) {
+        const transaction = new (Transaction())(data);
+        return this.setIn(['transactions', transaction.id], transaction);
+    }
+
+    updateTransaction(data) {
+        return this.mergeIn(['transactions', data.id], data);
     }
     
     get accountsByName() {

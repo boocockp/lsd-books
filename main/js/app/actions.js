@@ -19,8 +19,12 @@ function updateAccount(data) {
     return action(updateAccount, {data});
 }
 
-function addTransaction(transaction) {
-    return action(addTransaction, {transaction})
+function addTransaction(data) {
+    return action(addTransaction, {data})
 }
 
-module.exports = {setAccount, addAccount, updateAccount, addTransaction};
+function updateTransaction(data) {
+    return action(updateTransaction, {data})
+}
+
+module.exports = {setAccount, addAccount, updateAccount, addTransaction, updateTransaction};

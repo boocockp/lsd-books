@@ -18,7 +18,7 @@ let EntityView = React.createClass({
         const propertyNames = this.props.propertiesToShow
         return (
             <div >
-                <h2>{entity.id ? `${entityName} ${entity.description}` : `New ${entityName}`}</h2>
+                <h2>{entity.id ? `${entityName} ${entity.shortSummary}` : `New ${entityName}`}</h2>
                 <form>
                     {propertyNames.map( name => this.formItem(entityDescriptor.propertyDescriptor(name), entity[name]) )}
                 </form>

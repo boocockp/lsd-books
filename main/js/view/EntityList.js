@@ -27,9 +27,11 @@ const EntityList = React.createClass({
             return isEditing ? renderEditItem(item) : renderDisplayItem(item)
         }
 
+        const items = this.props.items
+
         return (
             <ListGroup>
-                { this.props.items.map(renderItem) }
+                { items.map(renderItem) }
             </ListGroup>
         )
     },
