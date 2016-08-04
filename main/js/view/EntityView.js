@@ -5,12 +5,16 @@ const FormItem = require('./FormItem')
 
 let EntityView = React.createClass({
 
-    componentWillMount: function () {
-        this.setState({entity: this.props.entity})
+    getInitialState: function() {
+        return {updatedEntity: null}
+    },
+
+    componentWillReceiveProps: function() {
+        this.setState({updatedEntity: null})
     },
 
     render: function () {
-        const entity = this.state.entity
+        const entity = this.state.updatedEntity || this.props.entity
         const entityDescriptor = entity.constructor.entityDescriptor || this.props.entityDescriptor
         if (!entityDescriptor) throw new Error('EntityDescriptor required')
         const entityName = entityDescriptor.name
@@ -27,16 +31,21 @@ let EntityView = React.createClass({
     },
 
     onChange: function(name, value) {
-        const oldEntity = this.state.entity
-        const entity = oldEntity.set(name, value)
-        this.setState({entity})
+        const oldEntity = this.state.updatedEntity || this.props.entity
+        const updatedEntity = oldEntity.set(name, value)
+        this.setState({updatedEntity})
     },
 
     onSave: function(e) {
-        const entity = this.state.entity;
-        console.log('save', entity.toJS())
         e.preventDefault()
-        this.props.onSave(entity)
+        const entity = this.state.updatedEntity;
+        if (entity) {
+            console.log('save', entity.toJS())
+            this.props.onSave(entity)
+            this.setState({updatedEntity: null})
+        } else {
+            console.log('save', 'no change')
+        }
     },
 
     formItem: function(propDesc, value) {

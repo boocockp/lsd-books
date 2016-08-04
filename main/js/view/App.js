@@ -27,12 +27,12 @@ let App = React.createClass({
                 <div id="googleLogin">
                     <GoogleSignin clientId={config.clientId}/>
                 </div>
-                <PersistentRouter hash ref={(c) => this._router = c}>
+                <Locations hash ref={(c) => this._router = c}>
                     <Location path="/" handler={MainPage}/>
                     <Location path="/account" handler={this.accountList()}/>
                     <Location path="/account/:selectedAccountId" handler={this.accountList()}/>
                     <NotFound handler={NotFoundPage}/>
-                </PersistentRouter>
+                </Locations>
             </div>
         )
     },
