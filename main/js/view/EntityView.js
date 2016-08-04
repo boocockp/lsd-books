@@ -18,7 +18,7 @@ let EntityView = React.createClass({
         const entityDescriptor = entity.constructor.entityDescriptor || this.props.entityDescriptor
         if (!entityDescriptor) throw new Error('EntityDescriptor required')
         const entityName = entityDescriptor.name
-        const propertyNames = this.props.propertiesToShow
+        const propertyNames = this.props.propertiesToShow || entityDescriptor.displayProperties
         return (
             <div >
                 <h2>{entity.id ? `${entityName} ${entity.shortSummary}` : `New ${entityName}`}</h2>
@@ -56,10 +56,10 @@ let EntityView = React.createClass({
 })
 
 EntityView.propTypes = {
-    entityDescriptor: PropTypes.object,
     entity: PropTypes.object.isRequired,
-    propertiesToShow: PropTypes.arrayOf(PropTypes.string),
-    onSave: PropTypes.func.isRequired
+    onSave: PropTypes.func.isRequired,
+    entityDescriptor: PropTypes.object,
+    propertiesToShow: PropTypes.arrayOf(PropTypes.string)
 }
 
 module.exports = EntityView

@@ -19,6 +19,11 @@ function updateAccount(data) {
     return action(updateAccount, {data});
 }
 
+function setTransaction(transaction) {
+    const transactionWithId = transaction.id ? transaction : transaction.merge({id: uuid.v4()})
+    return action(setTransaction, {data: transactionWithId});
+}
+
 function addTransaction(data) {
     return action(addTransaction, {data})
 }
@@ -27,4 +32,4 @@ function updateTransaction(data) {
     return action(updateTransaction, {data})
 }
 
-module.exports = {setAccount, addAccount, updateAccount, addTransaction, updateTransaction};
+module.exports = {setAccount, addAccount, updateAccount, setTransaction, addTransaction, updateTransaction};

@@ -70,6 +70,7 @@ const descriptor =  {
     propertyDescriptor: function(name) {
         return Object.assign({name, label: _.startCase(name)}, propertyDescriptors.find( x => x.name === name ))
     },
+    get displayProperties() { return ["name", "code", "type", "balance"] },
     get defaultValues() { return _.fromPairs( propertyDescriptors.filter( pd => !pd.readOnly ).map( desc => [desc.name, defaultValueForType(desc.type)]))  }
 }
 

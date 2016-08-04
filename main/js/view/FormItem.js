@@ -2,8 +2,10 @@ const React = require('react')
 const {PropTypes} = require('react')
 const {FormGroup, ControlLabel, FormControl, HelpBlock} = require('react-bootstrap')
 const {List} = require('immutable')
-
-const ViewUtils = require('./ViewUtils')
+const EntityListItem = require('./EntityListItem');
+const EntityViewFn = () => require('./EntityView');
+const EntityListEditable = require('./EntityListEditable');
+const DateTimeField = require('react-bootstrap-datetimepicker')
 
 const FormItem = React.createClass({
     getInitialState: function () {
@@ -13,6 +15,30 @@ const FormItem = React.createClass({
     handleChange: function (event) {
         const valueStr = event.target.value
         const value = valueStr === '' ? null : valueStr
+        this.setState({value})
+        if (this.props.onChange) {
+            this.props.onChange(value)
+        }
+    },
+
+    handleNumberChange: function (event) {
+        const valueStr = event.target.value
+        const value = valueStr === '' ? null : parseFloat(valueStr)
+        this.setState({value})
+        if (this.props.onChange) {
+            this.props.onChange(value)
+        }
+    },
+
+    handleDateChange: function (valueStr) {
+        const value = valueStr === '' ? null : new Date(parseInt(valueStr))
+        this.setState({value})
+        if (this.props.onChange) {
+            this.props.onChange(value)
+        }
+    },
+
+    handleListChange: function (value) {
         this.setState({value})
         if (this.props.onChange) {
             this.props.onChange(value)
@@ -50,6 +76,7 @@ const FormItem = React.createClass({
     },
 
     formControl: function() {
+        const EntityView = EntityViewFn()
         const propDesc = this.props.propDesc
         const type = this.props.type
         const readOnly = this.props.readOnly
@@ -62,11 +89,15 @@ const FormItem = React.createClass({
             return <FormControl type="text" value={value} placeholder={placeholder} onChange={this.handleChange}/>
         }
         if (type === Number) {
-            return <FormControl type="text" value={value} placeholder={placeholder} onChange={this.handleChange}/>
+            return <FormControl type="text" value={value} placeholder={placeholder} onChange={this.handleNumberChange}/>
+        }
+        if (type === Date) {
+            return <DateTimeField mode="date" onChange={this.handleDateChange} />
         }
         if (type === List) {
-            return <EntityList items={value} displayItem={ViewUtils.displayViewFactory(propDesc.itemType)}
-                                editItem={ViewUtils.editViewFactory(propDesc.itemType)}/>
+            const displayItemFn = (item) => <EntityListItem item={item} />
+            const editItemFn = (item, onSave) => <EntityView entity={item} onSave={onSave} />
+            return <EntityListEditable items={value} itemType={propDesc.itemType} displayItem={displayItemFn} editItem={editItemFn} onChange={this.handleListChange}/>
         }
         if (type.values) {
             const optionList = type.values().map( o => ({value: o.name, name: o.label}) )

@@ -1,4 +1,5 @@
-const {Record} = require('immutable');
+const _ = require('lodash')
+const {List, Record} = require('immutable');
 
 const serializableClasses = [];
 
@@ -18,6 +19,10 @@ function defaultFromStoreJson(clazz) {
 function reviver(key, value) {
     if (typeof value === 'string' && ISO_DATETIME_REGEX.test(value)) {
         return new Date(value);
+    }
+
+    if (_.isArray(value) && key === 'postings') {
+        return new List(value)
     }
 
     const type = value && value['@type'];

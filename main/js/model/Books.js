@@ -88,6 +88,10 @@ class Books extends Record({accounts: new Map(), transactions: new Map(), $actio
         return this.accounts.find( it => it.code == code );
     }
 
+    get transactionsByDate() {
+        return this.transactions.toList().sortBy( it => it.date);
+    }
+
     postingsForAccount(acct, fromDate = 0, toDate = Number.MAX_SAFE_INTEGER) {
         function inDates(transaction) {
             return transaction.date >= fromDate && transaction.date <= toDate;

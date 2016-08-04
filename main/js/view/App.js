@@ -7,8 +7,9 @@ const NotFoundPage = require('./NotFoundPage')
 const {Locations, Location, NotFound} = require('react-router-component')
 const GoogleSignin = require('./GoogleSignin')
 const Account = require('../model/Account')
+const Transaction = require('../model/Transaction')
 const EntityManager = require('./EntityManager')
-const {setAccount} = require('../app/actions')
+const {setAccount, setTransaction} = require('../app/actions')
 
 const config = {
     "clientId": "919408445147-a0csgn7e21d773ilrif3q8d9hfrfc7vm.apps.googleusercontent.com",
@@ -34,6 +35,8 @@ let App = React.createClass({
                     <Location path="/" handler={MainPage}/>
                     <Location path="/account" handler={this.accountList()}/>
                     <Location path="/account/:selectedId" handler={this.accountList()}/>
+                    <Location path="/transaction" handler={this.transactionList()}/>
+                    <Location path="/transaction/:selectedId" handler={this.transactionList()}/>
                     <NotFound handler={NotFoundPage}/>
                 </Locations>
             </div>
@@ -46,6 +49,14 @@ let App = React.createClass({
 
     navigateToNewAccount: function() {
         this._router.navigate(`/account/new`)
+    },
+
+    navigateToTransaction: function(id) {
+        this._router.navigate(`/transaction/${id}`)
+    },
+
+    navigateToNewTransaction: function() {
+        this._router.navigate(`/transaction/new`)
     },
 
     accountList: function () {
@@ -71,6 +82,32 @@ let App = React.createClass({
         return (
             <EntityListWithView items={this.props.appState.accountsByName} entityManager={entityManager}
                                 onSelect={this.navigateToAccount} onNew={this.navigateToNewAccount}/>
+        )
+    },
+
+    transactionList: function () {
+        class TransactionManager extends EntityManager {
+
+            get(id) {
+                return appState.transactions.get(id)
+            }
+
+            newInstance() {
+                return new Transaction();
+            }
+
+            save(entity) {
+                const action = setTransaction(entity);
+                dispatch(action)
+                return action.data
+            }
+        }
+        const appState = this.props.appState
+        const dispatch = this.props.dispatch
+        const entityManager = new TransactionManager()
+        return (
+            <EntityListWithView items={this.props.appState.transactionsByDate} entityManager={entityManager}
+                                onSelect={this.navigateToTransaction} onNew={this.navigateToNewTransaction}/>
         )
     }
 })

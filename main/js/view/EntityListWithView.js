@@ -23,8 +23,7 @@ let EntityListWithView = React.createClass({
                         {this.props.onNew ? <Button onClick={this.newObject}>New</Button> : ''}
                         <EntityList items={p.items} selectedItemId={selectedId} onSelect={this.select} displayItem={displayItemFn}/>
                     </Col>
-                    <Col xs={12} md={9}>{entity ? <EntityView entity={entity} onSave={this.saveEntity}
-                                                               propertiesToShow={["name", "code", "type", "balance"]}/> : '' }</Col>
+                    <Col xs={12} md={9}>{entity ? <EntityView entity={entity} onSave={this.saveEntity}/> : '' }</Col>
                 </Row>
             </Grid>
         )
