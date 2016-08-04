@@ -1,11 +1,14 @@
 const React = require('react')
 const { connect } = require('react-redux')
 const PersistentRouter = require('./PersistentRouter')
-const AccountListWithView = require('./AccountListWithView')
+const EntityListWithView = require('./EntityListWithView')
 const MainPage = require('./MainPage')
 const NotFoundPage = require('./NotFoundPage')
 const {Locations, Location, NotFound} = require('react-router-component')
 const GoogleSignin = require('./GoogleSignin')
+const Account = require('../model/Account')
+const EntityManager = require('./EntityManager')
+const {setAccount} = require('../app/actions')
 
 const config = {
     "clientId": "919408445147-a0csgn7e21d773ilrif3q8d9hfrfc7vm.apps.googleusercontent.com",
@@ -30,7 +33,7 @@ let App = React.createClass({
                 <Locations hash ref={(c) => this._router = c}>
                     <Location path="/" handler={MainPage}/>
                     <Location path="/account" handler={this.accountList()}/>
-                    <Location path="/account/:selectedAccountId" handler={this.accountList()}/>
+                    <Location path="/account/:selectedId" handler={this.accountList()}/>
                     <NotFound handler={NotFoundPage}/>
                 </Locations>
             </div>
@@ -46,8 +49,28 @@ let App = React.createClass({
     },
 
     accountList: function () {
+        class AccountManager extends EntityManager {
+
+            get(id) {
+                return appState.accounts.get(id)
+            }
+
+            newInstance() {
+                return new Account();
+            }
+
+            save(entity) {
+                const action = setAccount(entity);
+                dispatch(action)
+                return action.data
+            }
+        }
+        const appState = this.props.appState
+        const dispatch = this.props.dispatch
+        const entityManager = new AccountManager()
         return (
-            <AccountListWithView accounts={this.props.appState.accountsByName} onSelect={this.navigateToAccount} onNew={this.navigateToNewAccount}/>
+            <EntityListWithView items={this.props.appState.accountsByName} entityManager={entityManager}
+                                onSelect={this.navigateToAccount} onNew={this.navigateToNewAccount}/>
         )
     }
 })

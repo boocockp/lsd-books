@@ -8,7 +8,6 @@ const LocalStorageUpdateStore = require('../store/LocalStorageUpdateStore')
 const S3UpdateStore = require('../store/S3UpdateStore')
 const SynchronizingStore = require('../store/SynchronizingStore')
 const PersistentStore = require('../store/PersistentStore')
-const AccountList = require('../view/AccountList')
 const App = require('../view/App')
 const AppProvider = require('../view/AppProvider')
 const AccountType = require('../model/Types').AccountType
