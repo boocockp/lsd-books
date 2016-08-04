@@ -4,7 +4,6 @@ const _ = require('lodash'),
     // Books = require('./Books'),
     {CREDIT} = require('./Types').DebitCredit,
     {AccountType} = require('./Types')
-    , Posting2 = require('./Posting2')
 
 const propertyDescriptors = [
     {

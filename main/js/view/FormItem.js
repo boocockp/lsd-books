@@ -1,6 +1,9 @@
 const React = require('react')
 const {PropTypes} = require('react')
 const {FormGroup, ControlLabel, FormControl, HelpBlock} = require('react-bootstrap')
+const {List} = require('immutable')
+
+const ViewUtils = require('./ViewUtils')
 
 const FormItem = React.createClass({
     getInitialState: function () {
@@ -47,6 +50,7 @@ const FormItem = React.createClass({
     },
 
     formControl: function() {
+        const propDesc = this.props.propDesc
         const type = this.props.type
         const readOnly = this.props.readOnly
         const placeholder = readOnly ? "" : this.props.placeholder
@@ -59,6 +63,10 @@ const FormItem = React.createClass({
         }
         if (type === Number) {
             return <FormControl type="text" value={value} placeholder={placeholder} onChange={this.handleChange}/>
+        }
+        if (type === List) {
+            return <EntityList items={value} displayItem={ViewUtils.displayViewFactory(propDesc.itemType)}
+                                editItem={ViewUtils.editViewFactory(propDesc.itemType)}/>
         }
         if (type.values) {
             const optionList = type.values().map( o => ({value: o.name, name: o.label}) )
@@ -74,6 +82,7 @@ const FormItem = React.createClass({
 })
 
 FormItem.propTypes = {
+    propDesc: PropTypes.object,
     value: PropTypes.any,
     label: PropTypes.string,
     placeholder: PropTypes.string,

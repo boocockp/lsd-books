@@ -21,7 +21,7 @@ List view
 - Parameterized with item display view and item edit view - as functions? as classes?
 - Try function from item => element for display, or (item, onSave) => element for edit
 - Click to edit handled by list or its sub-item
-- Is given an imm List of entity items
+- Is given an immutable List of entity items
 
 Entity view
 -----------
@@ -34,4 +34,10 @@ Storing changes
 - Need to store only updated writable fields
 - Need to store only fields that have changed
 - May need to use json patch - but could be overkill, may not work for lists anyway
+
+Routing
+-------
+- Need to re-render elements to get overall changes without destroying pages with in-progress changes
+- Persistent router caches component so new one created with new state is not used
+- Maybe suppress update if not visible
  

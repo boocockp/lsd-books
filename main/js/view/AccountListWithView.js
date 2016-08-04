@@ -3,10 +3,11 @@ const { connect } = require('react-redux')
 const {PropTypes} = require('react')
 const {List} = require('immutable')
 const EntityList = require('./EntityList')
+const EntityView = require('./EntityView')
 const AccountListItem = require('./AccountListItem')
-const AccountView = require('./AccountView')
 const {Grid, Row, Col, Button} = require('react-bootstrap')
 const Account = require('../model/Account')
+const {setAccount} = require('../app/actions')
 
 
 let AccountListWithView = React.createClass({
@@ -15,6 +16,14 @@ let AccountListWithView = React.createClass({
         const selectedAccountId = p.selectedAccountId
         const account = p.selectedAccountId === "new" ? new Account() : p.accounts.find(a => a.id === selectedAccountId)
         const displayItemFn = (account) => <AccountListItem account={account} />
+        const saveEntity = entity => {
+            const newEntity = !entity.id
+            const action = setAccount(entity);
+            this.props.dispatch(action)
+            if (newEntity) {
+                this.newObjectSaved(action.data)
+            }
+        }
         return (
             <Grid>
                 <Row>
@@ -22,7 +31,8 @@ let AccountListWithView = React.createClass({
                         {this.props.onNew ? <Button onClick={this.newObject}>New</Button> : ''}
                         <EntityList items={p.accounts} selectedItemId={selectedAccountId} onSelect={this.select} displayItem={displayItemFn}/>
                     </Col>
-                    <Col xs={12} md={9}>{account ? <AccountView account={account} onNewObjectSaved={this.newObjectSaved}/> : '' }</Col>
+                    <Col xs={12} md={9}>{account ? <EntityView entity={account} onSave={saveEntity}
+                                                               propertiesToShow={["name", "code", "type", "balance"]}/> : '' }</Col>
                 </Row>
             </Grid>
         )

@@ -29,6 +29,7 @@ const propertyDescriptors = [
     {
         name: "postings",
         type: List,
+        itemType: Posting,
         description: "The amounts debited and credited to each account"
     }
 ]

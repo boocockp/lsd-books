@@ -1,6 +1,5 @@
 const _ = require('lodash')
 const React = require('react')
-const { connect } = require('react-redux')
 const {PropTypes} = require('react')
 const FormItem = require('./FormItem')
 
@@ -37,17 +36,13 @@ let EntityView = React.createClass({
         const entity = this.state.entity;
         console.log('save', entity.toJS())
         e.preventDefault()
-        if (this.props.entity.id) {
-            this.props.onUpdateEntity(entity)
-        } else {
-            this.props.onAddEntity(entity)
-        }
+        this.props.onSave(entity)
     },
 
     formItem: function(propDesc, value) {
         const changeFn = this.onChange.bind(this, propDesc.name)
         return <FormItem key={propDesc.name} type={propDesc.type} readOnly={propDesc.readOnly} onChange={changeFn} value={value} label={propDesc.label}
-                         placeholder={propDesc.description} help={propDesc.help}/>
+                         placeholder={propDesc.description} help={propDesc.help} propDesc={propDesc}/>
     }
 })
 
@@ -55,8 +50,7 @@ EntityView.propTypes = {
     entityDescriptor: PropTypes.object,
     entity: PropTypes.object.isRequired,
     propertiesToShow: PropTypes.arrayOf(PropTypes.string),
-    onUpdateEntity: PropTypes.func.isRequired,
-    onAddEntity: PropTypes.func.isRequired
+    onSave: PropTypes.func.isRequired
 }
 
 module.exports = EntityView
