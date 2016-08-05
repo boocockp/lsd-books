@@ -19,12 +19,13 @@ let EntityView = React.createClass({
         if (!entityDescriptor) throw new Error('EntityDescriptor required')
         const entityName = entityDescriptor.name
         const propertyNames = this.props.propertiesToShow || entityDescriptor.displayProperties
+        const heading = entity.has("id") ? (entity.id ? `${entityName} ${entity.shortSummary}` : `New ${entityName}`) : entityName
         return (
             <div >
-                <h2>{entity.id ? `${entityName} ${entity.shortSummary}` : `New ${entityName}`}</h2>
-                <form>
+                <h2>{heading}</h2>
+                <div>
                     {propertyNames.map( name => this.formItem(entityDescriptor.propertyDescriptor(name), entity[name]) )}
-                </form>
+                </div>
                 <button type="submit" className="btn btn-default" onClick={this.onSave}>Save</button>
             </div>
         )

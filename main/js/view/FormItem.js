@@ -2,6 +2,7 @@ const React = require('react')
 const {PropTypes} = require('react')
 const {FormGroup, ControlLabel, FormControl, HelpBlock} = require('react-bootstrap')
 const {List} = require('immutable')
+const moment = require('moment')
 const EntityListItem = require('./EntityListItem');
 const EntityViewFn = () => require('./EntityView');
 const EntityListEditable = require('./EntityListEditable');
@@ -31,7 +32,7 @@ const FormItem = React.createClass({
     },
 
     handleDateChange: function (valueStr) {
-        const value = valueStr === '' ? null : new Date(parseInt(valueStr))
+        const value = valueStr === 'Invalid date' ? null : new Date(parseInt(valueStr))
         this.setState({value})
         if (this.props.onChange) {
             this.props.onChange(value)
@@ -92,7 +93,9 @@ const FormItem = React.createClass({
             return <FormControl type="text" value={value} placeholder={placeholder} onChange={this.handleNumberChange}/>
         }
         if (type === Date) {
-            return <DateTimeField mode="date" onChange={this.handleDateChange} />
+            const displayFormat = "DD MMM YY"
+            return <DateTimeField mode="date" inputFormat={displayFormat} onChange={this.handleDateChange}
+                                  dateTime={value ? value.getTime() : undefined} />
         }
         if (type === List) {
             const displayItemFn = (item) => <EntityListItem item={item} />

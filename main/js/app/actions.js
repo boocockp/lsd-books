@@ -11,8 +11,7 @@ function setAccount(account) {
 }
 
 function addAccount(data) {
-    const dataWithId = data.id ? data : Object.assign({id: uuid.v4()}, data)
-    return action(addAccount, {data: dataWithId});
+    return action(addAccount, {data});
 }
 
 function updateAccount(data) {

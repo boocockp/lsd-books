@@ -26,9 +26,9 @@ class Books extends Record({accounts: new Map(), transactions: new Map(), $actio
     setAccount(account) {
         const updateAction = () => {
             if (this.getIn(['accounts', account.id])) {
-                return actions.updateAccount(account.toJS())
+                return actions.updateAccount(account)
             } else {
-                return actions.addAccount(account.toJS())
+                return actions.addAccount(account)
             }
         }
         return this.setIn(['accounts', account.id], account).set('$actionForLatestUpdate', updateAction());
@@ -46,9 +46,9 @@ class Books extends Record({accounts: new Map(), transactions: new Map(), $actio
     setTransaction(transaction) {
         const updateAction = () => {
             if (this.getIn(['transactions', transaction.id])) {
-                return actions.updateTransaction(transaction.toJS())
+                return actions.updateTransaction(transaction)
             } else {
-                return actions.addTransaction(transaction.toJS())
+                return actions.addTransaction(transaction)
             }
         }
         return this.setIn(['transactions', transaction.id], transaction).set('$actionForLatestUpdate', updateAction());

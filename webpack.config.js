@@ -34,7 +34,8 @@ module.exports = {
             { from: dir_html }, // to: output.path
             { from: dir_css }, // to: output.path
             { from: 'node_modules/bootstrap/dist/css/bootstrap.css' }, // to: output.path
-            { from: 'node_modules/bootstrap/dist/css/bootstrap-theme.css' } // to: output.path
+            { from: 'node_modules/bootstrap/dist/css/bootstrap-theme.css' }, // to: output.path
+            { from: 'node_modules/bootstrap/dist/fonts', to: 'fonts'  }
         ]),
     ],
     // Create Sourcemaps for the bundle

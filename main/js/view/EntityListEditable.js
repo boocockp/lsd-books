@@ -5,25 +5,25 @@ const {Button, ListGroup, ListGroupItem} = require('react-bootstrap')
 
 const EntityListEditable = React.createClass({
     render: function () {
-        const renderDisplayItem = (item) => {
+        const renderDisplayItem = (item, index) => {
             return (
-                <ListGroupItem key={item.id}
+                <ListGroupItem key={item.id || index}
                                onClick={this.onEdit.bind(this, item)}>
                     {this.props.displayItem(item)}
                 </ListGroupItem>
             )
         }
-        const renderEditItem = (item) => {
+        const renderEditItem = (item, index) => {
             return (
-                <ListGroupItem key={item.id}>
+                <ListGroupItem key={item.id || index}>
                     {this.props.editItem(item, this.onSave)}
                 </ListGroupItem>
             )
         }
 
-        const renderItem = (item) => {
+        const renderItem = (item, index) => {
             const isEditing = item === this.state.itemBeingEdited
-            return isEditing ? renderEditItem(item) : renderDisplayItem(item)
+            return isEditing ? renderEditItem(item, index) : renderDisplayItem(item, index)
         }
 
         const items = this.props.items

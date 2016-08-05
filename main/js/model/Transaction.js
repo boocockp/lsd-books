@@ -3,6 +3,7 @@
 const {Record, List} = require('immutable'),
     JsonUtil = require('../../../shared/modules/json/JsonUtil')
     , Posting = require('./Posting')
+    , moment = require('moment')
 
 const propertyDescriptors = [
     {
@@ -61,7 +62,8 @@ class Transaction extends Record(descriptor.defaultValues) {
     }
 
     get shortSummary() {
-        return `${this.date.toISOString()}  ${this.description}`
+        const formattedDate = this.date ? moment(this.date).format("DD MMM YY") : ""
+        return `${formattedDate}  ${this.description}`
     }
 
     toJSON() : Object {
