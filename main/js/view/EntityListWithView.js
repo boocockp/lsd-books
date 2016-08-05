@@ -21,7 +21,7 @@ let EntityListWithView = React.createClass({
                 <Row>
                     <Col xs={12} md={3}>
                         {this.props.onNew ? <Button onClick={this.newObject}>New</Button> : ''}
-                        <EntityList items={p.items} selectedItemId={selectedId} onSelect={this.select} displayItem={displayItemFn}/>
+                        <EntityList items={entityManager.choiceList()} selectedItemId={selectedId} onSelect={this.select} displayItem={displayItemFn}/>
                     </Col>
                     <Col xs={12} md={9}>{entity ? <EntityView entity={entity} onSave={this.saveEntity}/> : '' }</Col>
                 </Row>
@@ -47,7 +47,6 @@ let EntityListWithView = React.createClass({
 })
 
 EntityListWithView.propTypes = {
-    items: PropTypes.instanceOf(List).isRequired,
     entityManager: PropTypes.instanceOf(EntityManager).isRequired,
     selectedId: PropTypes.string,
     onSelect: PropTypes.func,

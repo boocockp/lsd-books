@@ -28,6 +28,7 @@ Entity view
 - Reduce callbacks to on save - up to container to know whether new object or not
 - Properties displayed - can have default on metadata
 - Horizontal layout variant
+- Reference property picking and displaying entity description
 
 Storing changes
 ---------------
@@ -40,4 +41,9 @@ Routing
 - Need to re-render elements to get overall changes without destroying pages with in-progress changes
 - Persistent router caches component so new one created with new state is not used
 - Maybe suppress update if not visible
+
+Redux
+-----
+- Ditch it
+
  

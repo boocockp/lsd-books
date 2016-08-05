@@ -96,7 +96,7 @@ class Books extends Record({accounts: new Map(), transactions: new Map(), $actio
         function inDates(transaction) {
             return transaction.date >= fromDate && transaction.date <= toDate;
         }
-        let postingLists = this.transactions.filter(inDates).map( t => t.postings.filter( p => p.accountId == acct.id ));
+        let postingLists = this.transactions.filter(inDates).map( t => t.postings.filter( p => p.account == acct.id ));
         return postingLists.flatten(1);
     }
 

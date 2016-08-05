@@ -1,4 +1,5 @@
 const React = require('react')
+const {PropTypes} = require('react')
 const { connect } = require('react-redux')
 const PersistentRouter = require('./PersistentRouter')
 const EntityListWithView = require('./EntityListWithView')
@@ -60,36 +61,31 @@ let App = React.createClass({
     },
 
     accountList: function () {
-        class AccountManager extends EntityManager {
-
-            get(id) {
-                return appState.accounts.get(id)
-            }
-
-            newInstance() {
-                return new Account();
-            }
-
-            save(entity) {
-                const action = setAccount(entity);
-                dispatch(action)
-                return action.data
-            }
-        }
-        const appState = this.props.appState
-        const dispatch = this.props.dispatch
-        const entityManager = new AccountManager()
         return (
-            <EntityListWithView items={this.props.appState.accountsByName} entityManager={entityManager}
+            <EntityListWithView entityManager={this.getEntityManager(Account)}
                                 onSelect={this.navigateToAccount} onNew={this.navigateToNewAccount}/>
         )
     },
 
     transactionList: function () {
+        return (
+            <EntityListWithView entityManager={this.getEntityManager(Transaction)}
+                                onSelect={this.navigateToTransaction} onNew={this.navigateToNewTransaction}/>
+        )
+    },
+
+    getEntityManager: function (entityType) {
+        const appState = this.props.appState
+        const dispatch = this.props.dispatch
+
         class TransactionManager extends EntityManager {
 
             get(id) {
                 return appState.transactions.get(id)
+            }
+
+            choiceList() {
+                return appState.transactionsByDate
             }
 
             newInstance() {
@@ -102,15 +98,49 @@ let App = React.createClass({
                 return action.data
             }
         }
-        const appState = this.props.appState
-        const dispatch = this.props.dispatch
-        const entityManager = new TransactionManager()
-        return (
-            <EntityListWithView items={this.props.appState.transactionsByDate} entityManager={entityManager}
-                                onSelect={this.navigateToTransaction} onNew={this.navigateToNewTransaction}/>
-        )
+
+        class AccountManager extends EntityManager {
+
+            get(id) {
+                return appState.accounts.get(id)
+            }
+
+            choiceList() {
+                return appState.accountsByName
+            }
+
+            newInstance() {
+                return new Account();
+            }
+
+            save(entity) {
+                const action = setAccount(entity);
+                dispatch(action)
+                return action.data
+            }
+        }
+
+        if (entityType === Account) {
+            return new AccountManager()
+        }
+
+        if (entityType === Transaction) {
+            return new TransactionManager()
+        }
+
+        throw new Error("Unknown entityType " + entityType)
+
+    },
+
+    getChildContext() {
+        return {getEntityManager: this.getEntityManager}
     }
 })
+
+App.childContextTypes = {
+    getEntityManager: PropTypes.func
+}
+
 
 App = connect(mapStateToProps)(App)
 

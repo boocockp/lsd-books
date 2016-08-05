@@ -16,3 +16,7 @@ select.no-selection {
     color: inherit;
     background-color: inherit;
 }
+
+.spaced-1 {
+    margin-right: 1em;
+}

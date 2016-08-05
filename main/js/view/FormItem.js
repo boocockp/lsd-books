@@ -7,6 +7,7 @@ const EntityListItem = require('./EntityListItem');
 const EntityViewFn = () => require('./EntityView');
 const EntityListEditable = require('./EntityListEditable');
 const DateTimeField = require('react-bootstrap-datetimepicker')
+const Reference = require('../model/Reference')
 
 const FormItem = React.createClass({
     getInitialState: function () {
@@ -49,6 +50,14 @@ const FormItem = React.createClass({
     handleSelectChange: function (event) {
         const optionValue = event.target.value
         const value = this.props.type.values().find( x => x.name === optionValue) || null
+        this.setState({value})
+        if (this.props.onChange) {
+            this.props.onChange(value)
+        }
+    },
+
+    handleRefChange: function (event) {
+        const value = event.target.value
         this.setState({value})
         if (this.props.onChange) {
             this.props.onChange(value)
@@ -102,6 +111,16 @@ const FormItem = React.createClass({
             const editItemFn = (item, onSave) => <EntityView entity={item} onSave={onSave} />
             return <EntityListEditable items={value} itemType={propDesc.itemType} displayItem={displayItemFn} editItem={editItemFn} onChange={this.handleListChange}/>
         }
+        if (type === Reference) {
+            const entities = this.context.getEntityManager(propDesc.itemType).choiceList()
+            const optionList = entities.map(o => ({value: o.id, name: o.shortSummary}) )
+            return (
+                <FormControl componentClass="select" value={value} onChange={this.handleRefChange}>
+                    <option value="">{placeholder || "Not selected"}</option>
+                    {optionList.map( op => <option key={op.value} value={op.value}>{op.name}</option> )}
+                </FormControl>
+            )
+        }
         if (type.values) {
             const optionList = type.values().map( o => ({value: o.name, name: o.label}) )
             return (
@@ -123,6 +142,10 @@ FormItem.propTypes = {
     help: PropTypes.string,
     readOnly: PropTypes.bool,
     onChange: PropTypes.func,
+}
+
+FormItem.contextTypes = {
+    getEntityManager: PropTypes.func
 }
 
 module.exports = FormItem
