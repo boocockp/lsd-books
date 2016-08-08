@@ -81,7 +81,7 @@ class Account extends Record(descriptor.defaultValues) {
         return descriptor
     }
 
-    constructor(data : AccountData, postings: List) {
+    constructor(data : AccountData = new AccountData(), postings: List = List()) {
         super({data, postings})
     }
 
@@ -89,6 +89,10 @@ class Account extends Record(descriptor.defaultValues) {
     get name() { return this.data.name }
     get code() { return this.data.code }
     get type() { return this.data.type }
+
+    setData(name, value) {
+        return this.setIn(['data', name], value)
+    }
 
     get shortSummary() : string {
         return `${this.code} - ${this.name}`

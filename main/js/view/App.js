@@ -102,7 +102,7 @@ let App = React.createClass({
         class AccountManager extends EntityManager {
 
             get(id) {
-                return appState.accounts.get(id)
+                return appState.account(id)
             }
 
             choiceList() {
@@ -114,7 +114,7 @@ let App = React.createClass({
             }
 
             save(entity) {
-                const action = setAccount(entity);
+                const action = setAccount(entity.data);
                 dispatch(action)
                 return action.data
             }

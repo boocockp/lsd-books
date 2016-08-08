@@ -19,7 +19,7 @@ let EntityView = React.createClass({
         if (!entityDescriptor) throw new Error('EntityDescriptor required')
         const entityName = entityDescriptor.name
         const propertyNames = this.props.propertiesToShow || entityDescriptor.displayProperties
-        const heading = entity.has("id") ? (entity.id ? `${entityName} ${entity.shortSummary}` : `New ${entityName}`) : entityName
+        const heading = _.hasIn(entity, 'id') ? (entity.id ? `${entityName} ${entity.shortSummary}` : `New ${entityName}`) : entityName
         return (
             <div >
                 <h2>{heading}</h2>
@@ -33,7 +33,7 @@ let EntityView = React.createClass({
 
     onChange: function(name, value) {
         const oldEntity = this.state.updatedEntity || this.props.entity
-        const updatedEntity = oldEntity.set(name, value)
+        const updatedEntity = oldEntity.setData(name, value)
         this.setState({updatedEntity})
     },
 
