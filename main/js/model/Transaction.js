@@ -1,7 +1,8 @@
 // @flow
 
 const {Record, List} = require('immutable'),
-    JsonUtil = require('../../../shared/modules/json/JsonUtil')
+    _ = require('lodash')
+    , JsonUtil = require('../../../shared/modules/json/JsonUtil')
     , Posting = require('./Posting')
     , moment = require('moment')
 
@@ -59,6 +60,10 @@ class Transaction extends Record(descriptor.defaultValues) {
 
     static get entityDescriptor() : Object {
         return descriptor
+    }
+
+    constructor(data : Object = {}) {
+        super(Object.assign({}, data, {postings: List(data.postings)}))
     }
 
     get shortSummary() {

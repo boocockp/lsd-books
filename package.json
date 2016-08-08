@@ -6,16 +6,6 @@
     "build": "webpack",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
-  "babel": {
-    "presets": [
-      "es2015",
-      "react",
-      "stage-0"
-    ],
-    "plugins": [
-      "transform-flow-strip-types"
-    ]
-  },
   "dependencies": {
     "aws-sdk": "^2.4.7",
     "bootstrap": "^3.3.6",
@@ -39,10 +29,12 @@
     "babel-preset-es2015": "^6.9.0",
     "babel-preset-react": "^6.11.1",
     "babel-preset-stage-0": "^6.5.0",
+    "babel-register": "^6.11.6",
     "chai": "^3.5.0",
     "chai-subset": "^1.2.2",
     "copy-webpack-plugin": "^3.0.1",
     "flow-bin": "^0.30.0",
+    "mocha": "^3.0.2",
     "sinon": "^1.17.4",
     "sinon-chai": "^2.8.0",
     "webpack": "^1.13.1"

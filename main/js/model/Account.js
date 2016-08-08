@@ -3,6 +3,7 @@ const _ = require('lodash'),
     JsonUtil = require('../../../shared/modules/json/JsonUtil'),
     // Books = require('./Books'),
     {CREDIT} = require('./Types').DebitCredit,
+    AccountData = require('./AccountData'),
     {AccountType} = require('./Types')
 
 const propertyDescriptors = [
@@ -71,7 +72,7 @@ const descriptor =  {
         return Object.assign({name, label: _.startCase(name)}, propertyDescriptors.find( x => x.name === name ))
     },
     get displayProperties() { return ["name", "code", "type", "balance"] },
-    get defaultValues() { return _.fromPairs( propertyDescriptors.filter( pd => !pd.readOnly ).map( desc => [desc.name, defaultValueForType(desc.type)]))  }
+    get defaultValues() { return {data: new AccountData(), postings: new List()}  }
 }
 
 class Account extends Record(descriptor.defaultValues) {
@@ -80,9 +81,14 @@ class Account extends Record(descriptor.defaultValues) {
         return descriptor
     }
 
-    constructor(data : Object) {
-        super(data)
+    constructor(data : AccountData, postings: List) {
+        super({data, postings})
     }
+
+    get id() { return this.data.id }
+    get name() { return this.data.name }
+    get code() { return this.data.code }
+    get type() { return this.data.type }
 
     get shortSummary() : string {
         return `${this.code} - ${this.name}`
@@ -90,10 +96,9 @@ class Account extends Record(descriptor.defaultValues) {
 
     //@precision(2)
     get signedBalance() : number {
-        // const signedAmount = (p) => p.type == CREDIT ? p.amount : -p.amount
-        // const sum = (acc, val) => acc + val
-        // return Books.instance.postingsForAccount(this).map(signedAmount).reduce(sum, 0)
-        return 0
+        const signedAmount = (p) => p.type == CREDIT ? p.amount : -p.amount
+        const sum = (acc, val) => acc + val
+        return this.postings.map(signedAmount).reduce(sum, 0)
     }
 
     get balance() : number {
@@ -110,7 +115,7 @@ class Account extends Record(descriptor.defaultValues) {
     }
 
     toJSON() : Object {
-        return Object.assign(super.toJSON(), {"@type": this.constructor.name})
+        throw new Error('Should not be serializing this object')
     }
 
 }

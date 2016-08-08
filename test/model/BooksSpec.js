@@ -30,19 +30,57 @@ function jsMatch(chai, utils) {
     });
 }
 
+function havePropertiesOf(chai, utils) {
+    chai.Assertion.addMethod('havePropertiesOf', function (expectedProperties) {
+        const obj = this._obj
+        var assertProperties = function (actualObj, expectedObj) {
+            if (_.isObject(expectedObj)) {
+                for (const p of Object.getOwnPropertyNames(expectedObj)) {
+                    const actual = actualObj[p], expected = expectedObj[p]
+                    this.assert(
+                        actual === expected
+                        , "expected property '" + p + "' of #{this} to be #{exp} but got #{act}"
+                        , "expected property '" + p + "' of #{this} 'to not be #{act}"
+                        , expected        // expected
+                        , actual   // actual
+                    )
+                }
+            } else {
+                const actual = actualObj, expected = expectedObj
+                this.assert(
+                    actual === expected
+                    , "expected #{this} to be #{exp} but got #{act}"
+                    , "expected #{this} 'to not be #{act}"
+                    , expected        // expected
+                    , actual   // actual
+                )
+
+            }
+        }.bind(this)
+
+        if (_.isArray(expectedProperties)) {
+            const arrayObj = _.isArray(obj) ? obj : obj.toArray()
+            expectedProperties.forEach( (exp, index) => assertProperties(arrayObj[index], exp))
+        } else {
+            assertProperties(obj, expectedProperties)
+        }
+    })
+}
+
 chai.use(jsEqual);
 chai.use(jsMatch);
+chai.use(havePropertiesOf);
 
 function credit(...acctsAmounts) {
     const type = CREDIT;
     const acctAmountPairs = _.chunk(acctsAmounts, 2);
-    return acctAmountPairs.map( ([acct, amount]) => new Posting(acct.id, type, amount));
+    return acctAmountPairs.map( ([acct, amount]) => new Posting({account: acct.id, type, amount}));
 }
 
 function debit(...acctsAmounts) {
     const type = DEBIT;
     const acctAmountPairs = _.chunk(acctsAmounts, 2);
-    return acctAmountPairs.map( ([acct, amount]) => new Posting(acct.id, type, amount));
+    return acctAmountPairs.map( ([acct, amount]) => new Posting({account: acct.id, type, amount}));
 }
 
 
@@ -54,9 +92,10 @@ describe("Books", function () {
     let books, a, b, c, d;
 
     function transaction(date, debits, credits) {
-        books = books.addTransaction(new Transaction(date, "Transaction " + (transaction.seqNo++), debits.concat(credits)));
+        const id = transaction.nextId++
+        books = books.addTransaction({id, date, description: "Transaction " + id, postings: debits.concat(credits)});
     }
-    transaction.seqNo = 0;
+    transaction.nextId = 2000;
 
     function dcTransaction(date, amount, debitAccount, creditAccount) {
         transaction(date, debit(debitAccount, amount), credit(creditAccount, amount))
@@ -82,30 +121,30 @@ describe("Books", function () {
 
     describe("Books object", function () {
         it("gets account by id now", function () {
-            books.account(a.id).should.jsEql(a);
+            books.account(a.id).should.havePropertiesOf(a);
         });
 
         it("knows accounts by name now", function () {
-            books.accountsByName.should.jsEql([b, c, d, a]);
+            books.accountsByName.should.havePropertiesOf([b, c, d, a]);
         });
 
         it("gets accounts by type sorted by code now", function () {
-            books.accountsOfType(EXPENSE).should.jsEql([c, a, d]);
+            books.accountsOfType(EXPENSE).should.havePropertiesOf([c, a, d]);
         });
 
         it("gets account by code now", function () {
-            books.accountByCode("2222").should.jsEql(b);
+            books.accountByCode("2222").should.havePropertiesOf(b);
         });
     });
 
     describe("books object with changing data", function () {
         it("updates account from partial data", function () {
             books = books.updateAccount({id: b.id, name: "Water"});
-            books.account(b.id).should.jsEql(_.merge({}, b, {name: "Water"}));
+            books.account(b.id).should.havePropertiesOf(_.merge({}, b, {name: "Water"}));
         });
         it("re-sorts accounts when names change", function () {
             books = books.updateAccount({id: b.id, name: "Water"});
-            books.accountsByName.should.jsEql([c, d, a, _.merge({}, b, {name: "Water"})]);
+            books.accountsByName.should.havePropertiesOf([c, d, a, _.merge({}, b, {name: "Water"})]);
         });
     });
 
@@ -114,9 +153,18 @@ describe("Books", function () {
             dcTransaction(date1, 100, a, b);
             transaction(date2, debit(a, 200, c, 50), credit(b, 200, d, 50));
 
-            books.accountViewsByName().map(it => it.signedBalance).should.jsEql([300, -50, 50, -300]);
-            books.accountViewsByName().map(it => it.debitBalance).should.jsEql([null, 50, null, 300]);
-            books.accountViewsByName().map(it => it.creditBalance).should.jsEql([300, null, 50, null]);
+            books.accountsByName.map(it => it.signedBalance).should.havePropertiesOf([300, -50, 50, -300]);
+            books.accountsByName.map(it => it.debitBalance).should.havePropertiesOf([null, 50, null, 300]);
+            books.accountsByName.map(it => it.creditBalance).should.havePropertiesOf([300, null, 50, null]);
+        });
+
+        it("knows account balances and debit and credit balances", function () {
+            dcTransaction(date1, 100, a, b);
+            transaction(date2, debit(a, 200, c, 50), credit(b, 200, d, 50));
+
+            books.accountViewsByName().map(it => it.signedBalance).should.havePropertiesOf([300, -50, 50, -300]);
+            books.accountViewsByName().map(it => it.debitBalance).should.havePropertiesOf([null, 50, null, 300]);
+            books.accountViewsByName().map(it => it.creditBalance).should.havePropertiesOf([300, null, 50, null]);
         });
 
         it("knows updates to individual account names", function () {
@@ -131,7 +179,7 @@ describe("Books", function () {
             books.account(b.id).name.should.eql("Customer Ents");
         });
 
-        it("returns same functional objects for each call", function () {
+        it.skip("returns same functional objects for each call", function () {
             const accA = books.accountByCode(a.code);
             const accA2 = books.accountByCode(a.code);
             accA.should.equal(accA2);
@@ -144,9 +192,9 @@ describe("Books", function () {
             transaction(date2, debit(a, 200, c, 50), credit(b, 200, d, 50));
 
             const json = JsonUtil.toStore(books);
-            // console.log("json", json);
+            console.log("json", json);
             const newBooks = JsonUtil.fromStore(json);
-            // console.log("newBooks", newBooks);
+            console.log("newBooks", newBooks);
 
             newBooks.accountViewsByName().map(it => it.signedBalance).should.jsEql([300, -50, 50, -300]);
             newBooks.accountViewsByName().map(it => it.debitBalance).should.jsEql([null, 50, null, 300]);

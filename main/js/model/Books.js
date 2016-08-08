@@ -6,8 +6,9 @@ const
     JsonUtil = require('../../../shared/modules/json/JsonUtil'),
     {Record, List, Map} = require('immutable'),
     actions = require('../app/actions'),
-    Account = () => require('./Account'),
+    AccountData = () => require('./AccountData'),
     Transaction = () => require('./Transaction'),
+    Account = require('./Account'),
     AccountAsAt = require('./AccountAsAt'),
     TrialBalance = require('./TrialBalance'),
     BalanceSheet = require('./BalanceSheet')
@@ -35,7 +36,7 @@ class Books extends Record({accounts: new Map(), transactions: new Map(), $actio
     }
 
     addAccount(data) {
-        const account = new (Account())(data);
+        const account = new (AccountData())(data);
         return this.setIn(['accounts', account.id], account);
     }
 
@@ -62,9 +63,12 @@ class Books extends Record({accounts: new Map(), transactions: new Map(), $actio
     updateTransaction(data) {
         return this.mergeIn(['transactions', data.id], data);
     }
-    
+
+    get accountModels() {
+        return this.accounts.map( a => new Account(a, this.postingsForAccount(a)) )
+    }
     get accountsByName() {
-        return this.accounts.toList().sortBy( it => it.name);
+        return this.accountModels.toList().sortBy( it => it.name);
     }
 
     accountViews(fromDate = 0, toDate = Number.MAX_SAFE_INTEGER) {
@@ -77,15 +81,15 @@ class Books extends Record({accounts: new Map(), transactions: new Map(), $actio
     }
 
     account(id) {
-        return this.getIn(['accounts', id]);
+        return this.accountModels.get(id)
     }
 
     accountsOfType(t) {
-        return this.accounts.toList().filter( it => it.type === t).sortBy( it => it.code );
+        return this.accountModels.toList().filter( it => it.type === t).sortBy( it => it.code );
     }
 
     accountByCode(code) {
-        return this.accounts.find( it => it.code == code );
+        return this.accountModels.find( it => it.code == code );
     }
 
     get transactionsByDate() {
@@ -96,7 +100,7 @@ class Books extends Record({accounts: new Map(), transactions: new Map(), $actio
         function inDates(transaction) {
             return transaction.date >= fromDate && transaction.date <= toDate;
         }
-        let postingLists = this.transactions.filter(inDates).map( t => t.postings.filter( p => p.account == acct.id ));
+        let postingLists = this.transactions.toList().filter(inDates).map( t => t.postings.filter( p => p.account == acct.id ));
         return postingLists.flatten(1);
     }
 

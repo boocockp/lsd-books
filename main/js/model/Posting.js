@@ -1,7 +1,8 @@
 // @flow
 
 const {List, Record} = require('immutable'),
-    JsonUtil = require('../../../shared/modules/json/JsonUtil')
+    _ = require('lodash')
+    , JsonUtil = require('../../../shared/modules/json/JsonUtil')
     , {DebitCredit} = require('./Types')
     , Reference = require('./Reference')
     , Account = require('./Account')
@@ -55,6 +56,10 @@ class Posting extends Record(descriptor.defaultValues) {
 
     static get entityDescriptor() : Object {
         return descriptor
+    }
+
+    constructor(data : Object) {
+        super(data)
     }
 
     toJSON() : Object {
