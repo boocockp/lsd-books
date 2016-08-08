@@ -210,16 +210,16 @@ describe("Books", function () {
             transaction(date1, debit(a, 100), credit(b, 100));
 
             let tb = books.trialBalance;
-            tb.accounts.should.jsMatch([b, a]);
-            tb.debitTotal.should.eql(100);
-            tb.creditTotal.should.eql(100);
+            tb.accounts.should.havePropertiesOf([b, a]);
+            tb.totals.debit.should.eql(100);
+            tb.totals.credit.should.eql(100);
 
             transaction(date2, debit(a, 200, c, 50), credit(b, 200, d, 50));
 
             tb = books.trialBalance;
-            tb.accounts.should.jsMatch([c, b, a, d]);
-            tb.debitTotal.should.eql(350);
-            tb.creditTotal.should.eql(350);
+            tb.accounts.should.havePropertiesOf([c, b, a, d]);
+            tb.totals.debit.should.eql(350);
+            tb.totals.credit.should.eql(350);
 
         });
     });

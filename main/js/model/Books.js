@@ -105,7 +105,7 @@ class Books extends Record({accounts: new Map(), transactions: new Map(), $actio
     }
 
     get trialBalance() {
-        return new TrialBalance(this);
+        return new TrialBalance(this.accountModels);
     }
     
     balanceSheet(date) {

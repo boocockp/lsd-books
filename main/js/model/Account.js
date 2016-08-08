@@ -1,7 +1,6 @@
 const _ = require('lodash'),
     {Record, List} = require('immutable'),
     JsonUtil = require('../../../shared/modules/json/JsonUtil'),
-    // Books = require('./Books'),
     {CREDIT} = require('./Types').DebitCredit,
     AccountData = require('./AccountData'),
     {AccountType} = require('./Types')

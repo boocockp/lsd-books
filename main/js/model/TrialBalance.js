@@ -1,20 +1,20 @@
-const {sum, prop} = require('./FunctionHelpers');
+const {sum, prop} = require('./FunctionHelpers')
+const {Record, List, Map} = require('immutable')
 
-module.exports = class TrialBalance {
+module.exports = class TrialBalance extends Record({allAccounts: List()}) {
     
-    constructor(books) {
-        this.books = books;
+    constructor(allAccounts) {
+        super({allAccounts})
     }
     
     get accounts() {
-        return this.books.accountViewsByName().filter(it => it.signedBalance !== 0 ).sortBy(prop('code'));
+        return this.allAccounts.filter(it => it.signedBalance !== 0 ).sortBy(prop('code'));
     }
 
-    get debitTotal() {
-        return this.accounts.map(it => it.debitBalance).reduce(sum);
-    }
-
-    get creditTotal() {
-        return this.accounts.map(it => it.creditBalance).reduce(sum);
+    get totals() {
+        return {
+            debit: this.accounts.map(it => it.debitBalance).reduce(sum),
+            credit: this.accounts.map(it => it.creditBalance).reduce(sum)
+        }
     }
 };
