@@ -1,6 +1,7 @@
 let chai = require('chai'),
     chaiSubset = require('chai-subset'),
     _ = require('lodash'),
+    {List} = require('immutable'),
     Books = require('../../main/js/model/Books'),
     Account = require('../../main/js/model/Account'),
     Transaction = require('../../main/js/model/Transaction'),
@@ -207,22 +208,23 @@ describe("Books", function () {
 
         it("has accounts with non-zero balances and debit totals", function () {
 
-            transaction(date1, debit(a, 100), credit(b, 100));
+            transaction(date1, debit(a, 100), credit(b, 100))
 
-            let tb = books.trialBalance;
-            tb.accounts.should.havePropertiesOf([b, a]);
-            tb.totals.debit.should.eql(100);
-            tb.totals.credit.should.eql(100);
+            let tb = books.trialBalance
+            tb.accounts.should.be.instanceof(List)
+            tb.accounts.should.havePropertiesOf([b, a])
+            tb.totals.debit.should.eql(100)
+            tb.totals.credit.should.eql(100)
 
-            transaction(date2, debit(a, 200, c, 50), credit(b, 200, d, 50));
+            transaction(date2, debit(a, 200, c, 50), credit(b, 200, d, 50))
 
-            tb = books.trialBalance;
-            tb.accounts.should.havePropertiesOf([c, b, a, d]);
-            tb.totals.debit.should.eql(350);
-            tb.totals.credit.should.eql(350);
+            tb = books.trialBalance
+            tb.accounts.should.havePropertiesOf([c, b, a, d])
+            tb.totals.debit.should.eql(350)
+            tb.totals.credit.should.eql(350)
 
-        });
-    });
+        })
+    })
 
     describe("balance sheet", function () {
         it("has amounts in correct categories sorted by code", function () {

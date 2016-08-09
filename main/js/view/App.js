@@ -3,6 +3,7 @@ const {PropTypes} = require('react')
 const { connect } = require('react-redux')
 const PersistentRouter = require('./PersistentRouter')
 const EntityListWithView = require('./EntityListWithView')
+const TrialBalanceView = require('./TrialBalanceView')
 const MainPage = require('./MainPage')
 const NotFoundPage = require('./NotFoundPage')
 const {Locations, Location, NotFound} = require('react-router-component')
@@ -38,6 +39,7 @@ let App = React.createClass({
                     <Location path="/account/:selectedId" handler={this.accountList()}/>
                     <Location path="/transaction" handler={this.transactionList()}/>
                     <Location path="/transaction/:selectedId" handler={this.transactionList()}/>
+                    <Location path="/reports/trialBalance" handler={this.trialBalance()}/>
                     <NotFound handler={NotFoundPage}/>
                 </Locations>
             </div>
@@ -72,6 +74,10 @@ let App = React.createClass({
             <EntityListWithView entityManager={this.getEntityManager(Transaction)}
                                 onSelect={this.navigateToTransaction} onNew={this.navigateToNewTransaction}/>
         )
+    },
+
+    trialBalance: function () {
+        return <TrialBalanceView entity={this.props.appState.trialBalance}/>
     },
 
     getEntityManager: function (entityType) {
