@@ -9,7 +9,7 @@ let EntityTableRowGroup = React.createClass({
 
     render: function () {
         return (
-            <tbody>
+            <tbody className={this.props.className}>
                 {this.props.items.map((item, index) => this.dataRow(item, index)) }
             </tbody>
         )

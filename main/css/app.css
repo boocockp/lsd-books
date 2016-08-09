@@ -20,3 +20,16 @@ select.no-selection {
 .spaced-1 {
     margin-right: 1em;
 }
+
+
+tbody.summary {
+    font-weight: bold;
+}
+
+.table-bordered > tbody > tr > td.empty {
+    border: none;
+}
+
+td.number {
+    text-align: right;
+}
