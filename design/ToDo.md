@@ -15,6 +15,8 @@ Auto metadata
 - Entity view driven from runtime metadata
 - Overrides and additions possible to entity view - override metadata, provide own rendering
 
+- Rationalise entity descriptors
+
 List view
 ---------
 - General list view
@@ -29,6 +31,10 @@ Entity view
 - Properties displayed - can have default on metadata
 - Horizontal layout variant
 - Reference property picking and displaying entity description
+
+Report views
+------------
+- Need to be able to have labels like "Totals" in rows
 
 Storing changes
 ---------------

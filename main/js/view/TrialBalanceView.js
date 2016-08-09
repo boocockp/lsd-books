@@ -17,7 +17,7 @@ let TrialBalanceView = React.createClass({
         return (
             <div >
                 <h2>{heading}</h2>
-                <EntityTable items={entity["accounts"]} propertiesToShow={["code", "name", "debitBalance", "creditBalance"]}>
+                <EntityTable items={entity["accounts"]} propertiesToShow={["code, itemLink", "name, itemLink", "debitBalance", "creditBalance"]}>
                     <EntityTableRowGroup className="summary"
                                         items={List([entity["totals"]])} propertiesToShow={["", "", "debit", "credit"]}
                                          entityDescriptor={entityDescriptor.propertyDescriptor("totals").type}/>

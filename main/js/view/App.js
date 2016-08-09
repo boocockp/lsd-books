@@ -103,6 +103,10 @@ let App = React.createClass({
                 dispatch(action)
                 return action.data
             }
+
+            linkHref(entity) {
+                return "/transaction/" + entity.id;
+            }
         }
 
         class AccountManager extends EntityManager {
@@ -123,6 +127,10 @@ let App = React.createClass({
                 const action = setAccount(entity.data);
                 dispatch(action)
                 return action.data
+            }
+
+            linkHref(entity) {
+                return "/account/" + entity.id;
             }
         }
 

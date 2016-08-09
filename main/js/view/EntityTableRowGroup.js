@@ -3,14 +3,15 @@ const React = require('react')
 const {PropTypes} = require('react')
 const {List} = require('immutable')
 const {Table} = require('react-bootstrap')
-
+const {Link} = require('react-router-component')
+const {parseProp} = require('./Util')
 
 let EntityTableRowGroup = React.createClass({
 
     render: function () {
         return (
             <tbody className={this.props.className}>
-                {this.props.items.map((item, index) => this.dataRow(item, index)) }
+            {this.props.items.map((item, index) => this.dataRow(item, index)) }
             </tbody>
         )
     },
@@ -23,23 +24,31 @@ let EntityTableRowGroup = React.createClass({
 
     },
 
-    propertyNames: function () {
-        return this.props.propertiesToShow || this.entityDescriptor().displayProperties
+    propertiesToShow: function () {
+        return (this.props.propertiesToShow || this.entityDescriptor().displayProperties).map( parseProp )
     },
 
-    dataCell: function (name, item, index) {
+    dataCell: function (propInfo, item, index) {
+        const {name} = propInfo
         if (name) {
-            const className = this.entityDescriptor().propertyDescriptor(name).type.name.toLowerCase()
-            return <td  key={name} className={className}>{item[name]}</td>
+            const typeClassName = this.entityDescriptor().propertyDescriptor(name).type.name.toLowerCase()
+            const text = item[name]
+            const content = propInfo.itemLink ? this.itemLink(item, text) : text
+            return <td key={name} className={typeClassName}>{content}</td>
         } else {
             return <td key={"empty" + index} className="empty"/>
         }
     },
 
+    itemLink: function(item, text) {
+        const entityManager = this.context.getEntityManager(item.constructor)
+        return <Link href={entityManager.linkHref(item)}>{text}</Link>
+    },
+
     dataRow: function (item, index) {
         return (
             <tr key={item.id || index}>
-                {this.propertyNames().map((name, index) => this.dataCell(name, item, index))}
+                {this.propertiesToShow().map((prop, index) => this.dataCell(prop, item, index))}
             </tr>
         )
     }
@@ -49,6 +58,10 @@ EntityTableRowGroup.propTypes = {
     items: PropTypes.instanceOf(List).isRequired,
     entityDescriptor: PropTypes.object,
     propertiesToShow: PropTypes.arrayOf(PropTypes.string)
+}
+
+EntityTableRowGroup.contextTypes = {
+    getEntityManager: PropTypes.func
 }
 
 module.exports = EntityTableRowGroup

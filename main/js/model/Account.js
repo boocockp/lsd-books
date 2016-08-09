@@ -24,7 +24,7 @@ const propertyDescriptors = [
     },
     {
         name: "code",
-        type: Number,
+        type: String,
         maxLength: 4,
         description: "The account short code",
         help: "Must be 4 digits"

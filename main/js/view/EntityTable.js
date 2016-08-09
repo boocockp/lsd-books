@@ -4,6 +4,7 @@ const {PropTypes} = require('react')
 const {List} = require('immutable')
 const {Table} = require('react-bootstrap')
 const EntityTableRowGroup = require('./EntityTableRowGroup')
+const {parseProp} = require('./Util')
 
 
 let EntityTable = React.createClass({
@@ -13,7 +14,7 @@ let EntityTable = React.createClass({
             <Table striped bordered condensed hover>
                 <thead>
                     <tr>
-                        {this.propertyNames().map( (name, index) => this.headerCell(name, index) )}
+                        {this.propertiesToShow().map( (propInfo, index) => this.headerCell(propInfo.name, index) )}
                     </tr>
                 </thead>
                 <EntityTableRowGroup items={this.props.items} propertiesToShow={this.props.propertiesToShow}/>
@@ -30,8 +31,8 @@ let EntityTable = React.createClass({
 
     },
 
-    propertyNames: function() {
-        return this.props.propertiesToShow || this.entityDescriptor().displayProperties
+    propertiesToShow: function() {
+        return (this.props.propertiesToShow || this.entityDescriptor().displayProperties).map( parseProp )
     },
 
     headerCell: function(name, index) {
