@@ -5,13 +5,13 @@ const {List, Record} = require('immutable'),
     , JsonUtil = require('../../../shared/modules/json/JsonUtil')
     , {DebitCredit} = require('./Types')
     , Reference = require('./Reference')
-    , Account = require('./Account')
+    , Account = () => require('./Account')
 
 const propertyDescriptors = [
     {
         name: "account",
         type: Reference,
-        itemType: Account,
+        get itemType() { return Account()},
         description: "The account for this posting"
     },
     {

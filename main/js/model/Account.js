@@ -3,9 +3,12 @@ const _ = require('lodash'),
     JsonUtil = require('../../../shared/modules/json/JsonUtil'),
     {CREDIT} = require('./Types').DebitCredit,
     AccountData = require('./AccountData'),
+    Posting = require('./Posting'),
+    EntityDescriptor = require('../metadata/EntityDescriptor'),
     {AccountType} = require('./Types')
 
-const propertyDescriptors = [
+
+const descriptor =  new EntityDescriptor( "Account", [
     {
         name: "id",
         type: String,
@@ -44,37 +47,27 @@ const propertyDescriptors = [
         name: "debitBalance",
         type: Number,
         readOnly: true,
+        display: false,
         description: "The current balance of the account if it is a debit balance, otherwise empty"
     },
     {
         name: "creditBalance",
         type: Number,
         readOnly: true,
+        display: false,
         description: "The current balance of the account if it is a credit balance, otherwise empty"
-    }
-]
-
-function defaultValueForType(type) {
-    switch (type) {
-        case List:
-            return new List()
-
-        default:
-            return null
-    }
-}
-
-const descriptor =  {
-    name: "Account",
-    propertyNames: propertyDescriptors.map( x => x.name ),
-    propertyDescriptor: function(name) {
-        return Object.assign({name, label: _.startCase(name)}, propertyDescriptors.find( x => x.name === name ))
     },
-    get displayProperties() { return ["name", "code", "type", "balance"] },
-    get defaultValues() { return {data: new AccountData(), postings: new List()}  }
-}
+    {
+        name: "postings",
+        type: List,
+        itemType: Posting,
+        readOnly: true,
+        description: "The debits and credits to the account"
+    }
+])
 
-class Account extends Record(descriptor.defaultValues) {
+
+class Account extends Record({data: new AccountData(), postings: List()}) {
 
     static get entityDescriptor() : Object {
         return descriptor

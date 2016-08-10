@@ -2,7 +2,8 @@ const React = require('react')
 const {PropTypes} = require('react')
 const {List} = require('immutable')
 const moment = require('moment')
-const EntityListItem = require('./EntityListItem');
+const EntityList = require('./EntityList');
+const EntityListItem = () => require('./EntityListItem');
 const Reference = require('../model/Reference')
 
 const DisplayItem = React.createClass({
@@ -31,7 +32,8 @@ const DisplayItem = React.createClass({
             return moment(value).format(displayFormat)
         }
         if (type === List) {
-            const displayItemFn = (item) => <EntityListItem item={item} />
+            const EntityListItemType = EntityListItem()
+            const displayItemFn = (item) => <EntityListItemType item={item} />
             return <EntityList items={value} itemType={propDesc.itemType} displayItem={displayItemFn} />
         }
         if (type === Reference) {

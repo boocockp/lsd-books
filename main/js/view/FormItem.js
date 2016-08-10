@@ -6,6 +6,7 @@ const moment = require('moment')
 const EntityListItem = require('./EntityListItem');
 const EntityViewFn = () => require('./EntityView');
 const EntityListEditable = require('./EntityListEditable');
+const DisplayItem = require('./DisplayItem');
 const DateTimeField = require('react-bootstrap-datetimepicker')
 const Reference = require('../model/Reference')
 
@@ -92,9 +93,11 @@ const FormItem = React.createClass({
         const readOnly = this.props.readOnly
         const placeholder = readOnly ? "" : this.props.placeholder
         const value = (this.state.value === undefined || this.state.value === null) ? "" : this.state.value
+
         if (readOnly) {
-            return <FormControl.Static>{value}</FormControl.Static>
+            return <FormControl.Static><DisplayItem propDesc={propDesc} value={value}/></FormControl.Static>
         }
+
         if (type === String) {
             return <FormControl type="text" value={value} placeholder={placeholder} onChange={this.handleChange}/>
         }

@@ -10,7 +10,7 @@ class EntityDescriptor {
         return Object.assign({name, label: _.startCase(name)}, desc)
     }
     get propertyNames() { return this.propertyDescriptors.map( x => x.name ) }
-    get displayProperties() { return this.propertyNames }
+    get displayProperties() { return this.propertyNames.filter( n => this.propertyDescriptor(n).display !== false) }
     get defaultValues() { return _.fromPairs( this.propertyDescriptors.filter( pd => !pd.readOnly )
         .map( desc => [desc.name, EntityDescriptor.defaultValueForType(desc.type)]))  }
 
