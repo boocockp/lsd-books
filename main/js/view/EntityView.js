@@ -5,6 +5,10 @@ const FormItem = require('./FormItem')
 
 let EntityView = React.createClass({
 
+    getDefaultProps() {
+        return {propertyViews: {}}
+    },
+
     getInitialState: function() {
         return {updatedEntity: null}
     },

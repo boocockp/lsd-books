@@ -1,6 +1,4 @@
-let _instance;
-
-const 
+const
     // Memoize = require('../../shared/modules/memoize/Memoize'),
     // Observe = require('../../shared/modules/observe/Observe'),
     JsonUtil = require('../../../shared/modules/json/JsonUtil'),
@@ -13,7 +11,6 @@ const
     AccountAsAt = require('./AccountAsAt'),
     TrialBalance = require('./TrialBalance'),
     BalanceSheet = require('./BalanceSheet')
-    ;
 
 class Books extends Record({accounts: new Map(), transactions: new Map(), $actionForLatestUpdate: null}) {
     
@@ -114,11 +111,6 @@ class Books extends Record({accounts: new Map(), transactions: new Map(), $actio
     balanceSheet(date) {
         return new BalanceSheet(this, date);
     }
-
-    static get TEST_newInstance() {
-        _instance = null;
-        return Books.instance
-    };
 
     toJSON() {
         return Object.assign(super.toJSON(), {"@type": this.constructor.name});

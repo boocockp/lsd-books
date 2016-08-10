@@ -113,7 +113,7 @@ describe("Books", function () {
 
     beforeEach("set up app", function () {
         // Observe.TEST_clearListeners();
-        books = Books.TEST_newInstance;
+        books = new Books()
         a = account("Travel", "3333", EXPENSE);
         b = account("Food", "2222", REVENUE);
         c = account("Heat", "1111", EXPENSE);
@@ -193,9 +193,9 @@ describe("Books", function () {
             transaction(date2, debit(a, 200, c, 50), credit(b, 200, d, 50));
 
             const json = JsonUtil.toStore(books);
-            console.log("json", json);
+            // console.log("json", json);
             const newBooks = JsonUtil.fromStore(json);
-            console.log("newBooks", newBooks);
+            // console.log("newBooks", newBooks);
 
             newBooks.accountViewsByName().map(it => it.signedBalance).should.jsEql([300, -50, 50, -300]);
             newBooks.accountViewsByName().map(it => it.debitBalance).should.jsEql([null, 50, null, 300]);

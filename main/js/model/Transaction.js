@@ -28,6 +28,7 @@ const descriptor =  new EntityDescriptor("Transaction",[
         name: "shortSummary",
         type: String,
         readOnly: true,
+        display: false,
         description: "Date and description of this transaction"
     },
     {
@@ -55,6 +56,10 @@ class Transaction extends Record(descriptor.defaultValues) {
 
     get transactionPostings() {
         return this.postings.map( (p, index) => new TransactionPosting(this, p, index) )
+    }
+
+    setData(name, value) {
+        return this.set(name, value)
     }
 
     toJSON() : Object {

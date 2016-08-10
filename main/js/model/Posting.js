@@ -43,6 +43,10 @@ class Posting extends Record(descriptor.defaultValues) {
         super(data)
     }
 
+    setData(name, value) {
+        return this.set(name, value)
+    }
+
     toJSON() : Object {
         return Object.assign(super.toJSON(), {"@type": this.constructor.name});
     }

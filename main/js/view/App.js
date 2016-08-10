@@ -105,8 +105,9 @@ let App = React.createClass({
                 return action.data
             }
 
-            linkHref(entity) {
-                return "/transaction/" + entity.id;
+            linkHref(entityOrId) {
+                const id = entityOrId instanceof Transaction ? entityOrId.id : entityOrId
+                return "/transaction/" + id;
             }
         }
 
@@ -130,8 +131,9 @@ let App = React.createClass({
                 return action.data
             }
 
-            linkHref(entity) {
-                return "/account/" + entity.id;
+            linkHref(entityOrId) {
+                const id = entityOrId instanceof Account ? entityOrId.id : entityOrId
+                return "/account/" + id;
             }
         }
 

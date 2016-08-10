@@ -29,22 +29,29 @@ let EntityTableRowGroup = React.createClass({
     },
 
     dataCell: function (propInfo, item, index) {
-        const {name} = propInfo
+        const {name, itemLink} = propInfo
         if (name) {
             const propDesc = this.entityDescriptor().propertyDescriptor(name);
             const typeClassName = propDesc.type.name.toLowerCase()
             const value = item[name]
             const displayItem = <DisplayItem propDesc={propDesc} value={value}/>
-            const content = propInfo.itemLink ? this.itemLink(item, displayItem) : displayItem
+            const content = itemLink ? this.itemLink(item, itemLink, displayItem) : displayItem
             return <td key={name} className={typeClassName}>{content}</td>
         } else {
             return <td key={"empty" + index} className="empty"/>
         }
     },
 
-    itemLink: function(item, text) {
-        const entityManager = this.context.getEntityManager(item.constructor)
-        return <Link href={entityManager.linkHref(item)}>{text}</Link>
+    itemLink: function(item, itemLinkPropertyName, displayItem) {
+        if (typeof itemLinkPropertyName === 'string') {
+            const linkPropertyDesc = this.entityDescriptor().propertyDescriptor(itemLinkPropertyName)
+            const linkPropertyValue = item[itemLinkPropertyName]
+            const entityManager = this.context.getEntityManager(linkPropertyDesc.itemType)
+            return <Link href={entityManager.linkHref(linkPropertyValue)}>{displayItem}</Link>
+        } else {
+            const entityManager = this.context.getEntityManager(item.constructor)
+            return <Link href={entityManager.linkHref(item)}>{displayItem}</Link>
+        }
     },
 
     dataRow: function (item, index) {
