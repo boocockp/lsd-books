@@ -3,10 +3,12 @@
 const {Record, List} = require('immutable'),
     _ = require('lodash')
     , JsonUtil = require('../../../shared/modules/json/JsonUtil')
+    , EntityDescriptor = require('../metadata/EntityDescriptor')
     , Posting = require('./Posting')
+    , TransactionPosting = require('./TransactionPosting')
     , moment = require('moment')
 
-const propertyDescriptors = [
+const descriptor =  new EntityDescriptor("Transaction",[
     {
         name: "id",
         type: String,
@@ -34,27 +36,7 @@ const propertyDescriptors = [
         itemType: Posting,
         description: "The amounts debited and credited to each account"
     }
-]
-
-function defaultValueForType(type) {
-    switch (type) {
-        case List:
-            return new List()
-
-        default:
-            return null
-    }
-}
-
-const descriptor =  {
-    name: "Transaction",
-    propertyNames: propertyDescriptors.map( x => x.name ),
-    propertyDescriptor: function(name) {
-        return Object.assign({name, label: _.startCase(name)}, propertyDescriptors.find( x => x.name === name ))
-    },
-    get displayProperties() { return ["date", "description", "postings"] },
-    get defaultValues() { return _.fromPairs( propertyDescriptors.filter( pd => !pd.readOnly ).map( desc => [desc.name, defaultValueForType(desc.type)]))  }
-}
+])
 
 class Transaction extends Record(descriptor.defaultValues) {
 
@@ -71,10 +53,13 @@ class Transaction extends Record(descriptor.defaultValues) {
         return `${formattedDate}  ${this.description}`
     }
 
+    get transactionPostings() {
+        return this.postings.map( (p, index) => new TransactionPosting(this, p, index) )
+    }
+
     toJSON() : Object {
         return Object.assign(super.toJSON(), {"@type": this.constructor.name});
     }
-
 }
 
 JsonUtil.registerClass(Transaction);

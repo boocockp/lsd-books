@@ -4,38 +4,17 @@ const _ = require('lodash'),
     {CREDIT} = require('./Types').DebitCredit,
     AccountData = require('./AccountData'),
     Posting = require('./Posting'),
-    EntityDescriptor = require('../metadata/EntityDescriptor'),
-    {AccountType} = require('./Types')
+    EntityDescriptor = require('../metadata/EntityDescriptor')
 
 
-const descriptor =  new EntityDescriptor( "Account", [
-    {
-        name: "id",
-        type: String,
-        description: "The unique identifier for this object"
-    },
-    {
-        name: "name",
-        type: String,
-        description: "The descriptive name"
-    },
+const descriptor =  new EntityDescriptor( "Account",
+    AccountData.entityDescriptor.propertyDescriptors.concat([
     {
         name: "shortSummary",
         type: String,
         readOnly: true,
+        display: false,
         description: "Code and name of this account"
-    },
-    {
-        name: "code",
-        type: String,
-        maxLength: 4,
-        description: "The account short code",
-        help: "Must be 4 digits"
-    },
-    {
-        name: "type",
-        type: AccountType,
-        description: "The type of account"
     },
     {
         name: "balance",
@@ -64,7 +43,7 @@ const descriptor =  new EntityDescriptor( "Account", [
         readOnly: true,
         description: "The debits and credits to the account"
     }
-])
+]))
 
 
 class Account extends Record({data: new AccountData(), postings: List()}) {

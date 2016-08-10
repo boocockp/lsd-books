@@ -2,9 +2,9 @@ const _ = require('lodash')
 const React = require('react')
 const {PropTypes} = require('react')
 const {List} = require('immutable')
-const {Table} = require('react-bootstrap')
 const {Link} = require('react-router-component')
 const {parseProp} = require('./Util')
+const DisplayItem = require('./DisplayItem')
 
 let EntityTableRowGroup = React.createClass({
 
@@ -31,9 +31,11 @@ let EntityTableRowGroup = React.createClass({
     dataCell: function (propInfo, item, index) {
         const {name} = propInfo
         if (name) {
-            const typeClassName = this.entityDescriptor().propertyDescriptor(name).type.name.toLowerCase()
-            const text = item[name]
-            const content = propInfo.itemLink ? this.itemLink(item, text) : text
+            const propDesc = this.entityDescriptor().propertyDescriptor(name);
+            const typeClassName = propDesc.type.name.toLowerCase()
+            const value = item[name]
+            const displayItem = <DisplayItem propDesc={propDesc} value={value}/>
+            const content = propInfo.itemLink ? this.itemLink(item, displayItem) : displayItem
             return <td key={name} className={typeClassName}>{content}</td>
         } else {
             return <td key={"empty" + index} className="empty"/>

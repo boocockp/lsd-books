@@ -5,9 +5,9 @@ const {ListGroup, ListGroupItem} = require('react-bootstrap')
 
 const EntityList = React.createClass({
     render: function () {
-        const renderItem = (item) => {
+        const renderItem = (item, index) => {
             return (
-                <ListGroupItem key={item.id}
+                <ListGroupItem key={item.id || index}
                                active={item.id === this.props.selectedItemId}
                                onClick={this.onClick.bind(this, item)}>
                     {this.props.displayItem(item)}

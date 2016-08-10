@@ -52,7 +52,7 @@ let EntityView = React.createClass({
     formItem: function(propDesc, value) {
         const changeFn = this.onChange.bind(this, propDesc.name)
         return <FormItem key={propDesc.name} type={propDesc.type} readOnly={propDesc.readOnly} onChange={changeFn} value={value} label={propDesc.label}
-                         placeholder={propDesc.description} help={propDesc.help} propDesc={propDesc}/>
+                         placeholder={propDesc.description} help={propDesc.help} propDesc={propDesc} viewElement={this.props.propertyViews[propDesc.name]}/>
     }
 })
 
@@ -60,7 +60,8 @@ EntityView.propTypes = {
     entity: PropTypes.object.isRequired,
     onSave: PropTypes.func.isRequired,
     entityDescriptor: PropTypes.object,
-    propertiesToShow: PropTypes.arrayOf(PropTypes.string)
+    propertiesToShow: PropTypes.arrayOf(PropTypes.string),
+    propertyViews: PropTypes.objectOf(PropTypes.element)
 }
 
 module.exports = EntityView

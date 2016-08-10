@@ -7,7 +7,7 @@ Auto metadata
 - Flow type checking on model classes
 - Flow annotations for Record
 - Model class annotations to no errors
-- Work flow for checking and stripping types 
+- Work flow for *checking* and stripping types 
 - Metadata-only decorators working
 - ASTs produced for model classes
 - ASTs transformed to metadata
@@ -15,7 +15,7 @@ Auto metadata
 - Entity view driven from runtime metadata
 - Overrides and additions possible to entity view - override metadata, provide own rendering
 
-- Rationalise entity descriptors
+- Rationalise entity descriptors - use class, editable, display property
 
 List view
 ---------
@@ -51,5 +51,11 @@ Routing
 Redux
 -----
 - Ditch it
+
+Improvements
+------------
+- EntityList has default for displayItem
+- Standardize way of passing components into other components
+- Flow check on every build
 
  

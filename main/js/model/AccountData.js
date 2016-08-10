@@ -1,11 +1,11 @@
 const _ = require('lodash'),
     {Record, List} = require('immutable'),
     JsonUtil = require('../../../shared/modules/json/JsonUtil'),
-    // Books = require('./Books'),
     {CREDIT} = require('./Types').DebitCredit,
+    EntityDescriptor = require('../metadata/EntityDescriptor'),
     {AccountType} = require('./Types')
 
-const propertyDescriptors = [
+const descriptor = new EntityDescriptor("AccountData", [
     {
         name: "id",
         type: String,
@@ -28,27 +28,7 @@ const propertyDescriptors = [
         type: AccountType,
         description: "The type of account"
     }
-]
-
-function defaultValueForType(type) {
-    switch (type) {
-        case List:
-            return new List()
-
-        default:
-            return null
-    }
-}
-
-const descriptor =  {
-    name: "AccountData",
-    propertyNames: propertyDescriptors.map( x => x.name ),
-    propertyDescriptor: function(name) {
-        return Object.assign({name, label: _.startCase(name)}, propertyDescriptors.find( x => x.name === name ))
-    },
-    get displayProperties() { return [] },
-    get defaultValues() { return _.fromPairs( propertyDescriptors.filter( pd => !pd.readOnly ).map( desc => [desc.name, defaultValueForType(desc.type)]))  }
-}
+])
 
 class AccountData extends Record(descriptor.defaultValues) {
 

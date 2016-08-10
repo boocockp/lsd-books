@@ -1,3 +1,5 @@
+import List from 'immutable'
+
 class EntityDescriptor {
     constructor(name, propertyDescriptors) {
         Object.assign(this, {name, propertyDescriptors})

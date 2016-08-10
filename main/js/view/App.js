@@ -4,6 +4,7 @@ const { connect } = require('react-redux')
 const PersistentRouter = require('./PersistentRouter')
 const EntityListWithView = require('./EntityListWithView')
 const TrialBalanceView = require('./TrialBalanceView')
+const AccountView = require('./AccountView')
 const MainPage = require('./MainPage')
 const NotFoundPage = require('./NotFoundPage')
 const {Locations, Location, NotFound} = require('react-router-component')
@@ -64,7 +65,7 @@ let App = React.createClass({
 
     accountList: function () {
         return (
-            <EntityListWithView entityManager={this.getEntityManager(Account)}
+            <EntityListWithView entityManager={this.getEntityManager(Account)} entityViewType={AccountView}
                                 onSelect={this.navigateToAccount} onNew={this.navigateToNewAccount}/>
         )
     },

@@ -23,10 +23,19 @@ let EntityListWithView = React.createClass({
                         {this.props.onNew ? <Button onClick={this.newObject}>New</Button> : ''}
                         <EntityList items={entityManager.choiceList()} selectedItemId={selectedId} onSelect={this.select} displayItem={displayItemFn}/>
                     </Col>
-                    <Col xs={12} md={9}>{entity ? <EntityView entity={entity} onSave={this.saveEntity}/> : '' }</Col>
+                    <Col xs={12} md={9}>{this.entityView(entity)}</Col>
                 </Row>
             </Grid>
         )
+    },
+
+    entityView: function(entity) {
+        if (!entity) {
+            return ""
+        }
+
+        const viewType = this.props.entityViewType || EntityView
+        return React.createElement(viewType,  {entity, onSave: this.saveEntity})
     },
 
     select: function(entity) {
@@ -48,6 +57,7 @@ let EntityListWithView = React.createClass({
 
 EntityListWithView.propTypes = {
     entityManager: PropTypes.instanceOf(EntityManager).isRequired,
+    entityViewType: PropTypes.func,
     selectedId: PropTypes.string,
     onSelect: PropTypes.func,
     onNew: PropTypes.func,

@@ -88,11 +88,12 @@ const FormItem = React.createClass({
 
     formControl: function() {
         const EntityView = EntityViewFn()
-        const propDesc = this.props.propDesc
-        const type = this.props.type
-        const readOnly = this.props.readOnly
-        const placeholder = readOnly ? "" : this.props.placeholder
+        const {propDesc, type, readOnly, placeholder, viewElement} = this.props
         const value = (this.state.value === undefined || this.state.value === null) ? "" : this.state.value
+
+        if (viewElement) {
+            return React.cloneElement(viewElement, {items: value})
+        }
 
         if (readOnly) {
             return <FormControl.Static><DisplayItem propDesc={propDesc} value={value}/></FormControl.Static>
@@ -138,6 +139,7 @@ const FormItem = React.createClass({
 })
 
 FormItem.propTypes = {
+    viewElement: PropTypes.element,
     propDesc: PropTypes.object,
     value: PropTypes.any,
     label: PropTypes.string,

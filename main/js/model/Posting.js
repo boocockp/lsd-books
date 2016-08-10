@@ -6,8 +6,9 @@ const {List, Record} = require('immutable'),
     , {DebitCredit} = require('./Types')
     , Reference = require('./Reference')
     , Account = () => require('./Account')
+    , EntityDescriptor = require('../metadata/EntityDescriptor')
 
-const propertyDescriptors = [
+const descriptor = new EntityDescriptor("Posting",[
     {
         name: "account",
         type: Reference,
@@ -30,27 +31,7 @@ const propertyDescriptors = [
         readOnly: true,
         description: "Date and description of this transaction"
     }
-]
-
-function defaultValueForType(type) {
-    switch (type) {
-        case List:
-            return new List()
-
-        default:
-            return null
-    }
-}
-
-const descriptor =  {
-    name: "Posting",
-    propertyNames: propertyDescriptors.map( x => x.name ),
-    propertyDescriptor: function(name) {
-        return Object.assign({name, label: _.startCase(name)}, propertyDescriptors.find( x => x.name === name ))
-    },
-    get displayProperties() { return ["type", "account", "amount"] },
-    get defaultValues() { return _.fromPairs( propertyDescriptors.filter( pd => !pd.readOnly ).map( desc => [desc.name, defaultValueForType(desc.type)]))  }
-}
+])
 
 class Posting extends Record(descriptor.defaultValues) {
 

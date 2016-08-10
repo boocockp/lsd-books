@@ -42,7 +42,7 @@ let EntityTable = React.createClass({
 })
 
 EntityTable.propTypes = {
-    items: PropTypes.instanceOf(List).isRequired,
+    items: PropTypes.instanceOf(List),  //TODO required but need to specify partial element for cloning
     entityDescriptor: PropTypes.object,
     propertiesToShow: PropTypes.arrayOf(PropTypes.string)
 }

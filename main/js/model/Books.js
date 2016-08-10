@@ -6,6 +6,7 @@ const
     JsonUtil = require('../../../shared/modules/json/JsonUtil'),
     {Record, List, Map} = require('immutable'),
     actions = require('../app/actions'),
+    {prop} = require('./FunctionHelpers'),
     AccountData = () => require('./AccountData'),
     Transaction = () => require('./Transaction'),
     Account = require('./Account'),
@@ -100,7 +101,9 @@ class Books extends Record({accounts: new Map(), transactions: new Map(), $actio
         function inDates(transaction) {
             return transaction.date >= fromDate && transaction.date <= toDate;
         }
-        let postingLists = this.transactions.toList().filter(inDates).map( t => t.postings.filter( p => p.account == acct.id ));
+        let postingLists = this.transactions.toList().filter(inDates)
+                                            .sortBy(prop('date'))
+                                            .map( t => t.transactionPostings.filter( p => p.account == acct.id ));
         return postingLists.flatten(1);
     }
 
