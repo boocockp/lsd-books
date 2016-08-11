@@ -1,17 +1,19 @@
-export default class NotEmpty {
+export default function NotEmpty() {
+    return new class NotEmpty {
 
-    validate(entity, value) {
-        if (!this.isValid(entity, value)) {
-            return this.description()
+        validate(entity, value) {
+            if (!this.isValid(entity, value)) {
+                return this.description()
+            }
         }
-    }
 
-    isValid(entity, value) {
-        return value !== undefined && value !== null && value !== ""
-    }
+        isValid(entity, value) {
+            return value !== undefined && value !== null && value !== ""
+        }
 
-    description() {
-        return "Must not be empty"
+        description() {
+            return "Must not be empty"
+        }
     }
 }
 

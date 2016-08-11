@@ -18,7 +18,7 @@ const descriptor = new EntityDescriptor("AccountData", [
         name: "name",
         type: String,
         description: "The descriptive name",
-        validators: [new NotEmpty() ]
+        validators: [NotEmpty() ]
     },
     {
         name: "code",
