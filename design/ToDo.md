@@ -62,6 +62,20 @@ Redux
 -----
 - Ditch it
 
+Validation
+----------
+- Entity - basic data - has function to give error map
+- Errors should come from metadata
+- Errors function is given whole app state when called
+  - have to pass app state around everywhere in context?
+- Metadata contains rule objects that can validate an object but also describe themselves
+  - allow for i18n
+- Rule object has validate(value, object, app) and description property
+- Rule objects applied in order when validate - stop on first error
+- EntityDescriptor has a validate method, delegates to Prop desc
+- PropertyDescriptor objects apply their rules and return a list of error messages - usually just one
+- Need to do whole object errors too
+
 Improvements
 ------------
 - EntityList has default for displayItem

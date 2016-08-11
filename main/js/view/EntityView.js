@@ -10,17 +10,22 @@ let EntityView = React.createClass({
     },
 
     getInitialState: function() {
-        return {updatedEntity: null}
+        return {updatedEntity: null, errors: {}}
     },
 
     componentWillReceiveProps: function() {
-        this.setState({updatedEntity: null})
+        this.setState(this.getInitialState())
     },
 
-    render: function () {
+    entityAndDescriptor: function() {
         const entity = this.state.updatedEntity || this.props.entity
         const entityDescriptor = entity.constructor.entityDescriptor || this.props.entityDescriptor
         if (!entityDescriptor) throw new Error('EntityDescriptor required')
+        return [entity, entityDescriptor]
+    },
+
+    render: function () {
+        const [entity, entityDescriptor] = this.entityAndDescriptor()
         const entityName = entityDescriptor.name
         const propertyNames = this.props.propertiesToShow || entityDescriptor.displayProperties
         const heading = _.hasIn(entity, 'id') ? (entity.id ? `${entityName} ${entity.shortSummary}` : `New ${entityName}`) : entityName
@@ -38,7 +43,10 @@ let EntityView = React.createClass({
     onChange: function(name, value) {
         const oldEntity = this.state.updatedEntity || this.props.entity
         const updatedEntity = oldEntity.setData(name, value)
-        this.setState({updatedEntity})
+        const [entity, entityDescriptor] = this.entityAndDescriptor()
+
+        const errors = entityDescriptor.validate(updatedEntity)
+        this.setState({updatedEntity, errors})
     },
 
     onSave: function(e) {
@@ -55,8 +63,10 @@ let EntityView = React.createClass({
 
     formItem: function(propDesc, value) {
         const changeFn = this.onChange.bind(this, propDesc.name)
+        const error = this.state.errors[propDesc.name] && this.state.errors[propDesc.name][0]
         return <FormItem key={propDesc.name} type={propDesc.type} readOnly={propDesc.readOnly} onChange={changeFn} value={value} label={propDesc.label}
-                         placeholder={propDesc.description} help={propDesc.help} propDesc={propDesc} viewElement={this.props.propertyViews[propDesc.name]}/>
+                         placeholder={propDesc.description} help={propDesc.help} error={error}
+                         propDesc={propDesc} viewElement={this.props.propertyViews[propDesc.name]}/>
     }
 })
 

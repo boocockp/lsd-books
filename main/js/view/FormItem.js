@@ -66,12 +66,13 @@ const FormItem = React.createClass({
     },
 
     render: function () {
+        const validationState = this.props.error ? "error" : null
         return (
-            <FormGroup controlId={this.state.fieldId} >
+            <FormGroup controlId={this.state.fieldId} validationState={validationState}>
                 <ControlLabel>{this.props.label}</ControlLabel>
                 {this.formControl()}
                 <FormControl.Feedback />
-                {this.props.help ? <HelpBlock>{this.props.help}</HelpBlock> : ''}
+                {this.props.error ? <HelpBlock>{this.props.error}</HelpBlock> : this.props.help ? <HelpBlock>{this.props.help}</HelpBlock> : ''}
             </FormGroup>
         )
     },
@@ -145,6 +146,7 @@ FormItem.propTypes = {
     label: PropTypes.string,
     placeholder: PropTypes.string,
     help: PropTypes.string,
+    error: PropTypes.string,
     readOnly: PropTypes.bool,
     onChange: PropTypes.func,
 }

@@ -5,6 +5,8 @@ const _ = require('lodash'),
     EntityDescriptor = require('../metadata/EntityDescriptor'),
     {AccountType} = require('./Types')
 
+import NotEmpty from '../metadata/validators/NotEmpty'
+
 const descriptor = new EntityDescriptor("AccountData", [
     {
         name: "id",
@@ -15,7 +17,8 @@ const descriptor = new EntityDescriptor("AccountData", [
     {
         name: "name",
         type: String,
-        description: "The descriptive name"
+        description: "The descriptive name",
+        validators: [new NotEmpty() ]
     },
     {
         name: "code",

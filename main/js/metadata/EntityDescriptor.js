@@ -1,8 +1,10 @@
 import List from 'immutable'
 import _ from 'lodash'
+import PropertyDescriptor from './PropertyDescriptor'
 
 class EntityDescriptor {
-    constructor(name, propertyDescriptors) {
+    constructor(name, propertyDescriptorData) {
+        const propertyDescriptors = propertyDescriptorData.map( p => new PropertyDescriptor(p) )
         Object.assign(this, {name, propertyDescriptors})
     }
     propertyDescriptor(name) {
@@ -10,12 +12,17 @@ class EntityDescriptor {
         if (!desc) {
             throw new Error(`No property ${name} in type ${this.name}`)
         }
-        return Object.assign({name, label: _.startCase(name)}, desc)
+        return desc
     }
     get propertyNames() { return this.propertyDescriptors.map( x => x.name ) }
-    get displayProperties() { return this.propertyNames.filter( n => this.propertyDescriptor(n).display !== false) }
+    get displayProperties() { return this.propertyNames.filter( n => this.propertyDescriptor(n).display) }
     get defaultValues() { return _.fromPairs( this.propertyDescriptors.filter( pd => !pd.readOnly )
         .map( desc => [desc.name, EntityDescriptor.defaultValueForType(desc.type)]))  }
+
+    validate(entity) {
+        return _.fromPairs( this.propertyDescriptors.filter( pd => !pd.readOnly )
+            .map( desc => [desc.name, desc.validate(entity)]))
+    }
 
     static defaultValueForType(type) {
         switch (type) {
