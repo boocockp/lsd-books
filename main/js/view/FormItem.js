@@ -92,7 +92,7 @@ const FormItem = React.createClass({
         const value = (this.state.value === undefined || this.state.value === null) ? "" : this.state.value
 
         if (viewElement) {
-            return React.cloneElement(viewElement, {items: value})
+            return React.cloneElement(viewElement, {items: value, entityDescriptor: propDesc.itemType.entityDescriptor})
         }
 
         if (readOnly) {

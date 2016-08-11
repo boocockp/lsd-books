@@ -1,6 +1,16 @@
 To Do
 =====
 
+Testing
+-------
+- React component unit tests
+  - Test against different data
+- Set up data 
+- Inspect data
+- Proxy for page items
+- Profiling
+- No local saving - if that is the bottleneck
+
 Auto metadata
 -------------
 

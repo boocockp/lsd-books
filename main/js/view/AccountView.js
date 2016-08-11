@@ -7,7 +7,7 @@ const EntityTable = require('./EntityTable')
 let AccountView = React.createClass({
 
     render: function () {
-        const postingsView = <EntityTable propertiesToShow={["date", "description, itemLink=transaction", "type", "amount"]}/>
+        const postingsView = <EntityTable propertiesToShow={["date", "description, itemLink=transaction", "type", "amount"]} />
         return <EntityView {...this.props} propertyViews={{postings: postingsView}}/>
     }
 })

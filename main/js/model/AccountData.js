@@ -9,6 +9,7 @@ const descriptor = new EntityDescriptor("AccountData", [
     {
         name: "id",
         type: String,
+        display: false,
         description: "The unique identifier for this object"
     },
     {

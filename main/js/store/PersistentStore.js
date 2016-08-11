@@ -35,9 +35,10 @@ module.exports = class PersistentStore {
 
 
     _assembleComponents(config) {
-        this.localStore = new LocalStorageUpdateStore('reactbooks', localStorage)
+        const storageKey = `${config.appName}.${config.dataSet}`
+        this.localStore = new LocalStorageUpdateStore(storageKey, localStorage)
         this.signinTracker = new GoogleSigninTracker()
-        this.remoteStore = new S3UpdateStore('ashridgetech.reactbooks-test', 'updates', 'reactbooks', this.signinTracker, config.identityPoolId)
+        this.remoteStore = new S3UpdateStore(config.bucketName, 'updates', config.appName, config.dataSet, this.signinTracker, config.identityPoolId)
         this.updateRouter = new UpdateRouter()
         this.newActionRouter = new NewActionRouter()
         this.newActionScheduler = new NewActionScheduler()

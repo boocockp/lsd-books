@@ -3,7 +3,7 @@ const _ = require('lodash'),
     JsonUtil = require('../../../shared/modules/json/JsonUtil'),
     {CREDIT} = require('./Types').DebitCredit,
     AccountData = require('./AccountData'),
-    Posting = require('./Posting'),
+    TransactionPosting = require('./TransactionPosting'),
     EntityDescriptor = require('../metadata/EntityDescriptor')
 
 
@@ -39,7 +39,7 @@ const descriptor =  new EntityDescriptor( "Account",
     {
         name: "postings",
         type: List,
-        itemType: Posting,
+        itemType: TransactionPosting,
         readOnly: true,
         description: "The debits and credits to the account"
     }

@@ -19,9 +19,15 @@ const config = {
     "bucketName": "ashridgetech.reactbooks-test"
 }
 
+const dataSetOverride = location.search.match(/dataSet=(\w+)/)[1]
+const appConfig = {
+    appName: "reactbooks",
+    dataSet: dataSetOverride || "main"
+}
+
 const reduxStore = createStore(booksReducer, new Books());
 const appStore = new SynchronizingStore(reduxStore)
-const persistentStore = new PersistentStore(config)
+const persistentStore = new PersistentStore({...config, ...appConfig})
 persistentStore.externalAction.sendTo(appStore.applyAction)
 appStore.dispatches.sendTo( persistentStore.dispatchAction )
 
@@ -31,16 +37,9 @@ persistentStore.init()
 window.appStore_ = appStore;
 window.perStore = persistentStore;
 
-const mainElement = React.createElement(AppProvider, {store: appStore})
-const renderedElement = ReactDOM.render(mainElement, document.getElementById('main'))
-
-
-// store.dispatch(addAccount({id: 1001, name: "Travel", code: "4110", type: AccountType.EXPENSE}))
-// store.dispatch(addAccount({id: 1002, name: "Accommodation", code: "4120", type: AccountType.REVENUE}))
-//
-// window.setTimeout( () => store.dispatch(addAccount({id: 1003, name: "Food", code: "4130", type: AccountType.CAPITAL})), 2000)
-
-
-
-
+const container = document.getElementById('main')
+if (container) {
+    const mainElement = React.createElement(AppProvider, {store: appStore})
+    const renderedElement = ReactDOM.render(mainElement, container)
+}
 

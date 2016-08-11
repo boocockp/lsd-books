@@ -5,8 +5,8 @@ const ObservableData = require('../util/ObservableData')
 
 module.exports = class S3UpdateStore {
 
-    constructor(bucketName, keyPrefix, appId, authTracker, identityPoolId) {
-        Object.assign(this, {bucketName, keyPrefix, appId, identityPoolId})
+    constructor(bucketName, keyPrefix, appId, dataSet, authTracker, identityPoolId) {
+        Object.assign(this, {bucketName, keyPrefix, appId, dataSet, identityPoolId})
         authTracker.signIn.sendTo( this.googleLogin.bind(this) )
 
         this.updateStored = new ObservableData()
@@ -17,7 +17,7 @@ module.exports = class S3UpdateStore {
 
     storeUpdate(update) {
         const prefix = this.keyPrefix ? this.keyPrefix + '/' : ''
-        const key = prefix + this.appId + '/' + update.id
+        const key = prefix + this.appId + '/' + this.dataSet + '/' + update.id
         this._storeInS3(key, JSON.stringify(update)).then( () => this.updateStored.set(update) ).then( () => console.log('Update stored', update.id))
     }
 
