@@ -2,6 +2,7 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const {createStore} = require('redux');
 const {addAccount, UpdateAccount, AddTransaction} = require('./actions');
+const JsonUtil = require('../../../shared/modules/json/JsonUtil')
 const Books = require('../model/Books');
 const {booksReducer} = require('./reducers');
 const LocalStorageUpdateStore = require('../store/LocalStorageUpdateStore')
@@ -19,7 +20,8 @@ const config = {
     "bucketName": "ashridgetech.reactbooks-test"
 }
 
-const dataSetOverride = location.search.match(/dataSet=(\w+)/)[1]
+const dataSetParam = location.search.match(/dataSet=(\w+)/);
+const dataSetOverride = dataSetParam && dataSetParam[1]
 const appConfig = {
     appName: "reactbooks",
     dataSet: dataSetOverride || "main"
@@ -33,9 +35,15 @@ appStore.dispatches.sendTo( persistentStore.dispatchAction )
 
 persistentStore.init()
 
+function applyAction(jsonAction) {
+    const action = JsonUtil.fromStore(JsonUtil.toStore(jsonAction))
+    appStore.applyAction(action)
+}
 
-window.appStore_ = appStore;
-window.perStore = persistentStore;
+
+window.appStore_ = appStore
+window.perStore = persistentStore
+window.applyAction = applyAction
 
 const container = document.getElementById('main')
 if (container) {
