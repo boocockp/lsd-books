@@ -6,8 +6,8 @@ const {jsEqual, jsMatch} = require('../testutil/ChaiHelpers')
 
 
 const should = chai.should()
-chai.use(jsEqual);
-chai.use(jsMatch);
+chai.use(jsEqual)
+chai.use(jsMatch)
 
 
 function testAction(name) {
@@ -60,6 +60,58 @@ describe("Persistent store controller", function () {
         should.not.exist(controller.actionToStore())
     })
 
+    it("stores actions from app when they are added to the local store and sent back to controller synchronously", function () {
+        const actionsStored = []
+        controller.actionToStore.sendTo( x => {actionsStored.push(x); controller.localStoredActions(actionsStored)} )
+
+        controller.actionFromApp(action1)
+        controller.actionFromApp(action2)
+
+        should.not.exist(controller.actionToStore())
+        actionsStored.should.containSubset([action1, action2])
+    })
+
+    it("on startup sends actions from local stored updates to actions to apply", function () {
+        const actionsOutput = []
+        controller.actionsToApply.sendFlatTo( x => actionsOutput.push(x) )
+
+        controller.localStoredUpdates([update([savedAction1, savedAction2]), update([savedAction3])])
+        controller.actionsToApply().size.should.eql(0)
+        actionsOutput.should.be.empty
+
+        controller.init()
+        controller.actionsToApply().should.jsMatch([savedAction1, savedAction2, savedAction3])
+        actionsOutput.should.eql([savedAction1, savedAction2, savedAction3])
+    })
+
+    it("on startup sends actions from local stored actions to actions to apply", function () {
+        const actionsOutput = []
+        controller.actionsToApply.sendFlatTo( x => actionsOutput.push(x) )
+
+        controller.localStoredActions([savedAction1, savedAction2])
+        controller.actionsToApply().size.should.eql(0)
+        actionsOutput.should.be.empty
+
+        controller.init()
+        controller.actionsToApply().should.jsMatch([savedAction1, savedAction2])
+        actionsOutput.should.eql([savedAction1, savedAction2])
+    })
+
+
+    it("on startup sends actions from local stored updates then local stored actions to actions to apply", function () {
+        const actionsOutput = []
+        controller.actionsToApply.sendFlatTo( x => actionsOutput.push(x) )
+
+        controller.localStoredActions([savedAction1])
+        controller.localStoredUpdates([update([savedAction2, savedAction3])])
+        controller.actionsToApply().size.should.eql(0)
+        actionsOutput.should.be.empty
+
+        controller.init()
+        controller.actionsToApply().should.jsMatch([savedAction2, savedAction3, savedAction1])
+        actionsOutput.should.eql([savedAction2, savedAction3, savedAction1])
+    })
+
     it("sends update to remote store when local stored actions with store already available", function () {
         controller.remoteStoreAvailable(true)
         should.not.exist(controller.updateToStoreRemote())
@@ -75,7 +127,7 @@ describe("Persistent store controller", function () {
 
         controller.remoteStoreAvailable(true)
         controller.updateToStoreRemote().actions.should.jsMatch([action1, action2])
-    });
+    })
 
     it("sends no update to remote store when local stored actions removed", function () {
         controller.localStoredActions([action1, action2])
@@ -83,7 +135,7 @@ describe("Persistent store controller", function () {
         controller.updateToStoreRemote().actions.should.jsMatch([action1, action2])
 
         controller.localStoredActions()
-    });
+    })
 
     it("sends ids to delete and update to local store once only when update stored in remote", function () {
         controller.updateStoredRemote(update([savedAction1, savedAction2]))
@@ -94,19 +146,6 @@ describe("Persistent store controller", function () {
         controller.localStoredUpdates([update([savedAction1, savedAction2]), update([savedAction3])])
         should.not.exist(controller.actionsToDelete())
         should.not.exist(controller.updateToStoreLocal())
-    });
-
-    it("on startup sends actions from local stored updates to actions to apply", function () {
-        const actionsOutput = []
-        controller.actionsToApply.sendFlatTo( x => actionsOutput.push(x) )
-
-        controller.localStoredUpdates([update([savedAction1, savedAction2]), update([savedAction3])])
-        controller.actionsToApply().size.should.eql(0)
-        actionsOutput.should.be.empty
-
-        controller.init()
-        controller.actionsToApply().should.jsMatch([savedAction1, savedAction2, savedAction3])
-        actionsOutput.should.eql([savedAction1, savedAction2, savedAction3])
-    });
+    })
 
 })
