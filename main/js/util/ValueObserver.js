@@ -12,7 +12,7 @@ module.exports = class ValueObserver {
 
     checkChange() {
         let currentValue = this.valueFn()
-        if (currentValue !== this.previousValue) {
+        if (currentValue !== undefined && currentValue !== this.previousValue) {
             this.notify(currentValue)
         }
         this.previousValue = currentValue
@@ -21,7 +21,7 @@ module.exports = class ValueObserver {
     notify(data) {
         if (data instanceof EventList) {
             data.events.forEach( e => this.notify(e))
-        } else if (data !== undefined) {
+        } else {
             this._listeners.map(l => l(data) )
         }
     }

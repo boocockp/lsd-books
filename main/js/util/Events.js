@@ -47,18 +47,46 @@ function resetInputEvents(obj) {
 }
 
 function notifyOutputChanges(obj) {
-    inputValues(obj).forEach( f => {
-        obj[f]._observer.check()
-    })
-    inputEvents(obj).forEach( f => {
-        obj[f]._observer.check()
-    })
-    outputValues(obj).forEach( f => {
-        obj[f]._observer.checkChange()
-    })
-    outputEvents(obj).forEach( f => {
-        obj[f]._observer.checkEvent()
-    })
+    if (obj._notifyingOutputChanges) {
+        throw new Error("Call to notifyOutputChanges while notifying")
+    }
+    obj._notifyingOutputChanges = true
+
+    try {
+        inputValues(obj).forEach( f => {
+            obj[f]._observer.check()
+        })
+        inputEvents(obj).forEach( f => {
+            obj[f]._observer.check()
+        })
+        outputValues(obj).forEach( f => {
+            obj[f]._observer.checkChange()
+        })
+        outputEvents(obj).forEach( f => {
+            obj[f]._observer.checkEvent()
+        })
+    } catch(e) {
+        obj._notifyingOutputChanges = false
+        throw e
+    } finally {
+        obj._notifyingOutputChanges = false
+        processNextUpdate(obj)
+    }
+}
+
+function storeUpdate(obj, propertyName, data) {
+    const storedUpdates = obj.__storedUpdateCalls || (obj.__storedUpdateCalls = [])
+    storedUpdates.push({propertyName, data})
+}
+
+function processNextUpdate(obj) {
+    const storedUpdates = obj.__storedUpdateCalls || (obj.__storedUpdateCalls = [])
+    const nextUpdate = storedUpdates.shift()
+    if (nextUpdate) {
+        const {propertyName, data} = nextUpdate
+        console.log('Processing update', nextUpdate, 'further updates', storedUpdates)
+        obj[propertyName].call(obj, data)
+    }
 }
 
 function makeInputValue(obj, propertyName) {
@@ -66,6 +94,10 @@ function makeInputValue(obj, propertyName) {
     if (propDesc.value && typeof propDesc.value === "function") {
         const originalFunction = propDesc.value
         propDesc.value = function (data) {
+            if (this._notifyingOutputChanges) {
+                storeUpdate(obj, propertyName, data)
+                return
+            }
             resetInputEvents(this)
             this[propertyName].changed = this[propertyName].value !== data
             const originalFunctionResult = originalFunction.call(this, data)

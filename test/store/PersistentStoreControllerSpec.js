@@ -112,38 +112,53 @@ describe("Persistent store controller", function () {
         actionsOutput.should.eql([savedAction2, savedAction3, savedAction1])
     })
 
-    it("sends update to remote store when local stored actions with store already available", function () {
+    it("sends update to remote store once only when local stored actions with store already available", function () {
         controller.remoteStoreAvailable(true)
         should.not.exist(controller.updateToStoreRemote())
 
         controller.localStoredActions([action1, action2])
-        controller.updateToStoreRemote().actions.should.jsMatch([action1, action2])
+        const storedUpdate = controller.updateToStoreRemote()
+        storedUpdate.actions.should.jsMatch([action1, action2])
         controller.updateToStoreRemote().id.should.not.be.null
+
+        controller.updateStoredRemote(storedUpdate)
+        should.not.exist(controller.updateToStoreRemote())
     })
 
-    it("sends update to remote store only when store becomes available", function () {
+    it("sends update to remote store once only when store becomes available", function () {
         controller.localStoredActions([action1, action2])
         should.not.exist(controller.updateToStoreRemote())
 
         controller.remoteStoreAvailable(true)
-        controller.updateToStoreRemote().actions.should.jsMatch([action1, action2])
+        const storedUpdate = controller.updateToStoreRemote()
+        storedUpdate.actions.should.jsMatch([action1, action2])
+
+        controller.updateStoredRemote(storedUpdate)
+        should.not.exist(controller.updateToStoreRemote())
     })
 
     it("sends no update to remote store when local stored actions removed", function () {
         controller.localStoredActions([action1, action2])
         controller.remoteStoreAvailable(true)
-        controller.updateToStoreRemote().actions.should.jsMatch([action1, action2])
+        const storedUpdate = controller.updateToStoreRemote()
+        storedUpdate.actions.should.jsMatch([action1, action2])
+
+        controller.updateStoredRemote(storedUpdate)
+        should.not.exist(controller.updateToStoreRemote())
 
         controller.localStoredActions()
+        should.not.exist(controller.updateToStoreRemote())
     })
 
-    it("sends ids to delete and update to local store once only when update stored in remote", function () {
+    it("sends ids to delete and update to local store once only when update stored in remote and changes synchronous", function () {
+        let deletedActions, updateToStore
+        controller.actionsToDelete.sendTo( (actions) => { deletedActions = actions; controller.localStoredActions([])  })
+        controller.updateToStoreLocal.sendTo( (update) => { updateToStore = update; controller.localStoredUpdates([update])  })
+
         controller.updateStoredRemote(update([savedAction1, savedAction2]))
+        deletedActions.should.eql([savedAction1, savedAction2])
+        updateToStore.actions.should.containSubset([savedAction1, savedAction2])
 
-        controller.actionsToDelete().should.eql([savedAction1, savedAction2])
-        controller.updateToStoreLocal().actions.should.containSubset([savedAction1, savedAction2])
-
-        controller.localStoredUpdates([update([savedAction1, savedAction2]), update([savedAction3])])
         should.not.exist(controller.actionsToDelete())
         should.not.exist(controller.updateToStoreLocal())
     })

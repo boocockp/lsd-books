@@ -32,7 +32,8 @@ class PersistentStoreController extends Record({_actionsFromApp: new List(),
     prev(previousState) {
         this._previousState = {
             actionsToApply: previousState ? previousState.actionsToApply() : List(),
-            updateToStoreLocal: previousState ? previousState.updateToStoreLocal() : null
+            _updateStoredRemote: previousState ? previousState._updateStoredRemote : null,
+            updateToStoreRemote: previousState ? previousState.updateToStoreRemote() : null
         }
 
         return this
@@ -69,13 +70,16 @@ class PersistentStoreController extends Record({_actionsFromApp: new List(),
 
     updateToStoreRemote() {
         const actions = this._localStoredActions
-        if (actions.size && this._remoteStoreAvailable) {
+        const previousActions = this._previousState.updateToStoreRemote && this._previousState.updateToStoreRemote.actions
+        if (actions !== previousActions
+            && actions.size
+            && this._remoteStoreAvailable) {
             return PersistentStoreController.newUpdate(actions)
         }
     }
 
     updateToStoreLocal() {
-        if (this._updateStoredRemote != this._previousState.updateToStoreLocal) {
+        if (this._updateStoredRemote != this._previousState._updateStoredRemote) {
             return this._updateStoredRemote
         }
     }
