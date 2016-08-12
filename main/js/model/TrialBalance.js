@@ -1,20 +1,40 @@
-const {sum, prop} = require('./FunctionHelpers');
+const {sum, prop} = require('./FunctionHelpers')
+const {Record, List, Map} = require('immutable')
+const Account = require('../model/Account')
+const EntityDescriptor = require('../metadata/EntityDescriptor')
 
-module.exports = class TrialBalance {
-    
-    constructor(books) {
-        this.books = books;
+const descriptor = new EntityDescriptor("Trial Balance", [
+    {
+        name: "accounts",
+        type: List,
+        itemType: Account,
+        description: "The accounts with a debit or credit balance"
+    },
+    {
+        name: "totals",
+        type: EntityDescriptor.forProperties({debit: Number, credit: Number}),
+        description: "The totals of the debit and credit balances"
+    }
+])
+
+module.exports = class TrialBalance extends Record({allAccounts: List()}) {
+
+    static get entityDescriptor() : Object {
+        return descriptor
+    }
+
+    constructor(allAccounts) {
+        super({allAccounts})
     }
     
     get accounts() {
-        return this.books.accountViewsByName().filter(it => it.signedBalance !== 0 ).sortBy(prop('code'));
+        return this.allAccounts.filter( it => it.signedBalance !== 0 ).toList().sortBy(prop('code'));
     }
 
-    get debitTotal() {
-        return this.accounts.map(it => it.debitBalance).reduce(sum);
-    }
-
-    get creditTotal() {
-        return this.accounts.map(it => it.creditBalance).reduce(sum);
+    get totals() {
+        return {
+            debit: this.accounts.map(it => it.debitBalance).reduce(sum),
+            credit: this.accounts.map(it => it.creditBalance).reduce(sum)
+        }
     }
 };

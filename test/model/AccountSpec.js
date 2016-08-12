@@ -1,15 +1,17 @@
 let chai = require('chai'),
     Account = require('../../main/js/model/Account'),
+    AccountData = require('../../main/js/model/AccountData'),
     {EXPENSE} = require('../../main/js/model/Types').AccountType;
 
 chai.should();
 
 describe("Account", function() {
     describe("object", function() {
-        let a;
+        let a, data;
 
         beforeEach(function () {
-            a = new Account({name: "Travel", code: "1111", type: EXPENSE});
+            data = new AccountData({name: "Travel", code: "1111", type: EXPENSE});
+            a = new Account(data);
         });
 
         it("knows details now", function() {
@@ -24,9 +26,9 @@ describe("Account", function() {
         });
 
         it("can get a new updated copy", function () {
-            const a2 = a.merge({name: "Fred"});
-            a.name.should.eql("Travel");
-            a.type.should.eql(EXPENSE);
+            const a2 = data.merge({name: "Fred"});
+            data.name.should.eql("Travel");
+            data.type.should.eql(EXPENSE);
             a2.name.should.eql("Fred");
             a2.type.should.eql(EXPENSE);
         });

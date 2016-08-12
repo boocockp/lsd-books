@@ -1,4 +1,5 @@
-const {Record} = require('immutable');
+const _ = require('lodash')
+const {List, Record} = require('immutable');
 
 const serializableClasses = [];
 
@@ -20,7 +21,11 @@ function reviver(key, value) {
         return new Date(value);
     }
 
-    const type = value['@type'];
+    if (_.isArray(value) && key === 'postings') {
+        return new List(value)
+    }
+
+    const type = value && value['@type'];
     if (type) {
         const clazz = serializableClasses.find( c => c.name == type);
         if (value.name && clazz[value.name]) {

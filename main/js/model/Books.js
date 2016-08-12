@@ -1,17 +1,18 @@
-let _instance;
-
-const 
+const
     // Memoize = require('../../shared/modules/memoize/Memoize'),
     // Observe = require('../../shared/modules/observe/Observe'),
     JsonUtil = require('../../../shared/modules/json/JsonUtil'),
     {Record, List, Map} = require('immutable'),
-    Account = () => require('./Account'),
+    actions = require('../app/actions'),
+    {prop} = require('./FunctionHelpers'),
+    AccountData = () => require('./AccountData'),
+    Transaction = () => require('./Transaction'),
+    Account = require('./Account'),
     AccountAsAt = require('./AccountAsAt'),
     TrialBalance = require('./TrialBalance'),
     BalanceSheet = require('./BalanceSheet')
-    ;
 
-class Books extends Record({accounts: new Map(), transactions: new List()}) {
+class Books extends Record({accounts: new Map(), transactions: new Map(), $actionForLatestUpdate: null}) {
     
     static get instance() {
         return _instance || (_instance = new Books());
@@ -21,8 +22,19 @@ class Books extends Record({accounts: new Map(), transactions: new List()}) {
         super();
     }
 
+    setAccount(account) {
+        const updateAction = () => {
+            if (this.getIn(['accounts', account.id])) {
+                return actions.updateAccount(account)
+            } else {
+                return actions.addAccount(account)
+            }
+        }
+        return this.setIn(['accounts', account.id], account).set('$actionForLatestUpdate', updateAction());
+    }
+
     addAccount(data) {
-        const account = new (Account())(data);
+        const account = new (AccountData())(data);
         return this.setIn(['accounts', account.id], account);
     }
 
@@ -30,12 +42,31 @@ class Books extends Record({accounts: new Map(), transactions: new List()}) {
         return this.mergeIn(['accounts', data.id], data);
     }
     
-    addTransaction(transaction) {
-        return this.update('transactions', l => l.push(transaction));
+    setTransaction(transaction) {
+        const updateAction = () => {
+            if (this.getIn(['transactions', transaction.id])) {
+                return actions.updateTransaction(transaction)
+            } else {
+                return actions.addTransaction(transaction)
+            }
+        }
+        return this.setIn(['transactions', transaction.id], transaction).set('$actionForLatestUpdate', updateAction());
     }
-    
+
+    addTransaction(data) {
+        const transaction = new (Transaction())(data);
+        return this.setIn(['transactions', transaction.id], transaction);
+    }
+
+    updateTransaction(data) {
+        return this.mergeIn(['transactions', data.id], data);
+    }
+
+    get accountModels() {
+        return this.accounts.map( a => new Account(a, this.postingsForAccount(a)) )
+    }
     get accountsByName() {
-        return this.accounts.toList().sortBy( it => it.name);
+        return this.accountModels.toList().sortBy( it => it.name);
     }
 
     accountViews(fromDate = 0, toDate = Number.MAX_SAFE_INTEGER) {
@@ -48,37 +79,38 @@ class Books extends Record({accounts: new Map(), transactions: new List()}) {
     }
 
     account(id) {
-        return this.getIn(['accounts', id]);
+        return this.accountModels.get(id)
     }
 
     accountsOfType(t) {
-        return this.accounts.toList().filter( it => it.type === t).sortBy( it => it.code );
+        return this.accountModels.toList().filter( it => it.type === t).sortBy( it => it.code );
     }
 
     accountByCode(code) {
-        return this.accounts.find( it => it.code == code );
+        return this.accountModels.find( it => it.code == code );
+    }
+
+    get transactionsByDate() {
+        return this.transactions.toList().sortBy( it => it.date);
     }
 
     postingsForAccount(acct, fromDate = 0, toDate = Number.MAX_SAFE_INTEGER) {
         function inDates(transaction) {
             return transaction.date >= fromDate && transaction.date <= toDate;
         }
-        let postingLists = this.transactions.filter(inDates).map( t => t.postings.filter( p => p.accountId == acct.id ));
+        let postingLists = this.transactions.toList().filter(inDates)
+                                            .sortBy(prop('date'))
+                                            .map( t => t.transactionPostings.filter( p => p.account == acct.id ));
         return postingLists.flatten(1);
     }
 
     get trialBalance() {
-        return new TrialBalance(this);
+        return new TrialBalance(this.accountModels);
     }
     
     balanceSheet(date) {
         return new BalanceSheet(this, date);
     }
-
-    static get TEST_newInstance() {
-        _instance = null;
-        return Books.instance
-    };
 
     toJSON() {
         return Object.assign(super.toJSON(), {"@type": this.constructor.name});

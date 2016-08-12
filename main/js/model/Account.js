@@ -1,39 +1,99 @@
-const {Record} = require('immutable'),
+const _ = require('lodash'),
+    {Record, List} = require('immutable'),
     JsonUtil = require('../../../shared/modules/json/JsonUtil'),
-    // Books = require('./Books'),
-    {CREDIT} = require('./Types').DebitCredit;
+    {CREDIT} = require('./Types').DebitCredit,
+    AccountData = require('./AccountData'),
+    TransactionPosting = require('./TransactionPosting'),
+    EntityDescriptor = require('../metadata/EntityDescriptor')
 
-class Account extends Record({id: null, name: null, code: null, type: null}) {
 
-    constructor(data = {}) {
-        super(data);
+const descriptor =  new EntityDescriptor( "Account",
+    AccountData.entityDescriptor.propertyDescriptors.concat([
+    {
+        name: "shortSummary",
+        type: String,
+        readOnly: true,
+        display: false,
+        description: "Code and name of this account"
+    },
+    {
+        name: "balance",
+        type: Number,
+        readOnly: true,
+        description: "The current balance of the account"
+    },
+    {
+        name: "debitBalance",
+        type: Number,
+        readOnly: true,
+        display: false,
+        description: "The current balance of the account if it is a debit balance, otherwise empty"
+    },
+    {
+        name: "creditBalance",
+        type: Number,
+        readOnly: true,
+        display: false,
+        description: "The current balance of the account if it is a credit balance, otherwise empty"
+    },
+    {
+        name: "postings",
+        type: List,
+        itemType: TransactionPosting,
+        readOnly: true,
+        description: "The debits and credits to the account"
+    }
+]))
+
+
+class Account extends Record({data: new AccountData(), postings: List()}) {
+
+    static get entityDescriptor() : Object {
+        return descriptor
     }
 
-    get signedBalance() {
-        // const signedAmount = (p) => p.type == CREDIT ? p.amount : -p.amount;
-        // const sum = (acc, val) => acc + val;
-        // return Books.instance.postingsForAccount(this).map(signedAmount).reduce(sum, 0);
-        return 0;
+    constructor(data : AccountData = new AccountData(), postings: List = List()) {
+        super({data, postings})
     }
 
-    get balance() {
-        const sign = this.type.normalBalanceType == CREDIT ? 1 : -1;
-        return this.signedBalance * sign;
+    get id() { return this.data.id }
+    get name() { return this.data.name }
+    get code() { return this.data.code }
+    get type() { return this.data.type }
+
+    setData(name, value) {
+        return this.setIn(['data', name], value)
     }
 
-    get debitBalance() {
-        return this.signedBalance < 0 ? Math.abs(this.signedBalance) : null;
+    get shortSummary() : string {
+        return `${this.code} - ${this.name}`
     }
 
-    get creditBalance() {
-        return this.signedBalance > 0 ? this.signedBalance : null;
+    //@precision(2)
+    get signedBalance() : number {
+        const signedAmount = (p) => p.type == CREDIT ? p.amount : -p.amount
+        const sum = (acc, val) => acc + val
+        return this.postings.map(signedAmount).reduce(sum, 0)
     }
 
-    toJSON() {
-        return Object.assign(super.toJSON(), {"@type": this.constructor.name});
+    get balance() : number {
+        const sign = this.type ? (this.type.normalBalanceType == CREDIT ? 1 : -1) : 0
+        return this.signedBalance * sign
+    }
+
+    get debitBalance() : ?number {
+        return this.signedBalance < 0 ? Math.abs(this.signedBalance) : null
+    }
+
+    get creditBalance() : ?number {
+        return this.signedBalance > 0 ? this.signedBalance : null
+    }
+
+    toJSON() : Object {
+        throw new Error('Should not be serializing this object')
     }
 
 }
 
-JsonUtil.registerClass(Account);
-module.exports = Account;
+JsonUtil.registerClass(Account)
+module.exports = Account

@@ -1,5 +1,4 @@
-const Books = () => require('./Books'),
-    {CREDIT} = require('./Types').DebitCredit;
+const {CREDIT} = require('./Types').DebitCredit;
 
 
 

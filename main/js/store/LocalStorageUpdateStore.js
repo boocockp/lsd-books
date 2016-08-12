@@ -1,4 +1,5 @@
 const {makeInputEvent, makeOutputValue, bindEventFunctions} = require('../util/Events')
+const JsonUtil = require('../../../shared/modules/json/JsonUtil')
 
 class LocalStorageUpdateStore {
 
@@ -35,11 +36,11 @@ class LocalStorageUpdateStore {
 
     _getFromStorage(key) {
         const json = this.storage.getItem(key) || '[]'
-        return JSON.parse(json)
+        return JSON.fromStore(json)
     }
 
     _writeToStorage(key, data) {
-        this.storage.setItem(key, JSON.stringify(data))
+        this.storage.setItem(key, JSON.toStore(data))
         return data
     }
 }

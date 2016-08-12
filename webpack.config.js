@@ -7,10 +7,12 @@ var dir_html = path.resolve(__dirname, 'main/html');
 var dir_build = path.resolve(__dirname, 'build');
 
 module.exports = {
-    entry: path.resolve(dir_js, 'app/appMain.js'),
+    entry: {
+        appMain: path.resolve(dir_js, 'app/appMain.js')
+    },
     output: {
         path: dir_build,
-        filename: 'appMain.bundle.js'
+        filename: '[name].bundle.js'
     },
     module: {
         noParse: [
@@ -19,7 +21,13 @@ module.exports = {
         loaders: [
             {
                 loader: 'babel-loader',
-                test: dir_js,
+                test: [dir_js, /\.js$/],
+                include: [
+                    dir_js,
+                ],
+                exclude: [
+                    path.resolve(__dirname, "node_modules"),
+                ]
             }
         ]
     },
@@ -28,7 +36,8 @@ module.exports = {
             { from: dir_html }, // to: output.path
             { from: dir_css }, // to: output.path
             { from: 'node_modules/bootstrap/dist/css/bootstrap.css' }, // to: output.path
-            { from: 'node_modules/bootstrap/dist/css/bootstrap-theme.css' } // to: output.path
+            { from: 'node_modules/bootstrap/dist/css/bootstrap-theme.css' }, // to: output.path
+            { from: 'node_modules/bootstrap/dist/fonts', to: 'fonts'  }
         ]),
     ],
     // Create Sourcemaps for the bundle
