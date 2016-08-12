@@ -1,4 +1,4 @@
-const {makeInputEvent, makeOutputValue, bindEventFunctions} = require('../util/Events')
+const {makeInputValue, makeOutputValue, bindEventFunctions} = require('../util/Events')
 const JsonUtil = require('../../../shared/modules/json/JsonUtil')
 
 class LocalStorageUpdateStore {
@@ -27,11 +27,11 @@ class LocalStorageUpdateStore {
     }
 
     allActions() {
-        return this._storedActions || this._getFromStorage(this.actionStoreKey)
+        return this._storedActions || (this._storedActions = this._getFromStorage(this.actionStoreKey))
     }
 
     allUpdates() {
-        return this._storedUpdates || this._getFromStorage(this.updateStoreKey)
+        return this._storedUpdates || (this._storedUpdates = this._getFromStorage(this.updateStoreKey))
     }
 
     _getFromStorage(key) {
@@ -45,9 +45,9 @@ class LocalStorageUpdateStore {
     }
 }
 
-makeInputEvent(LocalStorageUpdateStore.prototype, "storeAction")
-makeInputEvent(LocalStorageUpdateStore.prototype, "deleteActions")
-makeInputEvent(LocalStorageUpdateStore.prototype, "storeUpdate")
+makeInputValue(LocalStorageUpdateStore.prototype, "storeAction")
+makeInputValue(LocalStorageUpdateStore.prototype, "deleteActions")
+makeInputValue(LocalStorageUpdateStore.prototype, "storeUpdate")
 
 makeOutputValue(LocalStorageUpdateStore.prototype, "allActions")
 makeOutputValue(LocalStorageUpdateStore.prototype, "allUpdates")

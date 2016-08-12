@@ -75,12 +75,12 @@ function notifyOutputChanges(obj) {
 }
 
 function storeUpdate(obj, propertyName, data) {
-    const storedUpdates = obj.__storedUpdateCalls || (obj.__storedUpdateCalls = [])
+    const storedUpdates = obj.__pendingUpdateCalls || (obj.__pendingUpdateCalls = [])
     storedUpdates.push({propertyName, data})
 }
 
 function processNextUpdate(obj) {
-    const storedUpdates = obj.__storedUpdateCalls || (obj.__storedUpdateCalls = [])
+    const storedUpdates = obj.__pendingUpdateCalls || (obj.__pendingUpdateCalls = [])
     const nextUpdate = storedUpdates.shift()
     if (nextUpdate) {
         const {propertyName, data} = nextUpdate
