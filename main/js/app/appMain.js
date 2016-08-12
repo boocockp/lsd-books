@@ -30,11 +30,11 @@ const appConfig = {
 const reduxStore = createStore(booksReducer, new Books());
 const appStore = new SynchronizingStore(reduxStore)
 
-const localStore = new LocalStorageUpdateStore(appConfig.appName)
+const localStore = new LocalStorageUpdateStore(appConfig.appName, appConfig.dataSet)
 const googleSigninTracker = new GoogleSigninTracker()
 const cognitoCredentialsSource = new CognitoCredentialsSource(config.identityPoolId)
 googleSigninTracker.signIn.sendTo(cognitoCredentialsSource.signIn)
-const remoteStore = new S3UpdateStore(config.bucketName, 'updates', config.appName, cognitoCredentialsSource)
+const remoteStore = new S3UpdateStore(config.bucketName, 'updates', appConfig.appName, appConfig.dataSet, cognitoCredentialsSource)
 
 const persistentStore = new PersistentStore(localStore, remoteStore)
 

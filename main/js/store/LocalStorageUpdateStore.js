@@ -3,9 +3,9 @@ const JsonUtil = require('../../../shared/modules/json/JsonUtil')
 
 class LocalStorageUpdateStore {
 
-    constructor(appId) {
-        this.actionStoreKey = `${appId}.actions`
-        this.updateStoreKey = `${appId}.updates`
+    constructor(appId, dataSet) {
+        this.actionStoreKey = `${appId}.${dataSet}.actions`
+        this.updateStoreKey = `${appId}.${dataSet}.updates`
         this.storage = window.localStorage
         bindEventFunctions(this)
     }
@@ -36,11 +36,11 @@ class LocalStorageUpdateStore {
 
     _getFromStorage(key) {
         const json = this.storage.getItem(key) || '[]'
-        return JSON.fromStore(json)
+        return JsonUtil.fromStore(json)
     }
 
     _writeToStorage(key, data) {
-        this.storage.setItem(key, JSON.toStore(data))
+        this.storage.setItem(key, JsonUtil.toStore(data))
         return data
     }
 }
