@@ -1,16 +1,13 @@
 const uuid = require('node-uuid')
 const {Record, List, Map} = require('immutable')
 
+const ObservableData = require('../util/ObservableData')
+
 function subtractById(original, itemsToRemove) {
-    return original.filterNot( x => itemsToRemove.find( y => y.id === x.id) )
+    return original.filterNot(x => itemsToRemove.find(y => y.id === x.id))
 }
 
-class PersistentStoreController extends Record({_actionsFromApp: new List(),
-                                                _localStoredActions: new List(),
-                                                _localStoredUpdates: new List(),
-                                                _updateStoredRemote: null,
-                                                _remoteStoreAvailable: false,
-                                                _started: false}) {
+class PersistentStoreController {
 
     static newId() {
         const ensureUnique = Math.floor(Math.random() * 1000000)
@@ -25,82 +22,73 @@ class PersistentStoreController extends Record({_actionsFromApp: new List(),
     }
 
     constructor() {
-        super()
-        this.prev(null)
+        this._actionsFromApp = new List()
+        this._localStoredActions = new List()
+        this._localStoredUpdates = new List()
+        this._updateStoredRemote = null
+        this._remoteStoreAvailable = false
+        this._started = false
+
+        // outgoing data
+        //TODO use ObservableEvent - no initial update when subscribe, latestEvent instead of value
+        this.actionToStore = new ObservableData()
+        this.actionsToApply = new ObservableData()
+        this.updateToStoreLocal = new ObservableData()
+        this.actionsToDelete = new ObservableData()
+        this.updateToStoreRemote = new ObservableData()
+
+        this.init = this.init.bind(this)
+        this.actionFromApp = this.actionFromApp.bind(this)
+        this.localStoredActions = this.localStoredActions.bind(this)
+        this.localStoredUpdates = this.localStoredUpdates.bind(this)
+        this.updateStoredRemote = this.updateStoredRemote.bind(this)
+        this.remoteStoreAvailable = this.remoteStoreAvailable.bind(this)
     }
 
-    prev(previousState) {
-        this._previousState = {
-            actionsToApply: previousState ? previousState.actionsToApply() : List(),
-            _updateStoredRemote: previousState ? previousState._updateStoredRemote : null,
-            updateToStoreRemote: previousState ? previousState.updateToStoreRemote() : null
-        }
 
-        return this
-    }
-
+    // Incoming
     init() {
-        return this.set('_started', true).prev(this)
+        this._started = true
+        const actionsFromUpdates = this._localStoredUpdates.reduce((acc, val) => acc.concat(val.actions), [])
+        let allActions = List(actionsFromUpdates).concat(this._localStoredActions)
+        this.actionsToApply.set(allActions)
     }
 
     actionFromApp(action) {
         const actionWithId = Object.assign({id: PersistentStoreController.newId()}, action)
-        return this.update('_actionsFromApp', l => l.push(actionWithId)).prev(this);
+        this._actionsFromApp = this._actionsFromApp.push(actionWithId)
+        this.actionToStore.set(actionWithId)
     }
 
     localStoredActions(actions) {
-        return this.set('_localStoredActions', List(actions)).prev(this)
+        this._localStoredActions = List(actions)
+        this._sendUpdateToStoreRemote()
     }
 
     localStoredUpdates(updates) {
-        return this.set('_localStoredUpdates', List(updates)).prev(this)
+        this._localStoredUpdates = List(updates)
     }
 
     updateStoredRemote(update) {
-       return this.set('_updateStoredRemote', update).prev(this)
+        this._updateStoredRemote = update
+        this.updateToStoreLocal.set(update)
+        this.actionsToDelete.set(update.actions)
     }
 
     remoteStoreAvailable(isAvailable) {
-        return this.set('_remoteStoreAvailable', isAvailable).prev(this)
+        this._remoteStoreAvailable = isAvailable
+        this._sendUpdateToStoreRemote()
     }
 
-    actionToStore() {
-        return this._actionsFromApp.filterNot( x => this._localStoredActions.find( y => y.id === x.id)).first()
-    }
 
-    updateToStoreRemote() {
+    // Outgoing
+    _sendUpdateToStoreRemote() {
         const actions = this._localStoredActions
-        const previousActions = this._previousState.updateToStoreRemote && this._previousState.updateToStoreRemote.actions
-        if (actions !== previousActions
-            && actions.size
-            && this._remoteStoreAvailable) {
-            return PersistentStoreController.newUpdate(actions)
+        if (actions.size && this._remoteStoreAvailable) {
+            this.updateToStoreRemote.set(PersistentStoreController.newUpdate(actions))
         }
     }
-
-    updateToStoreLocal() {
-        if (this._updateStoredRemote != this._previousState._updateStoredRemote) {
-            return this._updateStoredRemote
-        }
-    }
-
-    actionsToDelete() {
-        if (this.updateToStoreLocal()) return this._updateStoredRemote.actions
-    }
-
-    actionsToApply() {
-        if (this._started) {
-            const actionsFromUpdates = this._localStoredUpdates.reduce( (acc, val) => acc.concat(val.actions), [])
-            let allActions = List(actionsFromUpdates).concat(this._localStoredActions)
-            allActions = subtractById(allActions, this._actionsFromApp)
-            allActions = subtractById(allActions, this._previousState.actionsToApply)
-            return allActions
-        }
-
-        return List()
-    }
-
- }
+}
 
 module.exports = PersistentStoreController
 

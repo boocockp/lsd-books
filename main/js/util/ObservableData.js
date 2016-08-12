@@ -28,4 +28,19 @@ module.exports = class ObservableData {
             }
         }
     }
+
+    sendFlatTo(...listeners) {
+        this.sendTo(...listeners.map(this.flatListener))
+
+    }
+
+    flatListener(listener) {
+        return function(collection) {
+            collection.forEach( x => {
+                listener(x)
+                return true
+            } )
+        }
+    }
+
 }

@@ -19,7 +19,7 @@ module.exports = class PersistentStore {
         this.remoteStore = remoteStore
         this.externalAction = new ObservableData()
         this.dispatchedAction = new ObservableData()
-        this.controller = new PersistentStoreControllerObservable(new PersistentStoreController())
+        this.controller = new PersistentStoreController()
         this.dispatchAction = this.dispatchAction.bind(this)
 
         this._assembleComponents()
