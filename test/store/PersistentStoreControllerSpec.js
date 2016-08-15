@@ -1,7 +1,5 @@
 const chai = require('chai')
 const PersistentStoreController = require('../../main/js/store/PersistentStoreController')
-const PersistentStoreControllerObservable = require('../../main/js/store/PersistentStoreControllerObservable')
-const NewActionRouter = require('../../main/js/store/NewActionRouter')
 const {jsEqual, jsMatch} = require('../testutil/ChaiHelpers')
 
 
@@ -19,7 +17,7 @@ function testActionWithId(name, id = uuid.v4()) {
 }
 
 function update(actions) {
-    return NewActionRouter.newUpdate(actions)
+    return PersistentStoreController.newUpdate(actions)
 }
 
 describe("Persistent store controller", function () {

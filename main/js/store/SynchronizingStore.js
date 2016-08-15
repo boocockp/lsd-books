@@ -1,4 +1,4 @@
-const ObservableData = require('../util/ObservableData')
+const ObservableData = require('lsd-events').ObservableData
 
 class SynchronizingStore {
 

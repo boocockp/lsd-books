@@ -1,11 +1,7 @@
 const uuid = require('node-uuid')
-const {Record, List, Map} = require('immutable')
+const {List} = require('immutable')
 
-const ObservableData = require('../util/ObservableData')
-
-function subtractById(original, itemsToRemove) {
-    return original.filterNot(x => itemsToRemove.find(y => y.id === x.id))
-}
+const ObservableData = require('lsd-events').ObservableData
 
 class PersistentStoreController {
 
@@ -25,9 +21,7 @@ class PersistentStoreController {
         this._actionsFromApp = new List()
         this._localStoredActions = new List()
         this._localStoredUpdates = new List()
-        this._updateStoredRemote = null
         this._remoteStoreAvailable = false
-        this._started = false
 
         // outgoing data
         //TODO use ObservableEvent - no initial update when subscribe, latestEvent instead of value
@@ -48,7 +42,6 @@ class PersistentStoreController {
 
     // Incoming
     init() {
-        this._started = true
         const actionsFromUpdates = this._localStoredUpdates.reduce((acc, val) => acc.concat(val.actions), [])
         let allActions = List(actionsFromUpdates).concat(this._localStoredActions)
         this.actionsToApply.set(allActions)
@@ -70,7 +63,6 @@ class PersistentStoreController {
     }
 
     updateStoredRemote(update) {
-        this._updateStoredRemote = update
         this.updateToStoreLocal.set(update)
         this.actionsToDelete.set(update.actions)
     }

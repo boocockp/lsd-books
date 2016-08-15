@@ -1,4 +1,5 @@
-const {makeInputValue, makeOutputValue, bindEventFunctions} = require('../util/Events')
+const ObservableData = require('lsd-events').ObservableData
+const bindFunctions = require('lsd-events').bindFunctions
 const JsonUtil = require('../../../shared/modules/json/JsonUtil')
 
 class LocalStorageUpdateStore {
@@ -7,31 +8,25 @@ class LocalStorageUpdateStore {
         this.actionStoreKey = `${appId}.${dataSet}.actions`
         this.updateStoreKey = `${appId}.${dataSet}.updates`
         this.storage = window.localStorage
-        bindEventFunctions(this)
+        this.allActions = new ObservableData(this._getFromStorage(this.actionStoreKey))
+        this.allUpdates = new ObservableData(this._getFromStorage(this.updateStoreKey))
+        bindFunctions(this)
     }
 
     storeAction(action) {
-        const updatedActions = this.allActions().concat(action)
-        this._storedActions = this._writeToStorage(this.actionStoreKey, updatedActions)
+        const updatedActions = this.allActions.value.concat(action)
+        this.allActions.value = this._writeToStorage(this.actionStoreKey, updatedActions)
     }
 
     deleteActions(actions) {
         const deletedIds = new Set(actions.map( a => a.id))
-        const updatedActions = this.allActions().filter( a => !deletedIds.has(a.id) )
-        this._storedActions = this._writeToStorage(this.actionStoreKey, updatedActions)
+        const updatedActions = this.allActions.value.filter( a => !deletedIds.has(a.id) )
+        this.allActions.value = this._writeToStorage(this.actionStoreKey, updatedActions)
     }
 
     storeUpdate(update) {
-        const updatedUpdates = this.allUpdates().concat(update)
-        this._storedUpdates = this._writeToStorage(this.updateStoreKey, updatedUpdates)
-    }
-
-    allActions() {
-        return this._storedActions || (this._storedActions = this._getFromStorage(this.actionStoreKey))
-    }
-
-    allUpdates() {
-        return this._storedUpdates || (this._storedUpdates = this._getFromStorage(this.updateStoreKey))
+        const updatedUpdates = this.allUpdates.value.concat(update)
+        this.allUpdates = this._writeToStorage(this.updateStoreKey, updatedUpdates)
     }
 
     _getFromStorage(key) {
@@ -44,12 +39,5 @@ class LocalStorageUpdateStore {
         return data
     }
 }
-
-makeInputValue(LocalStorageUpdateStore.prototype, "storeAction")
-makeInputValue(LocalStorageUpdateStore.prototype, "deleteActions")
-makeInputValue(LocalStorageUpdateStore.prototype, "storeUpdate")
-
-makeOutputValue(LocalStorageUpdateStore.prototype, "allActions")
-makeOutputValue(LocalStorageUpdateStore.prototype, "allUpdates")
 
 module.exports = LocalStorageUpdateStore

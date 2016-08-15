@@ -1,12 +1,7 @@
 const uuid = require('node-uuid')
 
-const ObservableData = require('../util/ObservableData')
-const PersistentStoreControllerObservable = require('./PersistentStoreControllerObservable')
+const ObservableData = require('lsd-events').ObservableData
 const PersistentStoreController = require('./PersistentStoreController')
-const UpdateRouter = require('./UpdateRouter')
-const NewActionRouter = require('./NewActionRouter')
-const NewActionScheduler = require('./NewActionScheduler')
-const StartupRouter = require('./StartupRouter')
 
 function newId() {
     return uuid.v4()
