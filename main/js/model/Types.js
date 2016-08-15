@@ -1,5 +1,5 @@
 const _ = require('lodash'),
-    JsonUtil = require('../../../shared/modules/json/JsonUtil');
+    {JsonUtil} = require('lsd-storage');
 
 function enumValues(clazz, ...enumArgs) {
     const vals = []

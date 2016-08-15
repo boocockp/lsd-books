@@ -1,6 +1,6 @@
 const _ = require('lodash'),
     {Record, List} = require('immutable'),
-    JsonUtil = require('../../../shared/modules/json/JsonUtil'),
+    {JsonUtil} = require('lsd-storage'),
     {CREDIT} = require('./Types').DebitCredit,
     AccountData = require('./AccountData'),
     TransactionPosting = require('./TransactionPosting'),

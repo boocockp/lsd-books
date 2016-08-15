@@ -2,7 +2,7 @@
 
 const {Record, List} = require('immutable'),
     _ = require('lodash')
-    , JsonUtil = require('../../../shared/modules/json/JsonUtil')
+    , {JsonUtil} = require('lsd-storage')
     , {EntityDescriptor} = require('lsd-metadata')
     , Posting = require('./Posting')
     , TransactionPosting = require('./TransactionPosting')

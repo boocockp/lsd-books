@@ -2,7 +2,7 @@
 
 const {Record} = require('immutable'),
     _ = require('lodash')
-    , JsonUtil = require('../../../shared/modules/json/JsonUtil')
+    , {JsonUtil} = require('lsd-storage')
     , {DebitCredit} = require('./Types')
     , Account = () => require('./Account')
     , {EntityDescriptor, Reference} = require('lsd-metadata')

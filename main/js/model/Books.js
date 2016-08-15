@@ -1,7 +1,5 @@
 const
-    // Memoize = require('../../shared/modules/memoize/Memoize'),
-    // Observe = require('../../shared/modules/observe/Observe'),
-    JsonUtil = require('../../../shared/modules/json/JsonUtil'),
+    {JsonUtil} = require('lsd-storage'),
     {Record, List, Map} = require('immutable'),
     actions = require('../app/actions'),
     {prop} = require('./FunctionHelpers'),

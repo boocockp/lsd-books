@@ -5,12 +5,9 @@ let chai = require('chai'),
     Account = require('../../main/js/model/Account'),
     Transaction = require('../../main/js/model/Transaction'),
     Posting = require('../../main/js/model/Posting'),
-    // Memoize = require('../../shared/modules/memoize/Memoize'),
-    // Observe = require('../../shared/modules/observe/Observe'),
-    JsonUtil = require('../../shared/modules/json/JsonUtil'),
+    {JsonUtil} = require('lsd-storage'),
     {DEBIT, CREDIT} = require('../../main/js/model/Types').DebitCredit,
-    {FIXED_ASSET, CURRENT_ASSET, LONG_TERM_LIABILITY, CURRENT_LIABILITY, CAPITAL, EXPENSE, REVENUE} = require('../../main/js/model/Types').AccountType,
-    {jsEqual, jsMatch} = require('../testutil/ChaiHelpers')
+    {FIXED_ASSET, CURRENT_ASSET, LONG_TERM_LIABILITY, CURRENT_LIABILITY, CAPITAL, EXPENSE, REVENUE} = require('../../main/js/model/Types').AccountType
 
 chai.should();
 
@@ -51,8 +48,6 @@ function havePropertiesOf(chai, utils) {
     })
 }
 
-chai.use(jsEqual);
-chai.use(jsMatch);
 chai.use(havePropertiesOf);
 
 function credit(...acctsAmounts) {
@@ -180,9 +175,9 @@ describe("Books", function () {
             const newBooks = JsonUtil.fromStore(json);
             // console.log("newBooks", newBooks);
 
-            newBooks.accountViewsByName().map(it => it.signedBalance).should.jsEql([300, -50, 50, -300]);
-            newBooks.accountViewsByName().map(it => it.debitBalance).should.jsEql([null, 50, null, 300]);
-            newBooks.accountViewsByName().map(it => it.creditBalance).should.jsEql([300, null, 50, null]);
+            newBooks.accountViewsByName().map(it => it.signedBalance).should.havePropertiesOf([300, -50, 50, -300]);
+            newBooks.accountViewsByName().map(it => it.debitBalance).should.havePropertiesOf([null, 50, null, 300]);
+            newBooks.accountViewsByName().map(it => it.creditBalance).should.havePropertiesOf([300, null, 50, null]);
         });
 
     });
@@ -221,10 +216,10 @@ describe("Books", function () {
             dcTransaction(date2, 150, faFurniture, capital);
 
             const bs = books.balanceSheet(date2);
-            bs.fixedAssets.accounts.map( it => [it.name, it.balance]).should.jsEql( [["Machines", 100], ["Furniture", 225]]);
+            bs.fixedAssets.accounts.map( it => [it.name, it.balance]).should.havePropertiesOf( [["Machines", 100], ["Furniture", 225]]);
             bs.fixedAssets.total.should.eql(325);
 
-            bs.capitalReserves.accounts.map( it => [it.name, it.balance]).should.jsEql( [["Capital", 325]]);
+            bs.capitalReserves.accounts.map( it => [it.name, it.balance]).should.havePropertiesOf( [["Capital", 325]]);
             bs.capitalReserves.total.should.eql(325);
 
         });

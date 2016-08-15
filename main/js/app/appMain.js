@@ -2,17 +2,17 @@ const React = require('react');
 const ReactDOM = require('react-dom');
 const {createStore} = require('redux');
 const {addAccount, UpdateAccount, AddTransaction} = require('./actions');
-const JsonUtil = require('../../../shared/modules/json/JsonUtil')
+const {JsonUtil} = require('lsd-storage')
 const Books = require('../model/Books');
 const {booksReducer} = require('./reducers');
-const LocalStorageUpdateStore = require('../store/LocalStorageUpdateStore')
-const S3UpdateStore = require('../store/S3UpdateStore')
-const SynchronizingStore = require('../store/SynchronizingStore')
-const PersistentStore = require('../store/PersistentStore')
+const LocalStorageUpdateStore = require('lsd-storage').LocalStorageUpdateStore
+const S3UpdateStore = require('lsd-storage').S3UpdateStore
+const SynchronizingStore = require('lsd-storage').SynchronizingStore
+const PersistentStore = require('lsd-storage').PersistentStore
 const App = require('../view/App')
 const AppProvider = require('../view/AppProvider')
 const GoogleSignin = require('superviews').GoogleSignin
-const CognitoCredentialsSource = require('../store/CognitoCredentialsSource')
+const CognitoCredentialsSource = require('lsd-storage').CognitoCredentialsSource
 
 const config = {
     "clientId": "919408445147-a0csgn7e21d773ilrif3q8d9hfrfc7vm.apps.googleusercontent.com",
