@@ -1,8 +1,8 @@
 const _ = require('lodash')
 const React = require('react')
 const {PropTypes} = require('react')
-const EntityView = require('./EntityView')
-const EntityTable = require('./EntityTable')
+const EntityView = require('superviews').EntityView
+const EntityTable = require('superviews').EntityTable
 
 let AccountView = React.createClass({
 

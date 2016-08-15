@@ -2,8 +2,8 @@ const _ = require('lodash')
 const React = require('react')
 const {PropTypes} = require('react')
 const {List} = require('immutable')
-const EntityTable = require('./EntityTable')
-const EntityTableRowGroup = require('./EntityTableRowGroup')
+const EntityTable = require('superviews').EntityTable
+const EntityTableRowGroup = require('superviews').EntityTableRowGroup
 
 let TrialBalanceView = React.createClass({
 

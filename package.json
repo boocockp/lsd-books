@@ -20,7 +20,8 @@
     "react-google-login": "^2.1.2",
     "react-redux": "^4.4.5",
     "react-router-component": "^0.36.0",
-    "redux": "^3.5.2"
+    "redux": "^3.5.2",
+    "superviews": "file:///Users/paulb/dev/superviews"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
@@ -35,6 +36,7 @@
     "copy-webpack-plugin": "^3.0.1",
     "flow-bin": "^0.30.0",
     "mocha": "^3.0.2",
+    "rm-local-modules": "0.0.1",
     "sinon": "^1.17.4",
     "sinon-chai": "^2.8.0",
     "webpack": "^1.13.1"

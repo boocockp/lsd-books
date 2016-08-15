@@ -1,17 +1,16 @@
 const React = require('react')
 const {PropTypes} = require('react')
 const { connect } = require('react-redux')
-const PersistentRouter = require('./PersistentRouter')
-const EntityListWithView = require('./EntityListWithView')
+const EntityListWithView = require('superviews').EntityListWithView
+const GoogleSignin = require('superviews').GoogleSignin
 const TrialBalanceView = require('./TrialBalanceView')
 const AccountView = require('./AccountView')
 const MainPage = require('./MainPage')
-const NotFoundPage = require('./NotFoundPage')
+const NotFoundPage = require('superviews').NotFoundPage
 const {Locations, Location, NotFound} = require('react-router-component')
-const GoogleSignin = require('./GoogleSignin')
 const Account = require('../model/Account')
 const Transaction = require('../model/Transaction')
-const EntityManager = require('./EntityManager')
+const EntityManager = require('superviews').EntityManager
 const {setAccount, setTransaction} = require('../app/actions')
 
 const config = {
