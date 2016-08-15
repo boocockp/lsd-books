@@ -2,10 +2,8 @@ const _ = require('lodash'),
     {Record, List} = require('immutable'),
     JsonUtil = require('../../../shared/modules/json/JsonUtil'),
     {CREDIT} = require('./Types').DebitCredit,
-    EntityDescriptor = require('../metadata/EntityDescriptor'),
+    {EntityDescriptor, NotEmpty} = require('lsd-metadata'),
     {AccountType} = require('./Types')
-
-import NotEmpty from '../metadata/validators/NotEmpty'
 
 const descriptor = new EntityDescriptor("AccountData", [
     {

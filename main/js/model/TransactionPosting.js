@@ -1,14 +1,13 @@
 // @flow
 
 const _ = require('lodash'),
-    {Record, List} = require('immutable'),
+    {Record} = require('immutable'),
     JsonUtil = require('../../../shared/modules/json/JsonUtil'),
     {CREDIT} = require('./Types').DebitCredit,
     AccountData = require('./AccountData'),
     Posting = require('./Posting'),
-    Reference = require('./Reference'),
     Transaction = () => require('./Transaction'),
-    EntityDescriptor = require('../metadata/EntityDescriptor')
+    {EntityDescriptor, Reference} = require('lsd-metadata')
 
 
 let descriptor

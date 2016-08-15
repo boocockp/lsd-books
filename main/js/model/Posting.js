@@ -1,12 +1,11 @@
 // @flow
 
-const {List, Record} = require('immutable'),
+const {Record} = require('immutable'),
     _ = require('lodash')
     , JsonUtil = require('../../../shared/modules/json/JsonUtil')
     , {DebitCredit} = require('./Types')
-    , Reference = require('./Reference')
     , Account = () => require('./Account')
-    , EntityDescriptor = require('../metadata/EntityDescriptor')
+    , {EntityDescriptor, Reference} = require('lsd-metadata')
 
 const descriptor = new EntityDescriptor("Posting",[
     {

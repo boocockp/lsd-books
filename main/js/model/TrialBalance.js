@@ -1,7 +1,7 @@
 const {sum, prop} = require('./FunctionHelpers')
 const {Record, List, Map} = require('immutable')
 const Account = require('../model/Account')
-const EntityDescriptor = require('../metadata/EntityDescriptor')
+const {EntityDescriptor} = require('lsd-metadata')
 
 const descriptor = new EntityDescriptor("Trial Balance", [
     {

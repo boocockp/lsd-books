@@ -4,7 +4,7 @@ const _ = require('lodash'),
     {CREDIT} = require('./Types').DebitCredit,
     AccountData = require('./AccountData'),
     TransactionPosting = require('./TransactionPosting'),
-    EntityDescriptor = require('../metadata/EntityDescriptor')
+    {EntityDescriptor} = require('lsd-metadata')
 
 
 const descriptor =  new EntityDescriptor( "Account",
