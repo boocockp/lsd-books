@@ -92,11 +92,6 @@ let App = React.createClass({
                 appStore.updateAndSave("setTransaction", entityWithId)
                 return entityWithId
             }
-
-            linkHref(entityOrId) {
-                const id = entityOrId instanceof Transaction ? entityOrId.id : entityOrId
-                return "/transaction/" + id;
-            }
         }
 
         class AccountManager extends EntityManager {
@@ -119,11 +114,6 @@ let App = React.createClass({
                 appStore.updateAndSave("setAccount", entityWithId)
                 return entityWithId
             }
-
-            linkHref(entityOrId) {
-                const id = entityOrId instanceof Account ? entityOrId.id : entityOrId
-                return "/account/" + id;
-            }
         }
 
         if (entityType === Account) {
@@ -139,12 +129,13 @@ let App = React.createClass({
     },
 
     getChildContext() {
-        return {getEntityManager: this.getEntityManager}
+        return {getEntityManager: this.getEntityManager, getNavigationManager: this.getNavigationManager}
     }
 })
 
 App.childContextTypes = {
-    getEntityManager: PropTypes.func
+    getEntityManager: PropTypes.func,
+    getNavigationManager: PropTypes.func
 }
 
 module.exports = App
