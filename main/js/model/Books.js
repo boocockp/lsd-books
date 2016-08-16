@@ -61,6 +61,10 @@ class Books extends Record({accounts: new Map(), transactions: new Map()}) {
         return this.accountModels.find( it => it.code == code );
     }
 
+    transaction(id) {
+        return this.transactions.get(id)
+    }
+
     get transactionsByDate() {
         return this.transactions.toList().sortBy( it => it.date);
     }

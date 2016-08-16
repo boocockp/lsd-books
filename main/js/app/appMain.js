@@ -1,14 +1,9 @@
-const React = require('react');
-const ReactDOM = require('react-dom');
-const {JsonUtil} = require('lsd-storage')
-const Books = require('../model/Books');
-const LocalStorageUpdateStore = require('lsd-storage').LocalStorageUpdateStore
-const S3UpdateStore = require('lsd-storage').S3UpdateStore
-const SynchronizingStore = require('lsd-storage').SynchronizingStore
-const PersistentStore = require('lsd-storage').PersistentStore
+const React = require('react')
+const ReactDOM = require('react-dom')
+const Books = require('../model/Books')
+const {LocalStorageUpdateStore, S3UpdateStore, SynchronizingStore, PersistentStore, CognitoCredentialsSource, JsonUtil} = require('lsd-storage')
 const App = require('../view/App')
 const GoogleSignin = require('superviews').GoogleSignin
-const CognitoCredentialsSource = require('lsd-storage').CognitoCredentialsSource
 
 const config = {
     "clientId": "919408445147-a0csgn7e21d773ilrif3q8d9hfrfc7vm.apps.googleusercontent.com",
@@ -16,7 +11,7 @@ const config = {
     "bucketName": "ashridgetech.reactbooks-test"
 }
 
-const dataSetParam = location.search.match(/dataSet=(\w+)/);
+const dataSetParam = location.search.match(/dataSet=(\w+)/)
 const dataSetOverride = dataSetParam && dataSetParam[1]
 const appConfig = {
     appName: "reactbooks",
@@ -43,12 +38,11 @@ function applyAction(jsonAction) {
     appStore.applyAction(action)
 }
 
-
 window.appStore_ = appStore
 window.perStore = persistentStore
 window.applyAction = applyAction
 
 const container = document.getElementById('main')
-const mainElement = React.createElement(App, {appStore: appStore})
+const mainElement = React.createElement(App, {appStore: appStore, googleClientId: config.clientId})
 const renderedElement = ReactDOM.render(mainElement, container)
 

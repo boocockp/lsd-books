@@ -1,8 +1,6 @@
 const React = require('react')
 const {PropTypes} = require('react')
-const uuid = require('node-uuid')
-const EntityListWithView = require('superviews').EntityListWithView
-const GoogleSignin = require('superviews').GoogleSignin
+const {EntityListWithView, GoogleSignin} = require('superviews')
 const TrialBalanceView = require('./TrialBalanceView')
 const AccountView = require('./AccountView')
 const MainPage = require('./MainPage')
@@ -10,14 +8,8 @@ const NotFoundPage = require('superviews').NotFoundPage
 const {Locations, Location, NotFound} = require('react-router-component')
 const Account = require('../model/Account')
 const Transaction = require('../model/Transaction')
-const EntityManager = require('superviews').EntityManager
+const EntityManagers = require('./EntityManagers')
 const NavigationManager = require('superviews').NavigationManager
-
-const config = {
-    "clientId": "919408445147-a0csgn7e21d773ilrif3q8d9hfrfc7vm.apps.googleusercontent.com",
-    "identityPoolId": "eu-west-1:c46e1da2-72cf-4965-92b8-ebe270684050",
-    "bucketName": "ashridgetech.reactbooks-test"
-}
 
 let App = React.createClass({
 
@@ -32,7 +24,7 @@ let App = React.createClass({
             <div>
                 <h1>ReactBooks</h1>
                 <div id="googleLogin">
-                    <GoogleSignin clientId={config.clientId}/>
+                    <GoogleSignin clientId={this.props.googleClientId}/>
                 </div>
                 <Locations hash ref={(c) => this._router = c}>
                     <Location path="/" handler={MainPage}/>
@@ -71,61 +63,7 @@ let App = React.createClass({
 
     getEntityManager: function (entityType) {
         const appStore = this.props.appStore
-        const appState = appStore.state.value
-
-        class TransactionManager extends EntityManager {
-
-            get(id) {
-                return appState.transactions.get(id)
-            }
-
-            choiceList() {
-                return appState.transactionsByDate
-            }
-
-            newInstance() {
-                return new Transaction();
-            }
-
-            save(entity) {
-                const entityWithId = entity.id ? entity : entity.merge({id: uuid.v4()})
-                appStore.updateAndSave("setTransaction", entityWithId)
-                return entityWithId
-            }
-        }
-
-        class AccountManager extends EntityManager {
-
-            get(id) {
-                return appState.account(id)
-            }
-
-            choiceList() {
-                return appState.accountsByName
-            }
-
-            newInstance() {
-                return new Account();
-            }
-
-            save(entity) {
-                const {data} = entity
-                const entityWithId = data.id ? data : data.merge({id: uuid.v4()})
-                appStore.updateAndSave("setAccount", entityWithId)
-                return entityWithId
-            }
-        }
-
-        if (entityType === Account) {
-            return new AccountManager()
-        }
-
-        if (entityType === Transaction) {
-            return new TransactionManager()
-        }
-
-        throw new Error("Unknown entityType " + entityType)
-
+        return EntityManagers.getManager(appStore, entityType)
     },
 
     getChildContext() {
@@ -136,6 +74,11 @@ let App = React.createClass({
 App.childContextTypes = {
     getEntityManager: PropTypes.func,
     getNavigationManager: PropTypes.func
+}
+
+App.propTypes = {
+    appStore: PropTypes.object.isRequired,
+    googleClientId: PropTypes.string.isRequired
 }
 
 module.exports = App
