@@ -10,7 +10,6 @@ const S3UpdateStore = require('lsd-storage').S3UpdateStore
 const SynchronizingStore = require('lsd-storage').SynchronizingStore
 const PersistentStore = require('lsd-storage').PersistentStore
 const App = require('../view/App')
-const AppProvider = require('../view/AppProvider')
 const GoogleSignin = require('superviews').GoogleSignin
 const CognitoCredentialsSource = require('lsd-storage').CognitoCredentialsSource
 
@@ -54,8 +53,6 @@ window.perStore = persistentStore
 window.applyAction = applyAction
 
 const container = document.getElementById('main')
-if (container) {
-    const mainElement = React.createElement(AppProvider, {store: appStore})
-    const renderedElement = ReactDOM.render(mainElement, container)
-}
+const mainElement = React.createElement(App, {appStore: appStore})
+const renderedElement = ReactDOM.render(mainElement, container)
 

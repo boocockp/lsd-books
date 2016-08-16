@@ -3,7 +3,7 @@ const
     {Record, List, Map} = require('immutable'),
     actions = require('../app/actions'),
     {prop} = require('./FunctionHelpers'),
-    AccountData = () => require('./AccountData'),
+    AccountData = require('./AccountData'),
     Transaction = () => require('./Transaction'),
     Account = require('./Account'),
     AccountAsAt = require('./AccountAsAt'),
@@ -11,53 +11,35 @@ const
     BalanceSheet = require('./BalanceSheet')
 
 class Books extends Record({accounts: new Map(), transactions: new Map(), $actionForLatestUpdate: null}) {
-    
-    static get instance() {
-        return _instance || (_instance = new Books());
-    }
-    
+
     constructor() {
         super();
     }
 
-    setAccount(account) {
-        const updateAction = () => {
-            if (this.getIn(['accounts', account.id])) {
-                return actions.updateAccount(account)
+    setAccount(data) {
+        const entityExists = this.getIn(['accounts', data.id])
+        let updatedState
+        if (entityExists) {
+            if (data instanceof AccountData) {
+                updatedState = this.setIn(['accounts', data.id], data)
             } else {
-                return actions.addAccount(account)
+                updatedState = this.mergeIn(['accounts', data.id], data)
+            }
+        } else {
+            if (data instanceof AccountData) {
+                updatedState = this.setIn(['accounts', data.id], data)
+            } else {
+                throw new Error("Cannot set plain object as new Account.  id=" + data.id)
             }
         }
-        return this.setIn(['accounts', account.id], account).set('$actionForLatestUpdate', updateAction());
+        return updatedState.set('$actionForLatestUpdate', actions.setAccount(data))
     }
 
-    addAccount(data) {
-        const account = new (AccountData())(data);
-        return this.setIn(['accounts', account.id], account);
-    }
-
-    updateAccount(data) {
-        return this.mergeIn(['accounts', data.id], data);
-    }
-    
     setTransaction(transaction) {
-        const updateAction = () => {
-            if (this.getIn(['transactions', transaction.id])) {
-                return actions.updateTransaction(transaction)
-            } else {
-                return actions.addTransaction(transaction)
-            }
-        }
-        return this.setIn(['transactions', transaction.id], transaction).set('$actionForLatestUpdate', updateAction());
-    }
-
-    addTransaction(data) {
-        const transaction = new (Transaction())(data);
-        return this.setIn(['transactions', transaction.id], transaction);
-    }
-
-    updateTransaction(data) {
-        return this.mergeIn(['transactions', data.id], data);
+        const updateAction = actions.setTransaction(transaction)
+        const entityExists = this.getIn(['transactions', transaction.id])
+        const updatedState = entityExists ? this.mergeIn(['transactions', transaction.id], transaction) : this.setIn(['transactions', transaction.id], transaction)
+        return updatedState.set('$actionForLatestUpdate', updateAction)
     }
 
     get accountModels() {

@@ -45,7 +45,7 @@ describe("Account Page", function () {
     function addAccountAction(acctData) {
         return {
             id: guid(),
-            type: "addAccount",
+            type: "setAccount",
             data: {
                 "@type": "AccountData",
                 id: guid(),

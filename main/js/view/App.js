@@ -1,6 +1,6 @@
 const React = require('react')
 const {PropTypes} = require('react')
-const { connect } = require('react-redux')
+const uuid = require('node-uuid')
 const EntityListWithView = require('superviews').EntityListWithView
 const GoogleSignin = require('superviews').GoogleSignin
 const TrialBalanceView = require('./TrialBalanceView')
@@ -19,13 +19,12 @@ const config = {
     "bucketName": "ashridgetech.reactbooks-test"
 }
 
-const mapStateToProps = (state) => {
-    return {
-        appState: state
-    }
-}
-
 let App = React.createClass({
+
+    componentWillMount: function() {
+        this.props.appStore.state.sendTo( appState => this.setState({appState}) )
+    },
+
     render: function () {
         return (
             <div>
@@ -77,12 +76,12 @@ let App = React.createClass({
     },
 
     trialBalance: function () {
-        return <TrialBalanceView entity={this.props.appState.trialBalance}/>
+        return <TrialBalanceView entity={this.state.appState.trialBalance}/>
     },
 
     getEntityManager: function (entityType) {
-        const appState = this.props.appState
-        const dispatch = this.props.dispatch
+        const appStore = this.props.appStore
+        const appState = this.state.appState
 
         class TransactionManager extends EntityManager {
 
@@ -99,9 +98,9 @@ let App = React.createClass({
             }
 
             save(entity) {
-                const action = setTransaction(entity);
-                dispatch(action)
-                return action.data
+                const entityWithId = entity.id ? entity : entity.merge({id: uuid.v4()})
+                appStore.dispatch( {type: "setTransaction", data: entityWithId} )
+                return entityWithId
             }
 
             linkHref(entityOrId) {
@@ -125,9 +124,10 @@ let App = React.createClass({
             }
 
             save(entity) {
-                const action = setAccount(entity.data);
-                dispatch(action)
-                return action.data
+                const {data} = entity
+                const entityWithId = data.id ? data : data.merge({id: uuid.v4()})
+                appStore.dispatch({type: "setAccount", data: entityWithId} )
+                return entityWithId
             }
 
             linkHref(entityOrId) {
@@ -156,8 +156,5 @@ let App = React.createClass({
 App.childContextTypes = {
     getEntityManager: PropTypes.func
 }
-
-
-App = connect(mapStateToProps)(App)
 
 module.exports = App

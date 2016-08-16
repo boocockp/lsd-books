@@ -2,6 +2,7 @@ let chai = require('chai'),
     _ = require('lodash'),
     {List} = require('immutable'),
     Books = require('../../main/js/model/Books'),
+    AccountData = require('../../main/js/model/AccountData'),
     Account = require('../../main/js/model/Account'),
     Transaction = require('../../main/js/model/Transaction'),
     Posting = require('../../main/js/model/Posting'),
@@ -72,7 +73,7 @@ describe("Books", function () {
 
     function transaction(date, debits, credits) {
         const id = transaction.nextId++
-        books = books.addTransaction({id, date, description: "Transaction " + id, postings: debits.concat(credits)});
+        books = books.setTransaction(new Transaction({id, date, description: "Transaction " + id, postings: debits.concat(credits)}));
     }
     transaction.nextId = 2000;
 
@@ -84,7 +85,7 @@ describe("Books", function () {
         const id = account.nextId++;
 
         const data = {id, name, code, type};
-        books = books.addAccount(data);
+        books = books.setAccount(new AccountData(data));
         return data;
     }
     account.nextId = 1000;
@@ -118,11 +119,11 @@ describe("Books", function () {
 
     describe("books object with changing data", function () {
         it("updates account from partial data", function () {
-            books = books.updateAccount({id: b.id, name: "Water"});
+            books = books.setAccount({id: b.id, name: "Water"});
             books.account(b.id).should.havePropertiesOf(_.merge({}, b, {name: "Water"}));
         });
         it("re-sorts accounts when names change", function () {
-            books = books.updateAccount({id: b.id, name: "Water"});
+            books = books.setAccount({id: b.id, name: "Water"});
             books.accountsByName.should.havePropertiesOf([c, d, a, _.merge({}, b, {name: "Water"})]);
         });
     });
@@ -147,13 +148,13 @@ describe("Books", function () {
         });
 
         it("knows updates to individual account names", function () {
-            books = books.updateAccount({id: a.id, name: "Travel Expenses"})
-                         .updateAccount({id: b.id, name: "Entertainment"});
+            books = books.setAccount({id: a.id, name: "Travel Expenses"})
+                         .setAccount({id: b.id, name: "Entertainment"});
 
             books.account(a.id).name.should.eql("Travel Expenses");
             books.account(b.id).name.should.eql("Entertainment");
 
-            books = books.updateAccount({id: b.id, name: "Customer Ents"});
+            books = books.setAccount({id: b.id, name: "Customer Ents"});
             books.account(a.id).name.should.eql("Travel Expenses");
             books.account(b.id).name.should.eql("Customer Ents");
         });

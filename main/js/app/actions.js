@@ -1,13 +1,9 @@
-const uuid = require('node-uuid')
-
 function action(type, args) {
     return Object.assign( {type: type.name}, args);
-    
 }
 
 function setAccount(account) {
-    const accountWithId = account.id ? account : account.merge({id: uuid.v4()})
-    return action(setAccount, {data: accountWithId});
+    return action(setAccount, {data: account});
 }
 
 function addAccount(data) {
@@ -19,8 +15,7 @@ function updateAccount(data) {
 }
 
 function setTransaction(transaction) {
-    const transactionWithId = transaction.id ? transaction : transaction.merge({id: uuid.v4()})
-    return action(setTransaction, {data: transactionWithId});
+    return action(setTransaction, {data: transaction});
 }
 
 function addTransaction(data) {
