@@ -11,6 +11,7 @@ const {Locations, Location, NotFound} = require('react-router-component')
 const Account = require('../model/Account')
 const Transaction = require('../model/Transaction')
 const EntityManager = require('superviews').EntityManager
+const NavigationManager = require('superviews').NavigationManager
 
 const config = {
     "clientId": "919408445147-a0csgn7e21d773ilrif3q8d9hfrfc7vm.apps.googleusercontent.com",
@@ -25,6 +26,8 @@ let App = React.createClass({
     },
 
     render: function () {
+        const accountNav = this.getNavigationManager(Account)
+        const transactionNav = this.getNavigationManager(Transaction)
         return (
             <div>
                 <h1>ReactBooks</h1>
@@ -33,10 +36,10 @@ let App = React.createClass({
                 </div>
                 <Locations hash ref={(c) => this._router = c}>
                     <Location path="/" handler={MainPage}/>
-                    <Location path="/account" handler={this.accountList()}/>
-                    <Location path="/account/:selectedId" handler={this.accountList()}/>
-                    <Location path="/transaction" handler={this.transactionList()}/>
-                    <Location path="/transaction/:selectedId" handler={this.transactionList()}/>
+                    <Location path={accountNav.listPath} handler={this.accountList()}/>
+                    <Location path={accountNav.selectedPath} handler={this.accountList()}/>
+                    <Location path={transactionNav.listPath} handler={this.transactionList()}/>
+                    <Location path={transactionNav.selectedPath} handler={this.transactionList()}/>
                     <Location path="/reports/trialBalance" handler={this.trialBalance()}/>
                     <NotFound handler={NotFoundPage}/>
                 </Locations>
@@ -44,33 +47,17 @@ let App = React.createClass({
         )
     },
 
-    navigateToAccount: function(id) {
-        this._router.navigate(`/account/${id}`)
-    },
-
-    navigateToNewAccount: function() {
-        this._router.navigate(`/account/new`)
-    },
-
-    navigateToTransaction: function(id) {
-        this._router.navigate(`/transaction/${id}`)
-    },
-
-    navigateToNewTransaction: function() {
-        this._router.navigate(`/transaction/new`)
-    },
-
     accountList: function () {
         return (
             <EntityListWithView entityManager={this.getEntityManager(Account)} entityViewType={AccountView}
-                                onSelect={this.navigateToAccount} onNew={this.navigateToNewAccount}/>
+                                navigationManager={this.getNavigationManager(Account)}/>
         )
     },
 
     transactionList: function () {
         return (
             <EntityListWithView entityManager={this.getEntityManager(Transaction)}
-                                onSelect={this.navigateToTransaction} onNew={this.navigateToNewTransaction}/>
+                                navigationManager={this.getNavigationManager(Transaction)}/>
         )
     },
 
@@ -78,9 +65,13 @@ let App = React.createClass({
         return <TrialBalanceView entity={this.state.appState.trialBalance}/>
     },
 
+    getNavigationManager: function(entityType) {
+        return new NavigationManager(entityType, () => this._router)
+    },
+
     getEntityManager: function (entityType) {
         const appStore = this.props.appStore
-        const appState = this.state.appState
+        const appState = appStore.state.value
 
         class TransactionManager extends EntityManager {
 
