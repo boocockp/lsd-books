@@ -16,22 +16,15 @@ class Books extends Record({accounts: new Map(), transactions: new Map()}) {
     }
 
     setAccount(data) {
-        const entityExists = this.getIn(['accounts', data.id])
-        let updatedState
-        if (entityExists) {
-            if (data instanceof AccountData) {
-                updatedState = this.setIn(['accounts', data.id], data)
-            } else {
-                updatedState = this.mergeIn(['accounts', data.id], data)
-            }
+        if (data instanceof AccountData) {
+            return this.setIn(['accounts', data.id], data)
         } else {
-            if (data instanceof AccountData) {
-                updatedState = this.setIn(['accounts', data.id], data)
+            if (this.getIn(['accounts', data.id])) {
+                return this.mergeIn(['accounts', data.id], data)
             } else {
                 throw new Error("Cannot set plain object as new Account.  id=" + data.id)
             }
         }
-        return updatedState
     }
 
     setTransaction(transaction) {
