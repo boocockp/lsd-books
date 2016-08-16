@@ -1,10 +1,7 @@
 const React = require('react');
 const ReactDOM = require('react-dom');
-const {createStore} = require('redux');
-const {addAccount, UpdateAccount, AddTransaction} = require('./actions');
 const {JsonUtil} = require('lsd-storage')
 const Books = require('../model/Books');
-const {booksReducer} = require('./reducers');
 const LocalStorageUpdateStore = require('lsd-storage').LocalStorageUpdateStore
 const S3UpdateStore = require('lsd-storage').S3UpdateStore
 const SynchronizingStore = require('lsd-storage').SynchronizingStore
@@ -26,8 +23,7 @@ const appConfig = {
     dataSet: dataSetOverride || "main"
 }
 
-const reduxStore = createStore(booksReducer, new Books());
-const appStore = new SynchronizingStore(reduxStore)
+const appStore = new SynchronizingStore(new Books())
 
 const localStore = new LocalStorageUpdateStore(appConfig.appName, appConfig.dataSet)
 const googleSigninTracker = new GoogleSignin.Tracker()

@@ -28,7 +28,7 @@ describe("Account Page", function () {
     }
 
     function dataStore() {
-        return appStore_.getState()
+        return appStore_.state.value
     }
 
     function guid() {

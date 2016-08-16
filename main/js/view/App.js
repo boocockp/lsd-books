@@ -11,7 +11,6 @@ const {Locations, Location, NotFound} = require('react-router-component')
 const Account = require('../model/Account')
 const Transaction = require('../model/Transaction')
 const EntityManager = require('superviews').EntityManager
-const {setAccount, setTransaction} = require('../app/actions')
 
 const config = {
     "clientId": "919408445147-a0csgn7e21d773ilrif3q8d9hfrfc7vm.apps.googleusercontent.com",
@@ -99,7 +98,7 @@ let App = React.createClass({
 
             save(entity) {
                 const entityWithId = entity.id ? entity : entity.merge({id: uuid.v4()})
-                appStore.dispatch( {type: "setTransaction", data: entityWithId} )
+                appStore.updateAndSave("setTransaction", entityWithId)
                 return entityWithId
             }
 
@@ -126,7 +125,7 @@ let App = React.createClass({
             save(entity) {
                 const {data} = entity
                 const entityWithId = data.id ? data : data.merge({id: uuid.v4()})
-                appStore.dispatch({type: "setAccount", data: entityWithId} )
+                appStore.updateAndSave("setAccount", entityWithId)
                 return entityWithId
             }
 

@@ -1,7 +1,6 @@
 const
     {JsonUtil} = require('lsd-storage'),
     {Record, List, Map} = require('immutable'),
-    actions = require('../app/actions'),
     {prop} = require('./FunctionHelpers'),
     AccountData = require('./AccountData'),
     Transaction = () => require('./Transaction'),
@@ -10,7 +9,7 @@ const
     TrialBalance = require('./TrialBalance'),
     BalanceSheet = require('./BalanceSheet')
 
-class Books extends Record({accounts: new Map(), transactions: new Map(), $actionForLatestUpdate: null}) {
+class Books extends Record({accounts: new Map(), transactions: new Map()}) {
 
     constructor() {
         super();
@@ -32,14 +31,13 @@ class Books extends Record({accounts: new Map(), transactions: new Map(), $actio
                 throw new Error("Cannot set plain object as new Account.  id=" + data.id)
             }
         }
-        return updatedState.set('$actionForLatestUpdate', actions.setAccount(data))
+        return updatedState
     }
 
     setTransaction(transaction) {
-        const updateAction = actions.setTransaction(transaction)
         const entityExists = this.getIn(['transactions', transaction.id])
         const updatedState = entityExists ? this.mergeIn(['transactions', transaction.id], transaction) : this.setIn(['transactions', transaction.id], transaction)
-        return updatedState.set('$actionForLatestUpdate', updateAction)
+        return updatedState
     }
 
     get accountModels() {
