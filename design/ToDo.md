@@ -60,7 +60,7 @@ Routing
 
 Redux
 -----
-- Ditch it
+  - Ditch it
 
 Validation
 ----------

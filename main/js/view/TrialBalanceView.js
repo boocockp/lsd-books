@@ -2,8 +2,7 @@ const _ = require('lodash')
 const React = require('react')
 const {PropTypes} = require('react')
 const {List} = require('immutable')
-const EntityTable = require('superviews').EntityTable
-const EntityTableRowGroup = require('superviews').EntityTableRowGroup
+const {EntityTable, EntityTableRowGroup} = require('lsd-views')
 
 let TrialBalanceView = React.createClass({
 

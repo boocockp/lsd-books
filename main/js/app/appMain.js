@@ -3,7 +3,7 @@ const ReactDOM = require('react-dom')
 const Books = require('../model/Books')
 const {LocalStorageUpdateStore, S3UpdateStore, SynchronizingStore, PersistentStore, CognitoCredentialsSource, JsonUtil} = require('lsd-storage')
 const App = require('../view/App')
-const GoogleSignin = require('superviews').GoogleSignin
+const {GoogleSignin} = require('lsd-views')
 
 const config = {
     "clientId": "919408445147-a0csgn7e21d773ilrif3q8d9hfrfc7vm.apps.googleusercontent.com",

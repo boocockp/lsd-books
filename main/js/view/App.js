@@ -1,15 +1,14 @@
 const React = require('react')
 const {PropTypes} = require('react')
-const {EntityListWithView, GoogleSignin} = require('superviews')
+const {EntityListWithView, GoogleSignin} = require('lsd-views')
 const TrialBalanceView = require('./TrialBalanceView')
 const AccountView = require('./AccountView')
 const MainPage = require('./MainPage')
-const NotFoundPage = require('superviews').NotFoundPage
+const {NotFoundPage, NavigationManager} = require('lsd-views')
 const {Locations, Location, NotFound} = require('react-router-component')
 const Account = require('../model/Account')
 const Transaction = require('../model/Transaction')
 const EntityManagers = require('./EntityManagers')
-const NavigationManager = require('superviews').NavigationManager
 
 let App = React.createClass({
 

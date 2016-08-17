@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "build": "webpack",
-    "build-dev": "npm update lsd-storage lsd-metadata lsd-events superviews && npm run build",
+    "build-dev": "npm update lsd-storage lsd-metadata lsd-events lsd-views && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -15,6 +15,7 @@
     "lsd-events": "file:///Users/paulb/dev/lsd-events",
     "lsd-metadata": "file:///Users/paulb/dev/lsd-metadata",
     "lsd-storage": "file:///Users/paulb/dev/lsd-storage",
+    "lsd-views": "file:///Users/paulb/dev/lsd-views",
     "moment": "^2.14.1",
     "node-uuid": "^1.4.7",
     "react": "^15.2.1",
@@ -22,8 +23,7 @@
     "react-bootstrap-datetimepicker": "0.0.22",
     "react-dom": "^15.2.1",
     "react-google-login": "^2.1.2",
-    "react-router-component": "^0.36.0",
-    "superviews": "file:///Users/paulb/dev/superviews"
+    "react-router-component": "^0.36.0"
   },
   "devDependencies": {
     "babel-cli": "^6.10.1",
