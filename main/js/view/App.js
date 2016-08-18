@@ -27,9 +27,9 @@ let App = React.createClass({
                 </div>
                 <Locations hash ref={(c) => this._router = c}>
                     <Location path="/" handler={MainPage}/>
-                    <Location path={accountNav.listPath} handler={this.accountList()}/>
+                    <Location path={accountNav.mainPath} handler={this.accountList()}/>
                     <Location path={accountNav.selectedPath} handler={this.accountList()}/>
-                    <Location path={transactionNav.listPath} handler={this.transactionList()}/>
+                    <Location path={transactionNav.mainPath} handler={this.transactionList()}/>
                     <Location path={transactionNav.selectedPath} handler={this.transactionList()}/>
                     <Location path="/reports/trialBalance" handler={this.trialBalance()}/>
                     <NotFound handler={NotFoundPage}/>

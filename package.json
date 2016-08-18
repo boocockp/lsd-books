@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "build": "webpack",
-    "build-dev": "npm update lsd-storage lsd-metadata lsd-events lsd-views && npm run build",
+    "build-dev": "npm update lsd-storage lsd-metadata lsd-observable lsd-views && npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
@@ -12,7 +12,7 @@
     "bootstrap": "^3.3.6",
     "immutable": "^3.8.1",
     "lodash": "^4.14.1",
-    "lsd-events": "file:///Users/paulb/dev/lsd-events",
+    "lsd-observable": "file:///Users/paulb/dev/lsd-observable",
     "lsd-metadata": "file:///Users/paulb/dev/lsd-metadata",
     "lsd-storage": "file:///Users/paulb/dev/lsd-storage",
     "lsd-views": "file:///Users/paulb/dev/lsd-views",

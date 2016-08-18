@@ -12,27 +12,27 @@ const descriptor =  new EntityDescriptor( "Account",
     {
         name: "shortSummary",
         type: String,
-        readOnly: true,
+        computed: true,
         display: false,
         description: "Code and name of this account"
     },
     {
         name: "balance",
         type: Number,
-        readOnly: true,
+        computed: true,
         description: "The current balance of the account"
     },
     {
         name: "debitBalance",
         type: Number,
-        readOnly: true,
+        computed: true,
         display: false,
         description: "The current balance of the account if it is a debit balance, otherwise empty"
     },
     {
         name: "creditBalance",
         type: Number,
-        readOnly: true,
+        computed: true,
         display: false,
         description: "The current balance of the account if it is a credit balance, otherwise empty"
     },
@@ -40,7 +40,7 @@ const descriptor =  new EntityDescriptor( "Account",
         name: "postings",
         type: List,
         itemType: TransactionPosting,
-        readOnly: true,
+        editable: false,
         description: "The debits and credits to the account"
     }
 ]))

@@ -27,7 +27,7 @@ const descriptor =  new EntityDescriptor("Transaction",[
     {
         name: "shortSummary",
         type: String,
-        readOnly: true,
+        computed: true,
         display: false,
         description: "Date and description of this transaction"
     },
