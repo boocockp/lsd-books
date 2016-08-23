@@ -78,8 +78,9 @@ Validation
 
 Improvements
 ------------
+- Merge AccountData back into Account
 - EntityList has default for displayItem
-- Standardize way of passing components into other components
+- Standardize way of passing components into other components - function, type, prototype - or allow any and have component creator fn
 - Flow check on every build
 
  

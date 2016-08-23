@@ -1,7 +1,7 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
 const Books = require('../model/Books')
-const {LocalStorageUpdateStore, S3UpdateStore, SynchronizingStore, PersistentStore, CognitoCredentialsSource, JsonUtil} = require('lsd-storage')
+const {LocalStorageUpdateStore, S3UpdateStore, StateController, PersistentStore, CognitoCredentialsSource, JsonUtil} = require('lsd-storage')
 const App = require('../view/App')
 const {GoogleSignin} = require('lsd-views')
 
@@ -18,7 +18,7 @@ const appConfig = {
     dataSet: dataSetOverride || "main"
 }
 
-const appStore = new SynchronizingStore(new Books())
+const appStore = new StateController(new Books())
 
 const localStore = new LocalStorageUpdateStore(appConfig.appName, appConfig.dataSet)
 const googleSigninTracker = new GoogleSignin.Tracker()
@@ -29,7 +29,7 @@ const remoteStore = new S3UpdateStore(config.bucketName, 'updates', appConfig.ap
 const persistentStore = new PersistentStore(localStore, remoteStore)
 
 persistentStore.externalAction.sendTo(appStore.applyAction)
-appStore.dispatches.sendTo( persistentStore.dispatchAction )
+appStore.newAction.sendTo( persistentStore.dispatchAction )
 
 persistentStore.init()
 

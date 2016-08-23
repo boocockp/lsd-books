@@ -95,5 +95,4 @@ class Account extends Record({data: new AccountData(), postings: List()}) {
 
 }
 
-JsonUtil.registerClass(Account)
 module.exports = Account

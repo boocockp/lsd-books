@@ -131,15 +131,16 @@ describe("Account Page", function () {
                 field("Type").value = "EXPENSE"
                 button("Save").click()
 
-                heading2().text().should.eql("Account 4203 - Fruit")
-                button("4203 - Fruit").hasClass("active").should.be.true
-                field("Name").value.should.eql("Fruit")
-                field("Code").value.should.eql("4203")
-                field("Type").value.should.eql("EXPENSE")
+                return waitFor( () => heading2().text() === "4203 - Fruit").then( () => {
+                    button("4203 - Fruit").hasClass("active").should.be.true
+                    field("Name").value.should.eql("Fruit")
+                    field("Code").value.should.eql("4203")
+                    field("Type").value.should.eql("EXPENSE")
+                    const expectedPath = "account/" + dataStore().accountByCode("4203").id
+                    appWindow.location.href.should.include(expectedPath)
+                    return true
+                })
 
-                const expectedPath = "account/" + dataStore().accountByCode("4203").id
-                appWindow.location.href.should.include(expectedPath)
-                return true
             })
         })
 
@@ -148,7 +149,7 @@ describe("Account Page", function () {
             const acct = account("Biscuits", 4303, "REVENUE")
             button("4303 - Biscuits").click()
 
-            heading2().text().should.eql("Account 4303 - Biscuits")
+            heading2().text().should.eql("4303 - Biscuits")
             button("4303 - Biscuits").hasClass("active").should.be.true
             field("Name").value.should.eql("Biscuits")
             field("Code").value.should.eql("4303")
