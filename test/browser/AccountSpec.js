@@ -1,4 +1,4 @@
-describe("Account Page", function () {
+describe("LSD Books", function () {
     this.timeout(5000);
     const dataSet = "test"
 
@@ -114,10 +114,6 @@ describe("Account Page", function () {
             window.appStore_ = appStore = appWindow.appStore_
             return true
         })
-    })
-
-    it("runs a test", function () {
-        (100 + 1).should.eql(101)
     })
 
     describe("Accounts", function () {

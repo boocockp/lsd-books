@@ -31,28 +31,33 @@ const NavBar = ({googleClientId}, {getNavigationManager}) => {
     }
     return (
         <Navbar inverse>
-        <Navbar.Header>
-            <Navbar.Brand>
-                <a href="#">LSD Books</a>
-            </Navbar.Brand>
-            <Navbar.Toggle />
-        </Navbar.Header>
-        <Navbar.Collapse>
-            <Nav>
-                <NavItem eventKey={1} href={accountNav.mainPath} onClick={goAccounts}>Accounts</NavItem>
-                <NavItem eventKey={2} href={transactionNav.mainPath} onClick={goTransactions}>Transactions</NavItem>
-                <NavItem eventKey={3} href="#">Link</NavItem>
-                <NavDropdown eventKey={3} title="Reports" id="reports-dropdown">
-                    <MenuItem eventKey={3.1} href="/reports/trialBalance" onClick={goTrialBalance}>Trial Balance</MenuItem>
-                    <MenuItem eventKey={3.2} href="/reports/balanceSheet" onClick={goBalanceSheet}>Balance Sheet</MenuItem>
-                </NavDropdown>
-            </Nav>
-            <Navbar.Form pullRight>
-                <GoogleSignin clientId={googleClientId}/>
-            </Navbar.Form>
-        </Navbar.Collapse>
-    </Navbar>
-)}
+            <Navbar.Header>
+                <Navbar.Brand>
+                    <a href="#">LSD Books</a>
+                </Navbar.Brand>
+                <Navbar.Toggle />
+            </Navbar.Header>
+            <Navbar.Collapse>
+                <Nav>
+                    <NavItem eventKey={1} href={accountNav.mainPath} onClick={goAccounts}>Accounts</NavItem>
+                    <NavItem eventKey={2} href={transactionNav.mainPath} onClick={goTransactions}>Transactions</NavItem>
+                    <NavDropdown eventKey={3} title="Reports" id="reports-dropdown">
+                        <MenuItem eventKey={3.1} href="/reports/trialBalance"
+                                  onClick={goTrialBalance}>Trial Balance</MenuItem>
+                        <MenuItem eventKey={3.2} href="/reports/balanceSheet"
+                                  onClick={goBalanceSheet}>Balance Sheet</MenuItem>
+                    </NavDropdown>
+                </Nav>
+                <Navbar.Form pullRight>
+                    <GoogleSignin clientId={googleClientId}/>
+                </Navbar.Form>
+                <Nav pullRight>
+                    <NavItem eventKey={4} href="test.html" target="_blank">Test</NavItem>
+                </Nav>
+            </Navbar.Collapse>
+        </Navbar>
+    )
+}
 
 NavBar.contextTypes = {getNavigationManager: React.PropTypes.func}
 

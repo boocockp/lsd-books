@@ -4,6 +4,7 @@ var path = require('path')
 var dir_js = path.resolve(__dirname, 'main/js');
 var dir_css = path.resolve(__dirname, 'main/css');
 var dir_html = path.resolve(__dirname, 'main/html');
+var dir_test = path.resolve(__dirname, 'test/browser');
 var dir_build = path.resolve(__dirname, 'build');
 
 module.exports = {
@@ -37,7 +38,8 @@ module.exports = {
             { from: dir_css }, // to: output.path
             { from: 'node_modules/bootstrap/dist/css/bootstrap.css' }, // to: output.path
             { from: 'node_modules/bootstrap/dist/css/bootstrap-theme.css' }, // to: output.path
-            { from: 'node_modules/bootstrap/dist/fonts', to: 'fonts'  }
+            { from: 'node_modules/bootstrap/dist/fonts', to: 'fonts'  },
+            { from: dir_test }
         ]),
     ],
     // Create Sourcemaps for the bundle
