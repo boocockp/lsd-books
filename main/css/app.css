@@ -1,5 +1,11 @@
+/* Bootstrap overrides */
+
 button.list-group-item {
     outline: 0;
+}
+
+.navbar-right {
+    margin-right: 0
 }
 
 .borders [class^=col-] {

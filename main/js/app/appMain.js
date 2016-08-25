@@ -1,9 +1,9 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
-const Books = require('../model/Books')
 const {LocalStorageUpdateStore, S3UpdateStore, StateController, PersistentStore, CognitoCredentialsSource, JsonUtil} = require('lsd-storage')
-const App = require('../view/App')
 const {GoogleSignin} = require('lsd-views')
+const Books = require('../model/Books')
+const App = require('../view/App')
 
 const config = {
     "clientId": "919408445147-a0csgn7e21d773ilrif3q8d9hfrfc7vm.apps.googleusercontent.com",

@@ -1,19 +1,19 @@
 const React = require('react')
 const {PropTypes} = require('react')
-const {EntityListWithView, GoogleSignin} = require('lsd-views')
+const {EntityListWithView, NotFoundPage, NavigationManager} = require('lsd-views')
 const TrialBalanceView = require('./TrialBalanceView')
 const AccountView = require('./AccountView')
 const MainPage = require('./MainPage')
-const {NotFoundPage, NavigationManager} = require('lsd-views')
 const {Locations, Location, NotFound} = require('react-router-component')
 const Account = require('../model/Account')
 const Transaction = require('../model/Transaction')
 const EntityManagers = require('./EntityManagers')
+const NavBar = require('./NavBar')
 
 let App = React.createClass({
 
-    componentWillMount: function() {
-        this.props.appStore.state.sendTo( appState => this.setState({appState}) )
+    componentWillMount: function () {
+        this.props.appStore.state.sendTo(appState => this.setState({appState}))
     },
 
     render: function () {
@@ -21,19 +21,18 @@ let App = React.createClass({
         const transactionNav = this.getNavigationManager(Transaction)
         return (
             <div>
-                <h1>ReactBooks</h1>
-                <div id="googleLogin">
-                    <GoogleSignin clientId={this.props.googleClientId}/>
+                <NavBar googleClientId={this.props.googleClientId}/>
+                <div>
+                    <Locations hash ref={(c) => this._router = c} component={null}>
+                        <Location path="/" handler={MainPage}/>
+                        <Location path={accountNav.mainPath} handler={this.accountList()}/>
+                        <Location path={accountNav.selectedPath} handler={this.accountList()}/>
+                        <Location path={transactionNav.mainPath} handler={this.transactionList()}/>
+                        <Location path={transactionNav.selectedPath} handler={this.transactionList()}/>
+                        <Location path="/reports/trialBalance" handler={this.trialBalance()}/>
+                        <NotFound handler={NotFoundPage}/>
+                    </Locations>
                 </div>
-                <Locations hash ref={(c) => this._router = c}>
-                    <Location path="/" handler={MainPage}/>
-                    <Location path={accountNav.mainPath} handler={this.accountList()}/>
-                    <Location path={accountNav.selectedPath} handler={this.accountList()}/>
-                    <Location path={transactionNav.mainPath} handler={this.transactionList()}/>
-                    <Location path={transactionNav.selectedPath} handler={this.transactionList()}/>
-                    <Location path="/reports/trialBalance" handler={this.trialBalance()}/>
-                    <NotFound handler={NotFoundPage}/>
-                </Locations>
             </div>
         )
     },
@@ -56,8 +55,17 @@ let App = React.createClass({
         return <TrialBalanceView entity={this.state.appState.trialBalance}/>
     },
 
-    getNavigationManager: function(entityType) {
-        return new NavigationManager(entityType, () => this._router)
+    getNavigationManager: function (entityType) {
+        const getRouter = () => this._router
+        if (entityType) {
+            return new NavigationManager(entityType, getRouter)
+        }  else {
+            return {
+                navigate: function(path) {
+                    getRouter().navigate(path)
+                }
+            }
+        }
     },
 
     getEntityManager: function (entityType) {

@@ -2,7 +2,7 @@ const React = require('react')
 
 const MainPage = () => (
     <div>
-        <h2>Welcome to ReactBooks</h2>
+        <h2>Welcome to LSD Books</h2>
     </div>
 )
 
