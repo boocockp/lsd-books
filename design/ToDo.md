@@ -86,9 +86,9 @@ Improvements
 Demo
 ----
   - Nav Bar
-- Demo data
+  - Demo data
 - Deployment
-- Built in tests
+  - Built in tests
 - Balance sheet
 - Browser tests for transactions
 

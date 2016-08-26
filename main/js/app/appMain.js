@@ -24,7 +24,7 @@ const localStore = new LocalStorageUpdateStore(appConfig.appName, appConfig.data
 const googleSigninTracker = new GoogleSignin.Tracker()
 const cognitoCredentialsSource = new CognitoCredentialsSource(config.identityPoolId)
 googleSigninTracker.signIn.sendTo(cognitoCredentialsSource.signIn)
-const remoteStore = new S3UpdateStore(config.bucketName, 'updates', appConfig.appName, appConfig.dataSet, cognitoCredentialsSource)
+const remoteStore = new S3UpdateStore(config.bucketName, 'updates', 'updates', appConfig.appName, appConfig.dataSet, cognitoCredentialsSource)
 
 const persistentStore = new PersistentStore(localStore, remoteStore)
 
