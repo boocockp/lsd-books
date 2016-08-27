@@ -8,11 +8,11 @@
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {
-    "bootstrap": "^3.3.6",
+    "bootstrap": "^3.3.7",
     "immutable": "^3.8.1",
     "lodash": "^4.14.1",
-    "lsd-observable": "file:///Users/paulb/dev/lsd-observable",
     "lsd-metadata": "file:///Users/paulb/dev/lsd-metadata",
+    "lsd-observable": "file:///Users/paulb/dev/lsd-observable",
     "lsd-storage": "file:///Users/paulb/dev/lsd-storage",
     "lsd-views": "file:///Users/paulb/dev/lsd-views",
     "moment": "^2.14.1",
@@ -37,6 +37,7 @@
     "copy-webpack-plugin": "^3.0.1",
     "flow-bin": "^0.30.0",
     "fs-readdir-recursive": "^1.0.0",
+    "html-webpack-plugin": "^2.22.0",
     "mime": "^1.3.4",
     "mocha": "^3.0.2",
     "promisify-node": "^0.4.0",
