@@ -42,6 +42,7 @@
     "mocha": "^3.0.2",
     "promisify-node": "^0.4.0",
     "rm-local-modules": "0.0.1",
+    "rollup": "^0.34.11",
     "sinon": "^1.17.4",
     "sinon-chai": "^2.8.0",
     "webpack": "^1.13.1"
