@@ -24,23 +24,17 @@ const localStore = new LocalStorageUpdateStore(appConfig.appName, appConfig.data
 const googleSigninTracker = new GoogleSignin.Tracker()
 const cognitoCredentialsSource = new CognitoCredentialsSource(config.identityPoolId)
 googleSigninTracker.signIn.sendTo(cognitoCredentialsSource.signIn)
-const remoteStore = new S3UpdateStore(config.bucketName, 'updates', 'updates', appConfig.appName, appConfig.dataSet, cognitoCredentialsSource)
+const remoteStore = new S3UpdateStore(config.bucketName, 'updates/users', 'updates/shared', appConfig.appName, appConfig.dataSet, cognitoCredentialsSource)
 
 const persistentStore = new PersistentStore(localStore, remoteStore)
 
-persistentStore.externalAction.sendTo(appStore.applyAction)
-appStore.newAction.sendTo( persistentStore.dispatchAction )
+persistentStore.externalUpdate.sendTo(appStore.applyUpdate)
+appStore.newUpdate.sendTo( persistentStore.dispatchUpdate )
 
 persistentStore.init()
 
-function applyAction(jsonAction) {
-    const action = JsonUtil.fromStore(JsonUtil.toStore(jsonAction))
-    appStore.applyAction(action)
-}
-
 window.appStore_ = appStore
 window.perStore = persistentStore
-window.applyAction = applyAction
 
 const container = document.getElementById('main')
 const mainElement = React.createElement(App, {appStore: appStore, googleClientId: config.clientId})
