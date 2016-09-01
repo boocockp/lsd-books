@@ -1,16 +1,10 @@
 var AWS = require('aws-sdk'),
-    promisify = require("promisify-node"),
-    fs = promisify('fs'),
+    fs = require('fs'),
     mime = require('mime')
 
 const Environment = require('./aws/Environment')
-const SES = require('./aws/SES')
 const S3 = require('./aws/S3')
-const IAM = require('./aws/IAM')
-const Cognito = require('./aws/Cognito')
-const Lambda = require('./aws/Lambda')
 const Policy = require('./aws/Policy')
-const Role = require('./aws/Role')
 const {arnFromResource}  = require('./aws/Util')
 
 AWS.config.loadFromPath('./awsConfig.json')
@@ -26,11 +20,7 @@ if (!envName) {
 }
 
 const environment = new Environment("lsdbooks", envName, awsConfig.accountId)
-const s3 = new S3(environment)
-const cognito = new Cognito(environment)
-const iam = new IAM(environment)
-const lambda = new Lambda(environment)
-const ses = new SES(environment)
+const {s3, cognito, iam, lambda} = environment
 
 const dataBucket = s3.bucket("data").allowCors()
 const idPool = cognito.identityPool("idPool", appConfig.googleClientId)
