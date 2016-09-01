@@ -7,14 +7,14 @@ const App = require('../view/App')
 
 const config = {
     "clientId": "919408445147-a0csgn7e21d773ilrif3q8d9hfrfc7vm.apps.googleusercontent.com",
-    "identityPoolId": "eu-west-1:c46e1da2-72cf-4965-92b8-ebe270684050",
-    "bucketName": "ashridgetech.reactbooks-test"
+    "identityPoolId": "eu-west-1:c0bf0e07-8c6a-4c40-b02a-13ccf6877bd1",
+    "bucketName": "lsdbooks-main-data"
 }
 
 const dataSetParam = location.search.match(/dataSet=(\w+)/)
 const dataSetOverride = dataSetParam && dataSetParam[1]
 const appConfig = {
-    appName: "reactbooks",
+    appName: "lsdbooks",
     dataSet: dataSetOverride || "main"
 }
 
@@ -24,7 +24,9 @@ const localStore = new LocalStorageUpdateStore(appConfig.appName, appConfig.data
 const googleSigninTracker = new GoogleSignin.Tracker()
 const cognitoCredentialsSource = new CognitoCredentialsSource(config.identityPoolId)
 googleSigninTracker.signIn.sendTo(cognitoCredentialsSource.signIn)
-const remoteStore = new S3UpdateStore(config.bucketName, 'updates/users', 'updates/shared', appConfig.appName, appConfig.dataSet, cognitoCredentialsSource)
+const remoteStore = new S3UpdateStore(config.bucketName,
+                            S3UpdateStore.defaultUserAreaPrefix, S3UpdateStore.defaultSharedAreaPrefix,
+                            appConfig.appName, appConfig.dataSet, cognitoCredentialsSource)
 
 const persistentStore = new PersistentStore(localStore, remoteStore)
 

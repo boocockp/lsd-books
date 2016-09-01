@@ -48,6 +48,15 @@ module.exports = class Bucket extends AwsResource {
         return this
     }
 
+    forWebsite() {
+        this._forWebsite = true
+        this._statements.push({
+            Effect: "Allow",
+            Principal: "*",
+            Action: ["s3:GetObject"]
+        })
+        return this
+    }
 
     requestResource() {
         return this.aws.headBucket({Bucket: this.name}).promise()
@@ -58,15 +67,9 @@ module.exports = class Bucket extends AwsResource {
     }
 
     postCreateResource() {
-        const corsPromise = this._configureCors()
-        if (this.policy) {
-            return this.aws.putBucketPolicy({
-                Bucket: this.name,
-                Policy: JSON.stringify(this.policy)
-            }).promise().then( () => corsPromise )
-        } else {
-            return corsPromise
-        }
+        return this._configurePolicy()
+            .then(this._configureCors.bind(this))
+            .then(this._configureBucketAsWebsite.bind(this))
     }
 
     destroyResource() {
@@ -85,12 +88,19 @@ module.exports = class Bucket extends AwsResource {
         return `Bucket ${this.name}`
     }
 
-    get policy() {
-        if (!this._statements.length) return null
-        return {
+    _configurePolicy() {
+        if (!this._statements.length) {
+            return Promise.resolve()
+        }
+        const policy = {
             "Version": "2012-10-17",
             "Statement": this._statements
         }
+
+        return this.aws.putBucketPolicy({
+            Bucket: this.name,
+            Policy: JSON.stringify(policy)
+        }).promise()
     }
 
     _configureCors() {
@@ -113,5 +123,22 @@ module.exports = class Bucket extends AwsResource {
         return this.aws.putBucketCors(params).promise()
 
     }
+
+    _configureBucketAsWebsite() {
+        if (!this._forWebsite) {
+            return Promise.resolve()
+        }
+
+        return this.aws.putBucketWebsite({
+            Bucket: this.name,
+            WebsiteConfiguration: {
+                IndexDocument: {
+                    Suffix: 'index.html'
+                }
+            }
+        }).promise()
+    }
+
+
 }
 

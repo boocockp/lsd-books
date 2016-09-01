@@ -94,5 +94,5 @@ class Books extends Record({accounts: new Map(), transactions: new Map()}) {
 }
 
 JsonUtil.registerClass(Books)
-// module.exports = Books
-export default Books
+module.exports = Books
+// export default Books
