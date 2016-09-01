@@ -43,28 +43,6 @@ module.exports = class Bucket extends AwsResource {
         return this
     }
 
-    allowCognitoFolderAccess(prefix) {
-        this._statements.push({
-            Effect: "Allow",
-            Principal: "*",
-            Action: ["s3:ListBucket"],
-            Resource: [this.arn],
-            Condition: {"StringLike": {"s3:prefix": [prefix + "${cognito-identity.amazonaws.com:sub}/*"]}}
-        })
-        this._statements.push({
-                Effect: "Allow",
-                Principal: "*",
-                Action: [
-                    "s3:GetObject",
-                    "s3:PutObject"
-                ],
-                Resource: [this.arn + "/" + prefix + "/${cognito-identity.amazonaws.com:sub}/*"]
-            }
-        )
-
-        return this
-    }
-
     allowCors(...methods) {
         this.corsMethods = methods.length ? methods : ['GET', 'HEAD', 'PUT']
         return this
@@ -80,10 +58,15 @@ module.exports = class Bucket extends AwsResource {
     }
 
     postCreateResource() {
-        return this.aws.putBucketPolicy({
-            Bucket: this.name,
-            Policy: JSON.stringify(this.policy)
-        }).promise().then( this._configureCors.bind(this) )
+        const corsPromise = this._configureCors()
+        if (this.policy) {
+            return this.aws.putBucketPolicy({
+                Bucket: this.name,
+                Policy: JSON.stringify(this.policy)
+            }).promise().then( () => corsPromise )
+        } else {
+            return corsPromise
+        }
     }
 
     get resourceNotFoundCode() {
@@ -99,6 +82,7 @@ module.exports = class Bucket extends AwsResource {
     }
 
     get policy() {
+        if (!this._statements.length) return null
         return {
             "Version": "2012-10-17",
             "Statement": this._statements

@@ -1,7 +1,8 @@
-let chai = require('chai'),
-    Account = require('../../main/js/model/Account'),
-    AccountData = require('../../main/js/model/AccountData'),
-    {EXPENSE} = require('../../main/js/model/Types').AccountType;
+import chai from 'chai'
+import Account from '../../main/js/model/Account'
+import AccountData from '../../main/js/model/AccountData'
+import {AccountType} from '../../main/js/model/Types'
+const {EXPENSE} = AccountType
 
 chai.should();
 

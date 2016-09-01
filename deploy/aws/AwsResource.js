@@ -1,82 +1,82 @@
-let {logError} = require('./Util');
+let {logError} = require('./Util')
 
 module.exports = class AwsResource {
     constructor(resourceFactory, nameInEnv) {
-        Object.assign(this, {resourceFactory, nameInEnv});
+        Object.assign(this, {resourceFactory, nameInEnv})
     }
 
     get aws() {
-        return this.resourceFactory.awsService;
+        return this.resourceFactory.awsService
     }
 
     get environment() {
-        return this.resourceFactory.environment;
+        return this.resourceFactory.environment
     }
 
     get name() {
-        return this.environment.name + "_" + this.nameInEnv;
+        return this.environment.name + "_" + this.nameInEnv
     }
 
     create() {
         let updateFromGetResponse = (data) => {
-            this.updateFromResource(data);
-            this.existed = true;
-            return this;
-        };
+            this.updateFromResource(data)
+            this.existed = true
+            return this
+        }
 
         let updateFromCreateResponse = (data) => {
-            this.updateFromResource(data);
-            this.created = true;
-            return this;
-        };
+            this.updateFromResource(data)
+            this.created = true
+            return this
+        }
 
         let updateFromUpdateResponse = (data) => {
-            this.updated = true;
-            return this;
-        };
+            this.updated = true
+            return this
+        }
 
         let logAndThrow = (err) => {
-            logError(err, 'create', this.logDescription);
-            throw err;
-        };
+            logError(err, 'create', this.logDescription)
+            throw err
+        }
 
         let doPostCreate = () => {
-            return this.postCreateResource();
-        };
+            return this.postCreateResource().then( () => Promise.resolve(this) )
+        }
 
         let doCreate = () => {
-            return this.createResource().then(updateFromCreateResponse).then(doPostCreate).catch(logAndThrow);
-        };
+            return this.createResource().then(updateFromCreateResponse).then(doPostCreate).catch(logAndThrow)
+        }
 
         let doUpdate = () => {
             if (typeof this.updateResource === 'function' ) {
-                return this.updateResource().then(updateFromUpdateResponse).catch(logAndThrow);
+                return this.updateResource().then(updateFromUpdateResponse).catch(logAndThrow)
             }
             return Promise.resolve(this)
-        };
+        }
 
         let getResourceIfExists = () => {
-            return this.requestResource().then(updateFromGetResponse).catch(this.checkError.bind(this));
-        };
+            return this.requestResource().then(updateFromGetResponse).catch(this.checkError.bind(this))
+        }
 
         let getOrCreate = () => {
-            return getResourceIfExists().then( resource => resource.existed ? doUpdate() : doCreate() ).catch(logError);
-        };
+            return getResourceIfExists().then( resource => resource.existed ? doUpdate() : doCreate() ).catch(logError)
+        }
 
-        return this._createPromise || (this._createPromise = getOrCreate() );
+        return this._createPromise || (this._createPromise = getOrCreate() )
     }
 
     checkError(err) {
         if (err.code == this.resourceNotFoundCode) {
-            return this;
+            return this
         }
 
-        throw err;
+        throw err
     }
 
     get resultDescription() {
-        let state = this.updated ? 'updated' : this.existed ? 'found' : this.created ? 'created': 'ERROR';
-        return `${this.logDescription} - ${state}`;
+        let state = this.updated ? 'updated' : this.existed ? 'found' : this.created ? 'created': 'ERROR'
+        return `${this.logDescription} - ${state}`
     }
 
     requestResource() {
@@ -96,7 +96,7 @@ module.exports = class AwsResource {
     }
 
     get logDescription() {
-        throw new Error('Subclass must implement')
+        return `${this.constructor.name} ${this.name}`
     }
 
     updateFromResource(data) {
@@ -104,7 +104,7 @@ module.exports = class AwsResource {
     }
 
     postCreateResource() {
-        return Promise.resolve(this);
+        return Promise.resolve(this)
     }
 
-};
+}

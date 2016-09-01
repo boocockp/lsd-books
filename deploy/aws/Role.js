@@ -1,23 +1,54 @@
-const AwsResource = require('./AwsResource');
+const AwsResource = require('./AwsResource')
 
 class Role extends AwsResource {
     constructor(iam, nameInEnv) {
-        super(iam, nameInEnv);
-        this.policies = [];
+        super(iam, nameInEnv)
+        this.policies = []
+        this.trustStatements = []
     }
 
     trust(service) {
-        this.trustedService = service.awsServiceName;
-        return this;
+        this.trustedService = service.awsServiceName
+        this.trustStatements.push({
+            Effect: "Allow",
+            Principal: {
+                Service: service.awsServiceName
+            },
+            Action: "sts:AssumeRole"
+        })
+        return this
+    }
+
+    trustIdentityPool(pool) {
+        this.trustedIdentityPool = pool
+        return this
+    }
+
+    identityPoolTrustStatement(pool) {
+        return {
+            Effect: "Allow",
+            Principal: {
+                Federated: "cognito-identity.amazonaws.com"
+            },
+            Action: "sts:AssumeRoleWithWebIdentity",
+            Condition: {
+                StringEquals: {
+                    "cognito-identity.amazonaws.com:aud": pool.identityPoolId
+                },
+                "ForAnyValue:StringLike": {
+                    "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+            }
+        }
     }
 
     withPolicies(...policies) {
-        this.policies = this.policies.concat(policies);
-        return this;
+        this.policies = this.policies.concat(policies)
+        return this
     }
 
     get arn() {
-        return `arn:aws:iam::${this.environment.accountId}:role/${this.name}`;
+        return `arn:aws:iam::${this.environment.accountId}:role/${this.name}`
     }
 
     requestResource() {
@@ -25,20 +56,27 @@ class Role extends AwsResource {
     }
 
     createResource() {
-        let params = {
-            AssumeRolePolicyDocument: JSON.stringify(this.trustPolicyDocument),
-            RoleName: this.name
-        };
+        const otherResourcesReady = this.trustedIdentityPool ? this.trustedIdentityPool.create() : Promise.resolve()
 
-        return this.aws.createRole(params).promise();
+        return otherResourcesReady.then( () => {
+            const params = {
+                AssumeRolePolicyDocument: JSON.stringify(this.trustPolicyDocument),
+                RoleName: this.name
+            }
+
+            return this.aws.createRole(params).promise()
+        })
     }
 
     postCreateResource() {
         let attachPolicy = (policy) => {
-            return policy.create().then(() => this.aws.attachRolePolicy({ PolicyArn: policy.arn, RoleName: this.name}).promise() )
-        };
+            return policy.create().then(() => this.aws.attachRolePolicy({
+                PolicyArn: policy.arn,
+                RoleName: this.name
+            }).promise())
+        }
 
-        return Promise.all(this.policies.map(attachPolicy)).then( () => this );
+        return Promise.all(this.policies.map(attachPolicy)).then(() => this)
     }
 
     get resourceNotFoundCode() {
@@ -46,26 +84,22 @@ class Role extends AwsResource {
     }
 
     updateFromResource(data) {
-        this.roleId = data.Role.RoleId;
+        this.roleId = data.Role.RoleId
     }
 
     get trustPolicyDocument() {
+        const trustStatements = this.trustStatements
+        if (this.trustedIdentityPool) {
+            trustStatements.push(this.identityPoolTrustStatement(this.trustedIdentityPool))
+        }
         return {
             Version: "2012-10-17",
-            Statement: [
-                {
-                    Effect: "Allow",
-                    Principal: {
-                        Service: this.trustedService
-                    },
-                    Action: "sts:AssumeRole"
-                }
-            ]
-        };
+            Statement: trustStatements
+        }
     }
 
     get logDescription() {
-        return `Role ${this.name} ${this.roleId}`;
+        return `${super.logDescription} ${this.roleId}`
     }
 }
 

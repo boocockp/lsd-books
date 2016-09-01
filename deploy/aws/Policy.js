@@ -1,4 +1,5 @@
 const AwsResource = require('./AwsResource');
+const S3 = require('./S3');
 const {arnFromResource}  = require('./Util');
 
 class Policy extends AwsResource {
@@ -13,7 +14,21 @@ class Policy extends AwsResource {
 
     allow(resource, ...actions) {
         this._statements.push({Effect: "Allow", Resource: arnFromResource(resource), Action: actions});
+        if (actions.includes(S3.getObject)) {
+            this.allowListBucket(resource)
+        }
         return this;
+    }
+
+    allowListBucket(resource) {
+        const arn = arnFromResource(resource)
+        const bucketArn = arn.split("/")[0]
+        const path = arn.includes("/") ? arn.replace(`${bucketArn}/`, "") : ""
+        const listStatement = {Effect: "Allow", Resource: bucketArn, Action: S3.listBucket}
+        if (path && path !== "*") {
+            listStatement.Condition = {StringLike: {"s3:prefix": [path]}}
+        }
+        this._statements.push(listStatement);
     }
 
     requestResource() {
@@ -49,5 +64,7 @@ class Policy extends AwsResource {
         return `Policy ${this.name} ${this.policyId}`;
     }
 }
+
+Policy.cognitoIdPlaceholder = "${cognito-identity.amazonaws.com:sub}"
 
 module.exports = Policy
