@@ -44,6 +44,10 @@ class Policy extends AwsResource {
         return this.aws.createPolicy(params).promise();
     }
 
+    destroyResource() {
+        return this.aws.deletePolicy({PolicyArn: this.arn}).promise()
+    }
+
     get resourceNotFoundCode() {
         return 'NoSuchEntity'
     }

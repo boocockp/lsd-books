@@ -79,6 +79,15 @@ class Role extends AwsResource {
         return Promise.all(this.policies.map(attachPolicy)).then(() => this)
     }
 
+    destroyResource() {
+        const detachPolicy = (policy) => {
+            return this.aws.detachRolePolicy({PolicyArn: policy.arn, RoleName: this.name}).promise()
+        }
+
+        const detachPolicies = Promise.all( this.policies.map(detachPolicy))
+        return detachPolicies.then( () => this.aws.deleteRole({RoleName: this.name}).promise() )
+    }
+
     get resourceNotFoundCode() {
         return 'NoSuchEntity'
     }

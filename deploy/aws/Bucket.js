@@ -69,6 +69,10 @@ module.exports = class Bucket extends AwsResource {
         }
     }
 
+    destroyResource() {
+        return this.aws.deleteBucket({Bucket: this.name}).promise()
+    }
+
     get resourceNotFoundCode() {
         return 'NotFound'
     }

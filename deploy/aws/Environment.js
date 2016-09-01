@@ -6,6 +6,11 @@ const S3 = require('./S3')
 const IAM = require('./IAM')
 const Cognito = require('./Cognito')
 const Lambda = require('./Lambda')
+const Role = require('./Role')
+
+function logResult(r) {
+    console.log(r.resultDescription)
+}
 
 module.exports = class Environment {
 
@@ -26,14 +31,14 @@ module.exports = class Environment {
     }
 
     create() {
-        let logCreated = r => {
-            console.log(r.resultDescription)
-        }
-        let createAll = () => {
-            return Promise.all(this.resources.map(r => r.create().then(logCreated)))
-        }
+        return Promise.all(this.resources.map(r => r.create().then(logResult)))
+    }
 
-        return createAll()
+    destroy() {
+        const roles = this.resources.filter( r => r instanceof Role)
+        const others = this.resources.filter( r => !(r instanceof Role))
+        return Promise.all(roles.map(r => r.destroy().then(logResult)))
+            .then(() => Promise.all(others.map(r => r.destroy().then(logResult))))
     }
 
     get s3() { return this._s3 || (this._s3 = new S3(this)) }

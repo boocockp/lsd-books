@@ -44,6 +44,9 @@ class IdentityPool extends AwsResource {
         return this.aws.createIdentityPool(params).promise()
     }
 
+    destroyResource() {
+        return this.aws.deleteIdentityPool({IdentityPoolId: this.identityPoolId}).promise()
+    }
 
     postCreateResource() {
         const params = {
