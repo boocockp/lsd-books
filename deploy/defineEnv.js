@@ -28,7 +28,7 @@ function defineEnv(envName) {
     idPool.authRole(cognitoRole)
 
     s3.object(websiteBucket, "config.json", config(appConfig, idPool, dataBucket), "application/json")
-    // s3.folder(websiteBucket, "", "../build")
+    s3.folder(websiteBucket, "", "../build")
 
     // const promoter = lambda.lambdaFunction("promoter", "../build_lambda/promoter/index.zip")
 
@@ -61,14 +61,3 @@ module.exports = defineEnv
 // let receiveEmailRule = ses.receiptRule(receiptRuleSet, 'processEmail')
 //     .withS3Action(emailBucket, bucketPrefix)
 //     .withLambdaAction(receiveEmail)
-
-function uploadWebsiteFile(bucketName, path, contentType, fileContent, extraParams = {}) {
-    var params = Object.assign({
-        Bucket: bucketName,
-        Key: path,
-        ACL: 'public-read',
-        Body: fileContent,
-        ContentType: contentType
-    }, extraParams);
-    return s3.putObject(params).promise();
-}

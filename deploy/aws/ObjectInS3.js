@@ -1,10 +1,12 @@
-let AwsResource = require('./AwsResource')
+const fs = require('fs')
+const mime = require('mime')
+const AwsResource = require('./AwsResource')
 
-module.exports = class ObjectInS3 extends AwsResource {
+class ObjectInS3 extends AwsResource {
 
     constructor(s3, bucket, key, content, contentType, extraParams) {
         super(s3, key)
-        Object.assign(this, {bucket, key, content, contentType, extraParams})
+        Object.assign(this, {bucket, key, _content: content, _contentType: contentType, extraParams})
     }
 
     get name() {
@@ -15,13 +17,39 @@ module.exports = class ObjectInS3 extends AwsResource {
         return `${this.bucket.arn}/${this.key}`
     }
 
+    get content() {
+        if (typeof this._content === 'string') {
+            return this._content
+        }
+
+        if (this._content instanceof ObjectInS3.File) {
+            return this._content.readStream()
+        }
+
+        if (typeof this._content === 'object') {
+            return JSON.stringify(this._content)
+        }
+    }
+
+    get contentType() {
+        if (typeof this._contentType === 'string') {
+            return this._contentType
+        }
+
+        if (this._content instanceof ObjectInS3.File) {
+            return this._content.contentType
+        }
+
+        return null
+    }
+
     requestResource() {
         return this.aws.headObject({Bucket: this.bucket.name, Key: this.key}).promise()
     }
 
     createResource() {
         return this.bucket.create()
-            .then( () => this.aws.putObject({Bucket: this.bucket.name, Key: this.key, Body: this.content}).promise() )
+            .then( () => this.aws.putObject({Bucket: this.bucket.name, Key: this.key, Body: this.content, ContentType: this.contentType}).promise() )
     }
 
     destroyResource() {
@@ -42,3 +70,18 @@ module.exports = class ObjectInS3 extends AwsResource {
 
 }
 
+ObjectInS3.File = class File {
+    constructor(fullPath) {
+        this.path = fullPath
+    }
+
+    readStream() {
+        return fs.createReadStream(this.path)
+    }
+
+    get contentType() {
+        return mime.lookup(this.path)
+    }
+}
+
+module.exports = ObjectInS3

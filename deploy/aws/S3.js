@@ -1,6 +1,7 @@
 let AWS = require('aws-sdk')
 let Bucket = require('./Bucket')
 let ObjectInS3 = require('./ObjectInS3')
+let Folder = require('./Folder')
 
 module.exports = class S3 {
     constructor(env) {
@@ -19,5 +20,9 @@ module.exports = class S3 {
     
     object(bucket, key, content, contentType, extraParams) {
         return this.environment.add(new ObjectInS3(this, bucket, key, content, contentType, extraParams))
+    }
+
+    folder(bucket, path, sourceFolder) {
+        return this.environment.add(new Folder(this, bucket, path, sourceFolder))
     }
 }
