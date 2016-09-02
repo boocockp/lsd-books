@@ -3,6 +3,7 @@ let {logError} = require('./Util')
 module.exports = class AwsResource {
     constructor(resourceFactory, nameInEnv) {
         Object.assign(this, {resourceFactory, nameInEnv})
+        this._dependsOnResources = []
     }
 
     get aws() {
@@ -15,6 +16,10 @@ module.exports = class AwsResource {
 
     get name() {
         return this.environment.name + "_" + this.nameInEnv
+    }
+
+    dependsOn(...resources) {
+        this._dependsOnResources = this._dependsOnResources.concat(resources)
     }
 
     create() {
@@ -59,8 +64,10 @@ module.exports = class AwsResource {
             return this.requestResource().then(updateFromGetResponse).catch(this.checkError.bind(this))
         }
 
+        const waitForDependsOn = () => Promise.all(this._dependsOnResources)
+
         let getOrCreate = () => {
-            return getResourceIfExists().then(resource => resource.existed ? doUpdate() : doCreate()).catch(logError)
+            return waitForDependsOn().then( () => getResourceIfExists()).then(resource => resource.existed ? doUpdate() : doCreate()).catch(logError)
         }
 
         return this._createPromise || (this._createPromise = getOrCreate() )

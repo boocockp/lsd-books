@@ -65,6 +65,11 @@ class IdentityPool extends AwsResource {
     updateFromResource(data) {
         this.identityPoolId = data.IdentityPoolId
     }
+
+
+    get logDescription() {
+        return `${super.logDescription} ${this.identityPoolId}`
+    }
 }
 
 module.exports = IdentityPool

@@ -18,16 +18,18 @@ class ObjectInS3 extends AwsResource {
     }
 
     get content() {
-        if (typeof this._content === 'string') {
-            return this._content
+        const contentSupplied = typeof this._content === "function" ? this._content() : this._content
+
+        if (typeof contentSupplied === 'string') {
+            return contentSupplied
         }
 
-        if (this._content instanceof ObjectInS3.File) {
-            return this._content.readStream()
+        if (contentSupplied instanceof ObjectInS3.File) {
+            return contentSupplied.readStream()
         }
 
-        if (typeof this._content === 'object') {
-            return JSON.stringify(this._content)
+        if (typeof contentSupplied === 'object') {
+            return JSON.stringify(contentSupplied)
         }
     }
 

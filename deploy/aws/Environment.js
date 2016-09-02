@@ -1,5 +1,4 @@
 let AWS = require('aws-sdk')
-let {logError} = require('./Util')
 
 const SES = require('./SES')
 const S3 = require('./S3')
@@ -15,15 +14,15 @@ function logResult(r) {
 
 module.exports = class Environment {
 
-    constructor(appName, envName, accountId) {
-        Object.assign(this, {appName, envName, accountId})
+    constructor(appName, instanceName, accountId) {
+        Object.assign(this, {appName, instanceName, accountId})
         this.region = AWS.config.region
         console.log("Account Id", this.accountId, "Region", this.region)
         this.resources = []
     }
 
     get name() {
-        return this.appName + "_" + this.envName
+        return this.appName + "_" + this.instanceName
     }
 
     add(resource) {
