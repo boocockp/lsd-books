@@ -53,8 +53,14 @@ module.exports = class Bucket extends AwsResource {
         this._statements.push({
             Effect: "Allow",
             Principal: "*",
-            Action: ["s3:GetObject"]
+            Action: ["s3:GetObject"],
+            Resource:[`${this.arn}/*`]
         })
+        return this
+    }
+
+    archiveOnDestroy(onOff = true) {
+        this._archiveOnDestroy = onOff
         return this
     }
 
@@ -73,11 +79,57 @@ module.exports = class Bucket extends AwsResource {
     }
 
     destroyResource() {
-        return this.aws.deleteBucket({Bucket: this.name}).promise()
+        const bucketName = this.name, s3 = this.aws
+        function getBucketKeys() {
+            return s3.listObjects({Bucket: bucketName}).promise()
+                .then( (data) => {
+                    if (data.IsTruncated) {
+                        throw new Error("More than 1000 keys in bucket " + bucketName)
+                    }
+                    return data.Contents.map( c => c.Key )
+                } )
+        }
+
+        const copyBucket = () => {
+            const timestamp = new Date().toISOString().replace(/\.\d\d\dZ/, "").replace(/:/g, "").replace("T", "-")
+            const archiveBucketName = `${this.name}-${timestamp}`
+            console.log(`Archiving bucket ${this.name} to ${archiveBucketName}`)
+            return this.aws.createBucket({Bucket: archiveBucketName}).promise()
+                .then( () => getBucketKeys()
+                    .then( keys => {
+                        if (keys.length) {
+                            const copyPromises = keys.map(k => ({Bucket: archiveBucketName, Key: k, CopySource: encodeURI(`${this.name}/${k}`)}))
+                                .map( params => this.aws.copyObject(params).promise())
+                            return Promise.all(copyPromises)
+                        } else {
+                            return Promise.resolve()
+                        }
+                    }))
+        }
+
+        const copyBucketIfRequired = () => {
+            return this._archiveOnDestroy ? copyBucket() : Promise.resolve()
+        }
+
+        function emptyBucket() {
+            return getBucketKeys()
+                .then( keys => {
+                    if (keys.length) {
+                        const objects = keys.map(k => ({Key: k}));
+                        return s3.deleteObjects({Bucket: bucketName, Delete: {Objects: objects}}).promise()
+                    } else {
+                        return Promise.resolve()
+                    }
+                })
+        }
+
+
+
+        return copyBucketIfRequired().then( () => emptyBucket() ).then( () => this.aws.deleteBucket({Bucket: bucketName}).promise() )
     }
 
     get resourceNotFoundCode() {
-        return 'NotFound'
+        return ['NoSuchBucket', 'NotFound']
     }
 
     updateFromResource(data) {

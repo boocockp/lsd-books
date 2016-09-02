@@ -20,7 +20,8 @@ module.exports = class ObjectInS3 extends AwsResource {
     }
 
     createResource() {
-        return this.aws.createObject({Bucket: this.bucket.name, Key: this.key, Body: this.content}).promise()
+        return this.bucket.create()
+            .then( () => this.aws.putObject({Bucket: this.bucket.name, Key: this.key, Body: this.content}).promise() )
     }
 
     destroyResource() {
@@ -28,7 +29,7 @@ module.exports = class ObjectInS3 extends AwsResource {
     }
 
     get resourceNotFoundCode() {
-        return 'NotFound'
+        return ['NotFound', 'NoSuchBucket']
     }
 
     updateFromResource(data) {

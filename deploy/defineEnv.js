@@ -9,15 +9,15 @@ const {S3UpdateStore} = require('lsd-storage')
 
 function defineEnv(envName) {
     AWS.config.loadFromPath('./awsConfig.json')
-    var awsConfig = JSON.parse(fs.readFileSync('./awsConfig.json', "utf8"))
-    var appConfig = JSON.parse(fs.readFileSync('./appConfig.json', "utf8"))
+    const awsConfig = JSON.parse(fs.readFileSync('./awsConfig.json', "utf8"))
+    const appConfig = JSON.parse(fs.readFileSync('./appConfig.json', "utf8"))
 
     const environment = new Environment("lsdbooks", envName, awsConfig.accountId)
     const {s3, cognito, iam, lambda} = environment
 
     const userArea = S3UpdateStore.defaultUserAreaPrefix, sharedArea = S3UpdateStore.defaultSharedAreaPrefix
     const websiteBucket = s3.bucket("site").forWebsite()
-    const dataBucket = s3.bucket("data").allowCors()
+    const dataBucket = s3.bucket("data").allowCors().archiveOnDestroy(envName === "prod")
     const idPool = cognito.identityPool("idPool", appConfig.googleClientId)
     const userFolder = dataBucket.objectsPrefixed(`${appConfig.appName}/${envName}/${userArea}/${Policy.cognitoIdPlaceholder}`)
     const sharedFolder = dataBucket.objectsPrefixed(`${appConfig.appName}/${envName}/${sharedArea}`)

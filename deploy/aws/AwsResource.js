@@ -83,7 +83,7 @@ module.exports = class AwsResource {
                     this.destroyed = true
                     return this
                 }
-            ).catch(logAndThrow)
+            ).catch(this.checkError.bind(this)).catch(logAndThrow)
         }
 
         let doNotFound = () => {
@@ -103,7 +103,8 @@ module.exports = class AwsResource {
     }
 
     checkError(err) {
-        if (err.code == this.resourceNotFoundCode) {
+        const notFoundCodes = [].concat(this.resourceNotFoundCode)
+        if (notFoundCodes.includes(err.code)) {
             return this
         }
 
