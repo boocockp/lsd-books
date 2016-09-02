@@ -4,7 +4,7 @@
   "version": "0.0.1",
   "scripts": {
     "build": "webpack",
-    "build-dev": "npm update lsd-storage lsd-metadata lsd-observable lsd-views && npm run build && date",
+    "build-dev": "npm update lsd-storage lsd-metadata lsd-observable lsd-views && npm run build && date  && cp -r build/* build_local",
     "build-lambda": "webpack --config webpack.lambda.config.js && (cd build_lambda/promoter && zip -r index.zip .)",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -39,6 +39,7 @@
     "flow-bin": "^0.30.0",
     "fs-readdir-recursive": "^1.0.0",
     "html-webpack-plugin": "^2.22.0",
+    "http-server": "^0.9.0",
     "mime": "^1.3.4",
     "mocha": "^3.0.2",
     "promisify-node": "^0.4.0",
@@ -46,6 +47,7 @@
     "rollup": "^0.34.11",
     "sinon": "^1.17.4",
     "sinon-chai": "^2.8.0",
+    "static-server": "^2.0.3",
     "webpack": "^1.13.1"
   },
   "repository": "http://none",
