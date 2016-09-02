@@ -3,6 +3,7 @@ const AWS = require('aws-sdk'),
 
 const Environment = require('./aws/Environment')
 const S3 = require('./aws/S3')
+const Lambda = require('./aws/Lambda')
 const Policy = require('./aws/Policy')
 const {S3UpdateStore} = require('lsd-storage')
 
@@ -19,6 +20,7 @@ function defineEnv(instanceName) {
     const dataBucket = s3.bucket("data").allowCors().archiveOnDestroy(instanceName === "prod")
     const idPool = cognito.identityPool("idPool", appConfig.googleClientId)
     const userFolder = dataBucket.objectsPrefixed(`${appConfig.appName}/*/${userArea}/${Policy.cognitoIdPlaceholder}`)
+    const allUserFolders = dataBucket.objectsPrefixed(`${appConfig.appName}/*/${userArea}`)
     const sharedFolder = dataBucket.objectsPrefixed(`${appConfig.appName}/*/${sharedArea}`)
     const folderAccessPolicy = iam.policy("userAccess")
         .allow(userFolder, S3.getObject, S3.putObject)
@@ -29,7 +31,11 @@ function defineEnv(instanceName) {
     s3.object(websiteBucket, "config.json", () => config(appConfig, idPool, instanceName), "application/json").dependsOn(idPool)
     s3.folder(websiteBucket, "", "../build")
 
-    // const promoter = lambda.lambdaFunction("promoter", "../build_lambda/promoter/index.zip")
+    const promoterPolicy = iam.policy("promoter")
+        .allow(allUserFolders, S3.getObject, S3.deleteObject)
+        .allow(sharedFolder, S3.getObject, S3.putObject);
+    const promoterRole = iam.role("promoter").trust(Lambda).withPolicies(iam.basicExecution, promoterPolicy);
+    const promoter = lambda.lambdaFunction("promoter", "../build_lambda/promoter/index.zip").withRole(promoterRole).canBeInvokedBy(S3)
 
     return environment
 }

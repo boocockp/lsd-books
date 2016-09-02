@@ -12,6 +12,7 @@ module.exports = class S3 {
     static get awsServiceName() { return "s3.amazonaws.com" }
     static get listBucket() { return "s3:ListBucket" }
     static get getObject() { return "s3:GetObject" }
+    static get deleteObject() { return "s3:DeleteObject" }
     static get putObject() { return "s3:PutObject" }
 
     bucket(name) {

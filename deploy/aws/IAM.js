@@ -7,7 +7,7 @@ module.exports = class IAM {
     constructor(env) {
         this.environment = env;
         this.iam = this.awsService = new AWS.IAM();
-        // this.basicExecution = this.policy("basicExecution").allow(IAM.allLogs, IAM.createLogGroup, IAM.createLogStream, IAM.putLogEvents);
+        this.basicExecution = this.policy("basicExecution").allow(IAM.allLogs, IAM.createLogGroup, IAM.createLogStream, IAM.putLogEvents);
     }
 
     static get allLogs() { return "arn:aws:logs:*:*:*" }

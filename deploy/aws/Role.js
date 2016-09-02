@@ -80,11 +80,15 @@ class Role extends AwsResource {
     }
 
     destroyResource() {
-        const detachPolicy = (policy) => {
-            return this.aws.detachRolePolicy({PolicyArn: policy.arn, RoleName: this.name}).promise()
+        const listPolicyArns = () => {
+            return this.aws.listAttachedRolePolicies({RoleName: this.name}).promise()
+                .then( (data) => data.AttachedPolicies.map( ap => ap.PolicyArn ))
+        }
+        const detachPolicy = (arn) => {
+            return this.aws.detachRolePolicy({PolicyArn: arn, RoleName: this.name}).promise()
         }
 
-        const detachPolicies = Promise.all( this.policies.map(detachPolicy))
+        const detachPolicies = listPolicyArns().then( arns => Promise.all( arns.map( detachPolicy )))
         return detachPolicies.then( () => this.aws.deleteRole({RoleName: this.name}).promise() )
     }
 
