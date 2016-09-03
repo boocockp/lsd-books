@@ -6,6 +6,7 @@ module.exports = class Bucket extends AwsResource {
     constructor(s3, nameInEnv) {
         super(s3, nameInEnv)
         this._statements = []
+        this._lambdaConfigurations = []
     }
 
     get name() {
@@ -54,9 +55,27 @@ module.exports = class Bucket extends AwsResource {
             Effect: "Allow",
             Principal: "*",
             Action: ["s3:GetObject"],
-            Resource:[`${this.arn}/*`]
+            Resource: [`${this.arn}/*`]
         })
         return this
+    }
+
+    notifyLambda(lambdaFunction, event, prefix) {
+        this._lambdaConfigurations.push({
+            Id: `${lambdaFunction.name}_on_${event.replace(/[:*]/g, "")}`,
+            Events: [event],
+            LambdaFunctionArn: lambdaFunction.arn,
+            Filter: {
+                Key: {
+                    FilterRules: [
+                        {
+                            Name: 'prefix',
+                            Value: prefix
+                        },
+                    ]
+                }
+            }
+        })
     }
 
     archiveOnDestroy(onOff = true) {
@@ -76,18 +95,20 @@ module.exports = class Bucket extends AwsResource {
         return this._configurePolicy()
             .then(this._configureCors.bind(this))
             .then(this._configureBucketAsWebsite.bind(this))
+            .then(this._configureLambdaNotifications.bind(this))
     }
 
     destroyResource() {
         const bucketName = this.name, s3 = this.aws
+
         function getBucketKeys() {
             return s3.listObjects({Bucket: bucketName}).promise()
-                .then( (data) => {
+                .then((data) => {
                     if (data.IsTruncated) {
                         throw new Error("More than 1000 keys in bucket " + bucketName)
                     }
-                    return data.Contents.map( c => c.Key )
-                } )
+                    return data.Contents.map(c => c.Key)
+                })
         }
 
         const copyBucket = () => {
@@ -95,11 +116,15 @@ module.exports = class Bucket extends AwsResource {
             const archiveBucketName = `${this.name}-${timestamp}`
             console.log(`Archiving bucket ${this.name} to ${archiveBucketName}`)
             return this.aws.createBucket({Bucket: archiveBucketName}).promise()
-                .then( () => getBucketKeys()
-                    .then( keys => {
+                .then(() => getBucketKeys()
+                    .then(keys => {
                         if (keys.length) {
-                            const copyPromises = keys.map(k => ({Bucket: archiveBucketName, Key: k, CopySource: encodeURI(`${this.name}/${k}`)}))
-                                .map( params => this.aws.copyObject(params).promise())
+                            const copyPromises = keys.map(k => ({
+                                Bucket: archiveBucketName,
+                                Key: k,
+                                CopySource: encodeURI(`${this.name}/${k}`)
+                            }))
+                                .map(params => this.aws.copyObject(params).promise())
                             return Promise.all(copyPromises)
                         } else {
                             return Promise.resolve()
@@ -113,7 +138,7 @@ module.exports = class Bucket extends AwsResource {
 
         function emptyBucket() {
             return getBucketKeys()
-                .then( keys => {
+                .then(keys => {
                     if (keys.length) {
                         const objects = keys.map(k => ({Key: k}));
                         return s3.deleteObjects({Bucket: bucketName, Delete: {Objects: objects}}).promise()
@@ -124,8 +149,7 @@ module.exports = class Bucket extends AwsResource {
         }
 
 
-
-        return copyBucketIfRequired().then( () => emptyBucket() ).then( () => this.aws.deleteBucket({Bucket: bucketName}).promise() )
+        return copyBucketIfRequired().then(() => emptyBucket()).then(() => this.aws.deleteBucket({Bucket: bucketName}).promise())
     }
 
     get resourceNotFoundCode() {
@@ -189,6 +213,21 @@ module.exports = class Bucket extends AwsResource {
                 }
             }
         }).promise()
+    }
+
+    _configureLambdaNotifications() {
+        if (!this._lambdaConfigurations.length) {
+            return Promise.resolve()
+        }
+
+        const params = {
+            Bucket: this.name,
+            NotificationConfiguration: {
+                LambdaFunctionConfigurations: this._lambdaConfigurations
+            }
+        };
+
+        return this.aws.putBucketNotificationConfiguration(params).promise()
     }
 
 

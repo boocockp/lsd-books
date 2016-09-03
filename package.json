@@ -3,9 +3,10 @@
   "description": "reactbooks",
   "version": "0.0.1",
   "scripts": {
+    "update-local": "npm update lsd-storage lsd-metadata lsd-observable lsd-views",
     "build": "webpack",
-    "build-dev": "npm update lsd-storage lsd-metadata lsd-observable lsd-views && npm run build && date  && cp -r build/* build_local",
-    "build-lambda": "webpack --config webpack.lambda.config.js && (cd build_lambda/promoter && zip -r index.zip .)",
+    "build-dev": "npm run update-local && npm run build && date  && cp -r build/* build_local",
+    "build-lambda": "npm run update-local && webpack --config webpack.lambda.config.js && (cd build_lambda/promoter && zip -r index.zip .)",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "dependencies": {

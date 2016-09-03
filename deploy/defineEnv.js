@@ -16,11 +16,13 @@ function defineEnv(instanceName) {
     const {s3, cognito, iam, lambda} = environment
 
     const userArea = S3UpdateStore.defaultUserAreaPrefix, sharedArea = S3UpdateStore.defaultSharedAreaPrefix
+    const allUserAreas = `${appConfig.appName}/*/${userArea}`
     const websiteBucket = s3.bucket("site").forWebsite()
-    const dataBucket = s3.bucket("data").allowCors().archiveOnDestroy(instanceName === "prod")
+    const dataBucket = s3.bucket("data").allowCors()
+        .archiveOnDestroy(instanceName === "prod")
     const idPool = cognito.identityPool("idPool", appConfig.googleClientId)
-    const userFolder = dataBucket.objectsPrefixed(`${appConfig.appName}/*/${userArea}/${Policy.cognitoIdPlaceholder}`)
-    const allUserFolders = dataBucket.objectsPrefixed(`${appConfig.appName}/*/${userArea}`)
+    const userFolder = dataBucket.objectsPrefixed(`${allUserAreas}/${Policy.cognitoIdPlaceholder}`)
+    const allUserFolders = dataBucket.objectsPrefixed(allUserAreas)
     const sharedFolder = dataBucket.objectsPrefixed(`${appConfig.appName}/*/${sharedArea}`)
     const folderAccessPolicy = iam.policy("userAccess")
         .allow(userFolder, S3.getObject, S3.putObject)
@@ -36,6 +38,8 @@ function defineEnv(instanceName) {
         .allow(sharedFolder, S3.getObject, S3.putObject);
     const promoterRole = iam.role("promoter").trust(Lambda).withPolicies(iam.basicExecution, promoterPolicy);
     const promoter = lambda.lambdaFunction("promoter", "../build_lambda/promoter/index.zip").withRole(promoterRole).canBeInvokedBy(S3)
+
+    dataBucket.notifyLambda(promoter, S3.objectCreated, allUserAreas)
 
     return environment
 }

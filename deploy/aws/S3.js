@@ -14,6 +14,7 @@ module.exports = class S3 {
     static get getObject() { return "s3:GetObject" }
     static get deleteObject() { return "s3:DeleteObject" }
     static get putObject() { return "s3:PutObject" }
+    static get objectCreated() { return "s3:ObjectCreated:*" }
 
     bucket(name) {
         return this.environment.add(new Bucket(this, name))

@@ -14,6 +14,7 @@ module.exports = {
         filename: 'index.js',
         libraryTarget: 'commonjs2'
     },
+    target: "node",
     externals: {
         "aws-sdk": true
     },

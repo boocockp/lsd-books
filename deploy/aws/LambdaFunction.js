@@ -61,7 +61,8 @@ module.exports = class LambdaFunction extends AwsResource {
                 Action: Lambda().invoke,
                 FunctionName: this.name,
                 Principal: service,
-                StatementId: `${service.replace(/\./g, '_')}CanInvoke`
+                StatementId: `${service.replace(/\./g, '_')}CanInvoke`,
+                SourceAccount: this.resourceFactory.environment.accountId
             }
             return this.aws.addPermission(params).promise().then( () => this )
         } else {
