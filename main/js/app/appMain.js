@@ -1,7 +1,7 @@
 const React = require('react')
 const ReactDOM = require('react-dom')
-const {LocalStorageUpdateStore, S3UpdateStore, StateController, PersistentStore, CognitoCredentialsSource, JsonUtil} = require('lsd-storage')
-const {GoogleSignin} = require('lsd-views')
+const {LocalStorageUpdateStore, S3UpdateStore, StateController, PersistentStore, CognitoCredentialsSource, JsonUtil, UpdateScheduler} = require('lsd-storage')
+const {GoogleSignin, ActivityTracker} = require('lsd-views')
 const Books = require('../model/Books')
 const App = require('../view/App')
 
@@ -36,6 +36,13 @@ function startApp(instanceConfig) {
     const container = document.getElementById('main')
     const mainElement = React.createElement(App, {appStore: appStore, googleClientId: instanceConfig.clientId})
     const renderedElement = ReactDOM.render(mainElement, container)
+
+    const updater = new UpdateScheduler(5, 20)
+    updater.updateRequired.sendTo(persistentStore.checkForUpdates)
+
+    const activityTracker = new ActivityTracker()
+    activityTracker.uiEvent.sendTo(updater.uiEventReceived)
+    activityTracker.windowEvent.sendTo(updater.windowInUse)
 }
 
 

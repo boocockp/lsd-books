@@ -1,6 +1,12 @@
 To Do
 =====
 
+AWS
+---
+- Separate module
+- Retry operation
+- Bucket - preserve data but update other things - archive and delete with extra setting 
+
 Testing
 -------
 - React component unit tests
