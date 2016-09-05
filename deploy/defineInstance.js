@@ -1,21 +1,16 @@
-const AWS = require('aws-sdk'),
-    fs = require('fs')
+const fs = require('fs')
 
-const Environment = require('./aws/Environment')
-const S3 = require('./aws/S3')
-const Lambda = require('./aws/Lambda')
-const Policy = require('./aws/Policy')
-const {S3UpdateStore} = require('lsd-storage')
+const {Instance, S3, Lambda, Policy, Tools} = require('lsd-aws')
+const Apps = require('../main/js/apps/Apps')
 
-function defineEnv(instanceName) {
-    AWS.config.loadFromPath('./awsConfig.json')
-    const awsConfig = JSON.parse(fs.readFileSync('./awsConfig.json', "utf8"))
+function defineInstance(instanceName) {
+    Tools.configureFromFile('./awsConfig.json')
     const appConfig = JSON.parse(fs.readFileSync('./appConfig.json', "utf8"))
 
-    const environment = new Environment(appConfig.appName, instanceName, awsConfig.accountId)
-    const {s3, cognito, iam, lambda} = environment
+    const instance = new Instance(appConfig.appName, instanceName, Tools.getConfig().accountId)
+    const {s3, cognito, iam, lambda} = instance
 
-    const userArea = S3UpdateStore.defaultUserAreaPrefix, sharedArea = S3UpdateStore.defaultSharedAreaPrefix
+    const userArea = Apps.defaultUserAreaPrefix, sharedArea = Apps.defaultSharedAreaPrefix
     const allUserAreas = `${appConfig.appName}/*/${userArea}`
     const websiteBucket = s3.bucket("site").forWebsite()
     const dataBucket = s3.bucket("data").allowCors()
@@ -41,7 +36,7 @@ function defineEnv(instanceName) {
 
     dataBucket.notifyLambda(promoter, S3.objectCreated, allUserAreas)
 
-    return environment
+    return instance
 }
 
 function config(appConfig, idPool, instanceName) {
@@ -54,19 +49,4 @@ function config(appConfig, idPool, instanceName) {
     return JSON.stringify(conf, null, '  ')
 }
 
-module.exports = defineEnv
-
-
-
-// let emailBucket = s3.bucket("emaildata")
-// const emailFolder = emailBucket.objectsPrefixed(bucketPrefix)
-// emailBucket.allowServiceFromThisAccount(SES.awsServiceName, emailBucket.allObjects, S3.putObject)
-// let receiveEmailPolicy = iam.policy("receiveEmail")
-//     .allow(emailFolder, S3.getObject)
-//     .allow(dataBucket.allObjects, S3.getObject, S3.putObject)
-// let receiveEmailRole = iam.role("receiveEmail").trust(Lambda).withPolicies(iam.basicExecution, receiveEmailPolicy)
-// let receiveEmail = lambda.lambdaFunction("receiveEmail", "../lambda/receiveEmail/build/build.zip").withRole(receiveEmailRole).canBeInvokedBy(SES)
-// let receiptRuleSet = ses.receiptRuleSet('receiveEmail')
-// let receiveEmailRule = ses.receiptRule(receiptRuleSet, 'processEmail')
-//     .withS3Action(emailBucket, bucketPrefix)
-//     .withLambdaAction(receiveEmail)
+module.exports = defineInstance

@@ -3,7 +3,7 @@
   "description": "reactbooks",
   "version": "0.0.1",
   "scripts": {
-    "update-local": "npm update lsd-storage lsd-metadata lsd-observable lsd-views",
+    "update-local": "npm update lsd-storage lsd-metadata lsd-observable lsd-views lsd-aws",
     "build": "webpack",
     "build-dev": "npm run update-local && npm run build && date  && cp -r build/* build_local",
     "build-lambda": "npm run update-local && webpack --config webpack.lambda.config.js && (cd build_lambda/promoter && zip -r index.zip .)",
@@ -41,6 +41,7 @@
     "fs-readdir-recursive": "^1.0.0",
     "html-webpack-plugin": "^2.22.0",
     "http-server": "^0.9.0",
+    "lsd-aws": "file:///Users/paulb/dev/lsd-aws",
     "mime": "^1.3.4",
     "mocha": "^3.0.2",
     "promisify-node": "^0.4.0",

@@ -2,6 +2,7 @@ const React = require('react')
 const ReactDOM = require('react-dom')
 const {LocalStorageUpdateStore, S3UpdateStore, StateController, PersistentStore, CognitoCredentialsSource, JsonUtil, UpdateScheduler} = require('lsd-storage')
 const {GoogleSignin, ActivityTracker} = require('lsd-views')
+const Apps = require('../apps/Apps')
 const Books = require('../model/Books')
 const App = require('../view/App')
 
@@ -20,7 +21,7 @@ function startApp(instanceConfig) {
     const cognitoCredentialsSource = new CognitoCredentialsSource(instanceConfig.identityPoolId)
     googleSigninTracker.signIn.sendTo(cognitoCredentialsSource.signIn)
     const remoteStore = new S3UpdateStore(dataBucketName,
-        S3UpdateStore.defaultUserAreaPrefix, S3UpdateStore.defaultSharedAreaPrefix,
+        Apps.defaultUserAreaPrefix, Apps.defaultSharedAreaPrefix,
         appName, dataSet, cognitoCredentialsSource)
 
     const persistentStore = new PersistentStore(localStore, remoteStore)
