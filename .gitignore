@@ -6,3 +6,5 @@ stuff/
 build/
 build_lambda/
 build_local/
+/deploy/awsConfig.json
+/deploy/appConfig.json

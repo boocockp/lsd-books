@@ -7,12 +7,15 @@ function defineInstance(instanceName) {
     Tools.configureFromFile('./awsConfig.json')
     const appConfig = JSON.parse(fs.readFileSync('./appConfig.json', "utf8"))
 
-    const instance = new Instance(appConfig.appName, instanceName, Tools.getConfig().accountId)
-    const {s3, cognito, iam, lambda} = instance
+    const awsConfig = Tools.getConfig()
+    const instance = new Instance(appConfig.appName, instanceName, awsConfig.accountId, awsConfig.hostedZoneId, appConfig.domain)
+    const {s3, cognito, iam, lambda, route53} = instance
 
     const userArea = Apps.defaultUserAreaPrefix, sharedArea = Apps.defaultSharedAreaPrefix
     const allUserAreas = `${appConfig.appName}/*/${userArea}`
-    const websiteBucket = s3.bucket("site").forWebsite()
+    const websiteHostName = `${instanceName}.${appConfig.domain}`
+    const websiteBucket = s3.bucket().forWebsite(websiteHostName)
+    route53.dnsRecord("A", websiteHostName, websiteBucket)
     const dataBucket = s3.bucket("data").allowCors()
         .archiveOnDestroy(instanceName === "prod")
     const idPool = cognito.identityPool("idPool", appConfig.googleClientId)
