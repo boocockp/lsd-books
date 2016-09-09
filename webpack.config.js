@@ -16,7 +16,6 @@ module.exports = {
     entry: {
         appMain: path.resolve(dir_js, 'app/appMain.js'),
         vendor: vendorDependencies,
-        // vendor: ['react', 'moment', 'lodash', 'react-bootstrap'],
     },
     output: {
         path: dir_build,
@@ -53,10 +52,5 @@ module.exports = {
         ]),
         new webpack.PrefetchPlugin('./node_modules/react-bootstrap/lib/PageItem.js'),
         new webpack.optimize.CommonsChunkPlugin({ names: ['vendor', 'manifest']}),
-    ],
-    // Create Sourcemaps for the bundle
-    // devtool: 'source-map',
-    devServer: {
-        contentBase: dir_build,
-    },
+    ]
 };

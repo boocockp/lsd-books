@@ -57,13 +57,13 @@ describe("LSD Books", function () {
     }
 
     function clearData(dataSet) {
-        localStorage.removeItem(`reactbooks.${dataSet}.actions`)
-        localStorage.removeItem(`reactbooks.${dataSet}.updates`)
+        localStorage.removeItem(`lsdbooks.${dataSet}.actions`)
+        localStorage.removeItem(`lsdbooks.${dataSet}.updates`)
     }
 
     function navigate(...pathElements) {
         const ideaSecurityCode = location.search.substr(1).split(/&/).find(it => it.match(/^_ijt=/))
-        const appUrl = `${location.origin}/reactbooks/build/index.html?dataSet=${dataSet}&${ideaSecurityCode}#`
+        const appUrl = `${location.origin}/lsdbooks/build/index.html?dataSet=${dataSet}&${ideaSecurityCode}#`
         const fullUrl = appUrl + "/" + pathElements.join("/")
         return new Promise(function (resolve, reject) {
             if (appFrame.src.startsWith(appUrl)) {

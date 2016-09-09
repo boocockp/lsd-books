@@ -1,4 +1,3 @@
-var CopyWebpackPlugin = require('copy-webpack-plugin')
 var webpack = require("webpack")
 var path = require('path')
 
@@ -33,7 +32,5 @@ module.exports = {
         ]
     },
     plugins: [
-        // new webpack.PrefetchPlugin('./node_modules/react-bootstrap/lib/PageItem.js'),
-        // new webpack.optimize.CommonsChunkPlugin({ names: ['vendor', 'manifest']}),
     ],
 };

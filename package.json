@@ -1,7 +1,8 @@
 {
-  "name": "reactbooks",
-  "description": "reactbooks",
-  "version": "0.0.1",
+  "name": "lsd-books",
+  "description": "A simple but usable bookkeeping application built with the Lightweight Software Development (LSD) approach",
+  "author": "Paul Boocock <paulb@ashridgetech.com>",
+  "version": "0.1.0",
   "scripts": {
     "update-local": "npm update lsd-storage lsd-metadata lsd-observable lsd-views lsd-aws",
     "build": "webpack",
@@ -13,10 +14,10 @@
     "bootstrap": "^3.3.7",
     "immutable": "^3.8.1",
     "lodash": "^4.14.1",
-    "lsd-metadata": "file:///Users/paulb/dev/lsd-metadata",
-    "lsd-observable": "file:///Users/paulb/dev/lsd-observable",
-    "lsd-storage": "file:///Users/paulb/dev/lsd-storage",
-    "lsd-views": "file:///Users/paulb/dev/lsd-views",
+    "lsd-metadata": "^0.1.1",
+    "lsd-observable": "^0.1.1",
+    "lsd-storage": "^0.1.1",
+    "lsd-views": "^0.1.0",
     "moment": "^2.14.1",
     "node-uuid": "^1.4.7",
     "react": "^15.2.1",
@@ -38,20 +39,16 @@
     "chai-subset": "^1.2.2",
     "copy-webpack-plugin": "^3.0.1",
     "flow-bin": "^0.30.0",
-    "fs-readdir-recursive": "^1.0.0",
-    "html-webpack-plugin": "^2.22.0",
     "http-server": "^0.9.0",
-    "lsd-aws": "file:///Users/paulb/dev/lsd-aws",
-    "mime": "^1.3.4",
+    "lsd-aws": "^0.1.1",
     "mocha": "^3.0.2",
-    "promisify-node": "^0.4.0",
-    "rm-local-modules": "0.0.1",
-    "rollup": "^0.34.11",
     "sinon": "^1.17.4",
     "sinon-chai": "^2.8.0",
-    "static-server": "^2.0.3",
     "webpack": "^1.13.1"
   },
-  "repository": "http://none",
-  "license": "UNLICENSED"
+  "repository": {
+    "type": "git",
+    "url": " https://github.com/lightweight-software-development/lsd-books.git"
+  },
+  "license": "MIT"
 }

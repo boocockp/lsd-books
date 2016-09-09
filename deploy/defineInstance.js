@@ -13,6 +13,7 @@ function defineInstance(instanceName) {
 
     const userArea = Apps.defaultUserAreaPrefix, sharedArea = Apps.defaultSharedAreaPrefix
     const allUserAreas = `${appConfig.appName}/*/${userArea}`
+    const mainDataSetUserAreas = `${appConfig.appName}/main/${userArea}`
     const websiteHostName = `${instanceName}.${appConfig.domain}`
     const websiteBucket = s3.bucket().forWebsite(websiteHostName)
     route53.dnsRecord("A", websiteHostName, websiteBucket)
@@ -37,7 +38,7 @@ function defineInstance(instanceName) {
     const promoterRole = iam.role("promoter").trust(Lambda).withPolicies(iam.basicExecution, promoterPolicy);
     const promoter = lambda.lambdaFunction("promoter", "../build_lambda/promoter/index.zip").withRole(promoterRole).canBeInvokedBy(S3)
 
-    dataBucket.notifyLambda(promoter, S3.objectCreated, allUserAreas)
+    dataBucket.notifyLambda(promoter, S3.objectCreated, mainDataSetUserAreas)
 
     return instance
 }
